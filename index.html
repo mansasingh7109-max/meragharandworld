@@ -21,7 +21,7 @@
   font-family: "Optimistic Mono", ui-monospace, monospace;
 }
 </style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Restro Apka</title>
+<title>mera ghar and world</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
@@ -189,7 +189,7 @@ profileShape: "round", // OPTION: "square"=chaukor, "round"=gol photo
 profilePos: "footer", // OPTION: "footer"=sabse neeche, "header"=sabse upar, "top"=upar, "left"=left, "right"=right, "center"=beech
 profileAlign: "center", // OPTION: "left"=box left me, "center"=box beech me, "right"=box right me (har position me kaam karega)
 profileSize: "1000", // OPTION: box ki chaudai pixels me: "320"=normal, "500"=bada, "800"=bahut bada (koi limit nahi, jitna chaho)
-profilePhotoSize: "100", // OPTION: photo ka size pixels me: "80"=normal, "120"=badi photo, "200"=bahut badi (koi limit nahi)
+profilePhotoSize: "80", // OPTION: photo ka size pixels me: "80"=normal, "120"=badi photo, "200"=bahut badi (koi limit nahi)
 profilePhotoAlign: "right", // OPTION: photo kis side: "left"=photo left me, "center"=photo beech me, "right"=photo right me
 profilePhoto2: "", // OPTION: extra photo 1 ka link - "Photos Dekho" button se alag page par dikhegi
 profilePhoto3: "", // OPTION: extra photo 2 ka link
@@ -206,7 +206,7 @@ profileChatText: "Chat Karo", // OPTION: chat button ka text
 profileChatNumber: "918769171078", // OPTION: WhatsApp number (country code ke saath)
 // ===== FRIENDS / TEAM / CAST (unlimited dost add karo) =====
 friendsOn: "on", // OPTION: "on"=friends section dikhega, "off"=gayab
-friendChatOn: "on", // OPTION: "on"=har dost ke naam ke paas chat button, "off"=gayab
+friendChatOn: "off", // OPTION: "on"=har dost ke naam ke paas chat button, "off"=gayab
 friendChatText: "💬 Chat", // OPTION: chat button ka text
 friendsTitle: "Hamare Dost", // OPTION: section ka title
 friendCount: "5000", // OPTION: kitne dost dikhenge (koi limit nahi)
@@ -269,14 +269,14 @@ friend6Chat: "", // OPTION: dost 6 ka WhatsApp number (khali = chat button nahi)
 };
 </script>
 <header id="hdr">
-<div id="brand">Restro Apka</div>
+<div id="brand">mera ghar and world</div>
 <nav id="nav">
 <a id="mH" href="#">Home</a><a id="mM" href="#items">Menu</a><a id="mO" href="#">Orders</a><a id="mC" href="#ftr">Contact</a>
 </nav></header>
 <div id="profileHead"></div>
 <section id="hero"><div id="heroIn">
-<h1>Barfi Special</h1>
-<p>30-min delivery in Pilibanga | taaza barfi, har roz</p>
+<h1>home Special</h1>
+<p>hello</p>
 <a id="ordBtn" class="btn2" href="https://wa.me/918769171078">Order on WhatsApp</a>
 </div></section>
 <div id="profileTop"></div>
@@ -287,7 +287,7 @@ friend6Chat: "", // OPTION: dost 6 ka WhatsApp number (khali = chat button nahi)
 <footer id="ftr">
 <b>Restro Apka</b> | Pilibanga<br><br>
 <a class="btn2" href="https://wa.me/918769171078">WhatsApp: 8769171078</a><br><br>
-<span style="font-size:12px">restroforyou.web.app</span>
+<span style="font-size:12px">meragharandworld.web.app</span>
 <div id="profile"></div>
 </footer>
 <script>
@@ -368,7 +368,7 @@ var _pi=2;
 while(1){var _pp=OPT['profilePhoto'+_pi];if(_pp===undefined)break;if(_pp&&_pp!=="")_xPhotos.push(_pp);_pi++;if(_pi>100)break;}
 var _sp=ph||"👩";
 var phHtml;
-if(_sp.indexOf("http")===0){phHtml='<div style="display:flex;justify-content:'+(_palg==="left"?"flex-start":_palg==="right"?"flex-end":"center")+'"><img src="'+_sp+'" style="width:'+_psz+'px;height:'+_psz+'px;object-fit:cover;border-radius:'+(OPT.profileShape==="square"?"8px":"50%")+'"></div>';}
+if(_sp.indexOf("http")===0||_sp.indexOf("data:")===0){phHtml='<div style="display:flex;justify-content:'+(_palg==="left"?"flex-start":_palg==="right"?"flex-end":"center")+'"><img src="'+_sp+'" style="width:'+_psz+'px;height:'+_psz+'px;object-fit:cover;border-radius:'+(OPT.profileShape==="square"?"8px":"50%")+'"></div>';}
 else{phHtml='<div style="width:'+_psz+'px;height:'+_psz+'px;background:#ffcc80;border-radius:'+(OPT.profileShape==="square"?"8px":"50%")+';display:flex;align-items:center;justify-content:center;font-size:'+Math.round(_psz/1.8)+'px;margin:'+_pm+'">'+_sp+'</div>';}
 // Extra images ka button - alag full page gallery kholega
 if(_xPhotos.length>0){
@@ -403,6 +403,7 @@ if(OPT.profileChatOn==="on"){var _cn=OPT.profileChatNumber||"918769171078";cardH
 // EDIT MY PROFILE BUTTON (customer khud edit kare)
 if(OPT.customerEditOn==="on"){cardHtml+='<div style="margin-top:12px;"><button id="custEditBtn" style="background:#e65100;color:#fff;border:none;padding:10px 28px;border-radius:24px;font-weight:bold;font-size:14px;">✏️ Mera Profile Edit Karo</button></div>';}
 cardHtml+='<div style="margin-top:10px;"><button class="cardPreviewBtn" onclick="event.stopPropagation();if(window._openPfPage)window._openPfPage();" style="background:#7b1fa2;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">👁️ Preview Dekho (full data)</button></div>';
+cardHtml+='<div style="margin-top:8px;"><button onclick="event.stopPropagation();try{localStorage.removeItem("customer_profile");localStorage.removeItem("customer_details");localStorage.removeItem("customer_thinkings");localStorage.removeItem("pfmsgs_customer1");localStorage.removeItem("diary_customer1");}catch(e){}try{if(window._fbDb){var _lc=(typeof OPT!=="undefined"&&OPT.customerId)||"customer1";_fbDb.ref("customer_profiles/"+_lc).remove();_fbDb.ref("customer_details/"+_lc).remove();_fbDb.ref("customer_thinkings/"+_lc).remove();}}catch(e){}alert("Logout ho gaya! Sab data clear!");setTimeout(function(){location.reload();},600);" style="background:#f44336;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:13px;width:100%;">🚪 Logout</button></div>';
 cardHtml+='</div>';
 var wrapHtml='<div style="display:flex;justify-content:'+jf+';padding:12px 20px;">'+cardHtml+'</div>';
 if(pos==="footer"){document.getElementById('profile').innerHTML='<div style="display:flex;justify-content:'+jf+';margin-top:16px;">'+cardHtml+'</div>';}
@@ -443,7 +444,7 @@ if(OPT.profileDetail)h+='<div style="margin-top:16px;background:#fff;padding:16p
 (function(){var _cid=OPT.customerId||"customer1";
 function _drawDT(arr){var box=document.getElementById('pfDetailTimeline');if(!box)return;var h='';
 if(arr.length===0&&OPT.profileDetail)h='<div style="font-size:15px;color:#555;line-height:1.7;">'+OPT.profileDetail+'</div>';
-arr.sort(function(a,b){return a.date>b.date?-1:1;});
+arr.sort(function(a,b){var _ad=(a.date||'')+''+(a.time||'');var _bd=(b.date||'')+''+(b.time||'');return _ad>_bd?-1:_ad<_bd?1:0;});
 for(var q=0;q<arr.length;q++){var e=arr[q];var _td=_todayL();
 var tag=e.date<_td?'📌':e.date===_td?'🟢':'🔮';
 h+='<div style="background:#fff;border:1px solid #ffe0b2;border-radius:10px;padding:12px;margin-bottom:8px;"><b style="font-size:12px;color:#e65100;">'+tag+' 📅 '+_fmtDate(e.date)+'</b><div style="font-size:14px;color:#333;margin-top:6px;line-height:1.6;">'+e.text+'</div>';
@@ -459,7 +460,7 @@ if(OPT.profileThinking||true)h+='<div style="margin-top:12px;background:#fff8e1;
 (function(){var _cid2=OPT.customerId||"customer1";
 function _drawTT(arr){var box=document.getElementById('pfThinkTimeline');if(!box)return;var h='';
 if(arr.length===0&&OPT.profileThinking)h='<div style="font-size:15px;color:#555;line-height:1.7;">'+OPT.profileThinking+'</div>';
-arr.sort(function(a,b){return a.date>b.date?-1:1;});
+arr.sort(function(a,b){var _ad=(a.date||'')+''+(a.time||'');var _bd=(b.date||'')+''+(b.time||'');return _ad>_bd?-1:_ad<_bd?1:0;});
 for(var q=0;q<arr.length;q++){var e=arr[q];var _td=_todayL();
 var tag=e.date<_td?'📌':e.date===_td?'🟢':'🔮';
 h+='<div style="background:#fff;border:1px solid #ffe082;border-radius:10px;padding:12px;margin-bottom:8px;"><b style="font-size:12px;color:#f57f00;">'+tag+' 📅 '+_fmtDate(e.date)+'</b><div style="font-size:14px;color:#333;margin-top:6px;line-height:1.6;">'+e.text+'</div>';
@@ -467,17 +468,21 @@ if(e.photo)h+='<img src="'+e.photo+'" style="width:100%;border-radius:8px;margin
 if(e.video)h+='<video src="'+e.video+'" controls style="width:100%;border-radius:8px;margin-top:8px;cursor:pointer;" onclick="window._openLightbox(this.src)"></video>';
 h+='</div>';}
 box.innerHTML=h;}
-if(window._fbDb){_fbDb.ref("customer_thinkings/"+_cid2).on("value",function(sn){var a=sn.val()||[];_drawTT(a);});}
-else{try{var a=JSON.parse(localStorage.getItem("customer_thinkings")||"[]");_drawTT(a);}catch(e){_drawTT([]);}}
+function _loadT(){try{var a=JSON.parse(localStorage.getItem("customer_thinkings")||"[]");if(a.length>0)_drawTT(a);}catch(e){}}
+if(window._fbDb){_fbDb.ref("customer_thinkings/"+_cid2).on("value",function(sn){var a=sn.val()||[];if(a.length>0)_drawTT(a);else _loadT();});}
+else{_loadT();}
 })();
 // Message + Chat + Edit buttons
 if(OPT.profileMsgOn==="on")h+='<div style="margin-top:16px;"><button id="pfFullMsg" style="background:#25D366;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">📩 Message Bhejo</button></div>';
 if(OPT.profileChatOn==="on"){var _cn=OPT.profileChatNumber||"918769171078";h+='<div style="margin-top:10px;"><a href="https://wa.me/'+_cn+'" style="display:block;background:#25D366;color:#fff;font-weight:bold;padding:12px;border-radius:24px;text-decoration:none;font-size:16px;">💬 '+(OPT.profileChatText||"Chat Karo")+'</a></div>';}
 if(OPT.customerEditOn==="on")h+='<div style="margin-top:10px;"><button id="pfFullEdit" style="background:#e65100;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">✏️ Mera Profile Edit Karo</button></div>';
+h+='<div style="margin-top:10px;"><button id="pfFullLogout" style="background:#f44336;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">🚪 Logout</button></div>';
 h+='<div style="height:30px;"></div></div>';
 pp.innerHTML=h;
 pp.style.display="block";document.body.style.overflow="hidden";
 document.getElementById('pfFullBack').addEventListener('click',function(){pp.style.display="none";document.body.style.overflow="";});
+var _plo=document.getElementById('pfFullLogout');
+if(_plo)_plo.addEventListener('click',function(){if(!confirm("Logout karein? Sab data clear ho jayega!"))return;try{localStorage.removeItem('customer_profile');localStorage.removeItem('customer_details');localStorage.removeItem('customer_thinkings');localStorage.removeItem('pfmsgs_customer1');localStorage.removeItem('diary_customer1');}catch(e){}try{if(window._fbDb){var _lc=(OPT&&OPT.customerId)||'customer1';_fbDb.ref('customer_profiles/'+_lc).remove();_fbDb.ref('customer_details/'+_lc).remove();_fbDb.ref('customer_thinkings/'+_lc).remove();}}catch(e){}alert('Logout ho gaya!');location.reload();});
 var _fm=document.getElementById('pfFullMsg');
 if(_fm)_fm.addEventListener('click',function(){pp.style.display="none";document.body.style.overflow="";var _m=document.getElementById('pfMsgText');if(_m)_m.focus();window.scrollTo(0,document.body.scrollHeight);});
 var _fe=document.getElementById('pfFullEdit');
@@ -495,6 +500,7 @@ if(e.target.closest('button')||e.target.closest('a')||e.target.closest('input')|
 _openPfPage();});
 // "Poora dekho" hint add
 if(!c.querySelector('.pfHint')){var hint=document.createElement('div');hint.className='pfHint';hint.style.cssText='font-size:11px;color:#999;margin-top:8px;';hint.textContent='👆 Tap karo - poora profile dekho';c.appendChild(hint);}
+if(!c.querySelector('.pfPrevBtn')){var pb=document.createElement('button');pb.className='pfPrevBtn';pb.style.cssText='background:#7b1fa2;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:13px;margin-top:8px;width:100%;';pb.textContent='👁️ Preview Dekho';pb.addEventListener('click',function(e){e.stopPropagation();if(window._openPfPage)window._openPfPage();});c.appendChild(pb);}
 // Card me Detail/Thinking latest entries dikhao
 (function(){
 function _fd(d){try{var p=d.split("-");var mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return p[2].replace(/^0/,"")+" "+mn[parseInt(p[1])-1];}catch(e){return d;}}
@@ -502,7 +508,7 @@ function _loadCardTL(){
 var cid=OPT.customerId||"customer1";
 function drawD(arr){
 document.querySelectorAll('.cardDetailTL').forEach(function(box){
-var h='';arr.sort(function(a,b){return a.date>b.date?-1:1;});
+var h='';arr.sort(function(a,b){var _ad=(a.date||'')+''+(a.time||'');var _bd=(b.date||'')+''+(b.time||'');return _ad>_bd?-1:_ad<_bd?1:0;});
 var show=arr.slice(0,2);
 for(var q=0;q<show.length;q++){var e=show[q];
 h+='<div style="background:#fff3e0;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;"><b style="color:#e65100;">📝 '+_fd(e.date)+'</b> <span style="color:#555;">'+(e.text?e.text.substring(0,60):'')+'</span>'+(e.photo?' 📸':'')+(e.video?' 🎥':'')+'</div>';}
@@ -511,7 +517,7 @@ if(arr.length===0&&OPT.profileDetail)h='<div style="font-size:12px;color:#666;">
 box.innerHTML=h;});}
 function drawT(arr){
 document.querySelectorAll('.cardThinkTL').forEach(function(box){
-var h='';arr.sort(function(a,b){return a.date>b.date?-1:1;});
+var h='';arr.sort(function(a,b){var _ad=(a.date||'')+''+(a.time||'');var _bd=(b.date||'')+''+(b.time||'');return _ad>_bd?-1:_ad<_bd?1:0;});
 var show=arr.slice(0,2);
 for(var q=0;q<show.length;q++){var e=show[q];
 h+='<div style="background:#fff8e1;border-left:3px solid #ffc107;border-radius:0 8px 8px 0;padding:8px 10px;margin-bottom:6px;font-size:12px;"><b style="color:#f57f00;">💭 '+_fd(e.date)+'</b> <span style="color:#555;">'+(e.text?e.text.substring(0,60):'')+'</span>'+(e.photo?' 📸':'')+(e.video?' 🎥':'')+'</div>';}
@@ -583,7 +589,7 @@ if(!confirm("Ye entry delete karein?"))return;var id=b.getAttribute('data-id');
 if(window._fbDb){_fbDb.ref("customer_diary/"+cid+"/"+id).remove();}
 else{_entries=_entries.filter(function(e){return e._id!==id;});try{localStorage.setItem("diary_"+cid,JSON.stringify(_entries));}catch(e){}_renderDiary();}});});}
 // Compress image
-function _compImg(file,cb){var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var c=document.createElement('canvas');var w=img.width,h=img.height,mx=800;if(w>mx||h>mx){var r=Math.min(mx/w,mx/h);w=Math.round(w*r);h=Math.round(h*r);}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.7));};img.src=rd.result;};rd.readAsDataURL(file);}
+function _compImg(file,cb){var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var c=document.createElement('canvas');var w=img.width,h=img.height,mx=800;if(w>mx||h>mx){var r=Math.min(mx/w,mx/h);w=Math.round(w*r);h=Math.round(h*r);}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.6));};img.src=rd.result;};rd.readAsDataURL(file);}
 // Events
 document.getElementById('diaryBack').addEventListener('click',function(){dp.style.display="none";document.body.style.overflow="";});
 document.getElementById('diarySearchBtn').addEventListener('click',function(){_filterDate=document.getElementById('diaryDateSearch').value;_renderDiary();});
@@ -655,14 +661,14 @@ _loadPfMsgs();
 if(canEdit){document.getElementById('pfMsgAdd').addEventListener('click',_showPfMsgForm);}};
 function _todayL(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0');}
 function _loadPfMsgs(){
+function _loadPfL(){var arr=[];try{var v=localStorage.getItem("pfmsgs_"+cid);arr=v?JSON.parse(v):[];}catch(e){}
+arr.sort(function(a,b){var _ad=(a.date||'')+''+(a.time||'');var _bd=(b.date||'')+''+(b.time||'');return _ad>_bd?-1:_ad<_bd?1:0;});if(arr.length>0)_drawPfMsgs(arr);}
 if(window._fbDb){
 _fbDb.ref("profile_messages/"+cid).on("value",function(snap){
 var arr=[];snap.forEach(function(c){var v=c.val();v._id=c.key;arr.push(v);});
-arr.sort(function(a,b){return a.date>b.date?-1:1;});
-_drawPfMsgs(arr);});}
-else{var arr=[];try{var v=localStorage.getItem("pfmsgs_"+cid);arr=v?JSON.parse(v):[];}catch(e){}
-arr.sort(function(a,b){return a.date>b.date?-1:1;});
-_drawPfMsgs(arr);}}
+arr.sort(function(a,b){var _ad=(a.date||'')+''+(a.time||'');var _bd=(b.date||'')+''+(b.time||'');return _ad>_bd?-1:_ad<_bd?1:0;});
+if(arr.length>0)_drawPfMsgs(arr);else _loadPfL();});}
+else{_loadPfL();}}
 function _fmtDate(ds){try{var p=ds.split("-");var mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return p[2].replace(/^0/,"")+" "+mn[parseInt(p[1])-1]+" "+p[0];}catch(e){return ds;}}
 function _drawPfMsgs(arr){
 var box=document.getElementById('pfMsgList');if(!box)return;
@@ -709,7 +715,7 @@ document.getElementById('pfmCancel').addEventListener('click',function(){ov.remo
 // Photo/Video upload handlers
 document.getElementById('pfmPhotoBtn').addEventListener('click',function(){document.getElementById('pfmPhotoFile').click();});
 document.getElementById('pfmPhotoFile').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;
-var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var c=document.createElement('canvas');var w=img.width,h=img.height,mx=800;if(w>mx||h>mx){var r=Math.min(mx/w,mx/h);w=Math.round(w*r);h=Math.round(h*r);}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);var dt=c.toDataURL('image/jpeg',0.7);var p=document.getElementById('pfmPhotoPrev');p.src=dt;p.style.display='block';p.dataset.val=dt;};img.src=rd.result;};rd.readAsDataURL(f);e.target.value='';});
+var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var c=document.createElement('canvas');var w=img.width,h=img.height,mx=800;if(w>mx||h>mx){var r=Math.min(mx/w,mx/h);w=Math.round(w*r);h=Math.round(h*r);}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);var dt=c.toDataURL('image/jpeg',0.6);var p=document.getElementById('pfmPhotoPrev');p.src=dt;p.style.display='block';p.dataset.val=dt;};img.src=rd.result;};rd.readAsDataURL(f);e.target.value='';});
 document.getElementById('pfmVideoBtn').addEventListener('click',function(){document.getElementById('pfmVideoFile').click();});
 document.getElementById('pfmVideoFile').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;
 if(f.size>8*1024*1024){alert('Video 8MB se chhota hona chahiye');return;}
@@ -873,10 +879,8 @@ d.profileName=document.getElementById('ceName').value;
 d.profilePhone=document.getElementById('cePhone').value;
 d.customerStatus=document.getElementById('ceStatus').value;
 // Detail/Thinking entries save (localStorage + Firebase)
-try{localStorage.setItem("customer_details",JSON.stringify(_ceDetails));}
-catch(e){alert("⚠️ Detail me photo/video bahut bada hai! Chhota karo.");return;}
-try{localStorage.setItem("customer_thinkings",JSON.stringify(_ceThinks));}
-catch(e){alert("⚠️ Thinking me photo/video bahut bada hai! Chhota karo.");return;}
+try{localStorage.setItem("customer_details",JSON.stringify(_ceDetails));}catch(e){}
+try{localStorage.setItem("customer_thinkings",JSON.stringify(_ceThinks));}catch(e){}
 // Purane single fields bhi rakho (pehli entry ka text)
 d.profileDetail=_ceDetails.length>0?_ceDetails[0].text:"";
 d.profileThinking=_ceThinks.length>0?_ceThinks[0].text:"";
@@ -886,7 +890,7 @@ if(pv.dataset.val){d.profilePhoto=pv.dataset.val;}
 else if(pv.style.display!=="none"&&pv.src){d.profilePhoto=pv.src;}
 for(var q=2;q<=15;q++){d['profilePhoto'+q]=_cePhotos[q-2]||"";}
 try{localStorage.setItem("customer_profile",JSON.stringify(d));}
-catch(e){alert("⚠️ Photo bahut badi hai! Chhoti photo use karo ya kuch photos hatao. ("+e.message+")");return;}
+catch(e){alert("⚠️ Photo bahut badi hai! Chhoti photo use karo. ("+e.message+")");return;}
 var cid=OPT.customerId||"customer1";
 if(window._fbDb){try{
 // Detail/Thinking entries bhi Firebase me
@@ -914,7 +918,7 @@ var fst=OPT['friend'+fi+'Status']||"";var fth=OPT['friend'+fi+'Thinking']||"";
 var finfo=OPT['friend'+fi+'Info']||"";var fch=OPT['friend'+fi+'Chat']||"";
 window._FR[fi]={photo:fp,name:fn,role:fr,detail:fd,link:fl,status:fst,thinking:fth,info:finfo,chat:fch};
 var fph;
-if(fp.indexOf("http")===0){fph='<img src="'+fp+'" style="width:70px;height:70px;object-fit:cover;border-radius:50%;margin:0 auto;display:block">';}
+if(fp.indexOf("http")===0||fp.indexOf("data:")===0){fph='<img src="'+fp+'" style="width:70px;height:70px;object-fit:cover;border-radius:50%;margin:0 auto;display:block">';}
 else{fph='<div style="width:70px;height:70px;background:#ffe0b2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto">'+fp+'</div>';}
 var chatBtn='';
 if(_chatOn&&fch){chatBtn='<button class="frChatBtn" data-fi="'+fi+'" style="background:#25D366;color:#fff;border:none;padding:8px 18px;border-radius:20px;font-weight:bold;font-size:13px;margin-top:8px;">'+(OPT.friendChatText||"\uD83D\uDCAC Chat")+'</button>';}
@@ -970,7 +974,7 @@ function _esc(t){return String(t).replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function _openPage(f){var d=window._FR[f];if(!d)return;
 document.getElementById('frPageTitle').textContent=d.name;
 var mp=d.photo,mph;
-if(mp.indexOf("http")===0){mph='<img src="'+mp+'" style="width:130px;height:130px;object-fit:cover;border-radius:50%;margin:0 auto;display:block;border:4px solid #ffcc80;">';}
+if(mp.indexOf("http")===0||mp.indexOf("data:")===0){mph='<img src="'+mp+'" style="width:130px;height:130px;object-fit:cover;border-radius:50%;margin:0 auto;display:block;border:4px solid #ffcc80;">';}
 else{mph='<div style="width:130px;height:130px;background:#ffe0b2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:64px;margin:0 auto;border:4px solid #ffcc80;">'+mp+'</div>';}
 var bh='<div style="text-align:center;">'+mph;
 bh+='<div style="font-size:24px;font-weight:bold;margin-top:12px;color:#333">'+d.name+'</div>';
