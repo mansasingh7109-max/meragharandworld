@@ -51,24 +51,23 @@ body{background:linear-gradient(135deg,#ff7043,#e65100);min-height:100vh;display
 <p>mera ghar and world</p>
 <div class="status" id="st"></div>
 <div id="setSec" style="display:none;">
-<div style="background:#e3f2fd;border-radius:10px;padding:12px;margin-bottom:16px;">
-<div style="font-size:18px;font-weight:bold;color:#1565c0;">🔐 Apna PIN Set Karo</div>
-<div style="font-size:12px;color:#666;margin-top:4px;">Pehli baar hai! Neeche apni details bharo</div>
-</div>
-<p>🔢 PIN banao (4-digit):</p>
-<input type="password" id="newPin" class="pin-inp" maxlength="4" inputmode="numeric" placeholder="jaise: 1234">
-<p style="font-size:13px;">🔑 Password likho:</p>
+<p>Pehli baar! Apni details bharo:</p>
+<p style="font-size:13px;">👤 Username (aapka naam):</p>
+<input type="text" id="uname" placeholder="jaise: Manisha">
+<p style="font-size:13px;">🔢 PIN banao (4-digit):</p>
+<input type="password" id="newPin" class="pin-inp" maxlength="4" inputmode="numeric" placeholder="....">
+<p style="font-size:13px;">Password likho:</p>
 <input type="text" id="pwd" placeholder="jaise: meri billi">
-<p style="font-size:13px;">📱 Mobile number likho:</p>
-<input type="tel" id="mob" maxlength="10" inputmode="numeric" placeholder="jaise: 0000000000">
-<p style="font-size:13px;">📧 Email ID likho:</p>
-<input type="email" id="eml" placeholder="jaise: aapka@email.com">
-<button class="btn btn-set" onclick="setPin()">Save</button>
+<p style="font-size:13px;">📱 Mobile number:</p>
+<input type="tel" id="mob" maxlength="10" inputmode="numeric" placeholder="10-digit mobile">
+<p style="font-size:13px;">📧 Email ID:</p>
+<input type="email" id="eml" placeholder="aapka@email.com">
+<button class="btn btn-set" onclick="setPin()">PIN Set Karo</button>
 <div class="warn">⚠️ <b>Remember your PIN & Password!</b><br>📝 <b>Kahin NOTE karke rakho</b> (diary/copy me)!<br>❌ Bhool gaye to RESET karna padega!<br>🗑️ Reset par <b>SARA DATA</b> (photo, message) <b>mit jayega!</b></div>
 </div>
 <div id="loginSec" style="display:none;">
 <p>Apna PIN likho:</p>
-<input type="password" id="pin" class="pin-inp" maxlength="4" inputmode="numeric" placeholder="apna PIN likho">
+<input type="password" id="pin" class="pin-inp" maxlength="4" inputmode="numeric" placeholder="....">
 <button class="btn btn-login" onclick="doLogin()">Login</button>
 <button class="btn btn-back" onclick="forgotPin()" style="color:#f44336;">PIN Bhool Gaye?</button>
 <button class="btn btn-back" onclick="masterReset()" style="color:#999;font-size:13px;">Sab Reset Karo</button>
@@ -79,12 +78,13 @@ body{background:linear-gradient(135deg,#ff7043,#e65100);min-height:100vh;display
 </div>
 <div class="msg" id="msg"></div>
 <button class="btn btn-back" onclick="location.href='index.html'" style="margin-top:10px;">Wapas</button>
+<div style="background:#e8f5e9;border-radius:10px;padding:10px;font-size:12px;color:#2e7d32;margin-top:12px;text-align:left;">🔒 <b>Safe hai!</b><br>PIN/Password <b>code me chhupa</b> kar save hota hai.<br>Koi aasani se nahi dekh payega!</div>
 </div>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
-// ===== FIREBASE CONFIG - API keys yahan bharo =====
-var FIREBASE_CONFIG = {
+// ===== FIREBASE CONFIG - Yahan apni keys bharo =====
+const firebaseConfig = {
   apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
   authDomain: "santramarketshoppingmall.firebaseapp.com",
   databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
@@ -96,8 +96,8 @@ var FIREBASE_CONFIG = {
 };
 var _fbDb = null;
 try {
-  if (FIREBASE_CONFIG.apiKey !== "TUMHARI_API_KEY") {
-    firebase.initializeApp(FIREBASE_CONFIG);
+  if (firebaseConfig.apiKey !== "TUMHARI_API_KEY_YAHAN") {
+    firebase.initializeApp(firebaseConfig);
     _fbDb = firebase.database();
   }
 } catch(e) {}
@@ -114,9 +114,8 @@ document.getElementById('setSec').style.display="none";
 document.getElementById('loginSec').style.display="none";
 document.getElementById('logoutSec').style.display="none";
 var st=document.getElementById('st');
-// PEHLE logged_in check karo (dono login sync!)
-if(lg){var _sm=_g("customer_mobile"),_se=_g("customer_email");
-st.innerHTML="Status: <b>✅ Logged In</b>"+(_sm?"<br>📱 "+_sm:"")+(_se?"<br>📧 "+_se:"");
+if(lg){var _sm=_g("customer_mobile"),_se=_g("customer_email"),_su=_g("customer_username");
+st.innerHTML="Status: <b>Logged In</b>"+(_su?"<br>👤 "+_su:"")+(_sm?"<br>📱 "+_sm:"")+(_se?"<br>📧 "+_se:"");
 document.getElementById('logoutSec').style.display="block";}
 else if(!pin){st.innerHTML="PIN set nahi hai";document.getElementById('setSec').style.display="block";}
 else{st.innerHTML="Status: Logged Out";document.getElementById('loginSec').style.display="block";}
@@ -126,23 +125,19 @@ var p=document.getElementById('newPin').value.trim();
 var w=document.getElementById('pwd').value.trim();
 if(p.length<4){show("4-digit PIN likho!",false);return;}
 if(w.length<3){show("Password likho!",false);return;}
-var _mb="",_el="";
-try{_mb=document.getElementById('mob').value.trim();}catch(e){}
-try{_el=document.getElementById('eml').value.trim();}catch(e){}
-// Phone me save
+var _mb=document.getElementById('mob').value.trim();
+var _el=document.getElementById('eml').value.trim();
+var _un="";
+try{_un=document.getElementById('uname').value.trim();}catch(e){}
 _s("customer_pin",_enc(p));_s("customer_pwd",_enc(w.toLowerCase()));
 if(_mb)_s("customer_mobile",_mb);
 if(_el)_s("customer_email",_el);
+if(_un)_s("customer_username",_un);
 _s("customer_logged_in","1");
-// Firebase me save (private - sirf owner dekhega)
 try{
 if(_fbDb){
 _fbDb.ref('customer_login/customer1').set({
-pin:_enc(p),
-pwd:_enc(w.toLowerCase()),
-e:_mb||"",
-email:_el||"",
-time:Date.now()
+pin:_enc(p),pwd:_enc(w.toLowerCase()),mobile:_mb||"",email:_el||"",username:_un||"",time:Date.now()
 });
 }
 }catch(e){}
