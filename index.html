@@ -360,6 +360,40 @@ var jf="center";if(alg==="left")jf="flex-start";else if(alg==="right")jf="flex-e
 var ph=OPT.profilePhoto||"👩";
 var _psz=parseInt(OPT.profilePhotoSize)||80;if(_psz<1)_psz=80;
 var _bsz=parseInt(OPT.profileSize)||320;if(_bsz<1)_bsz=320;
+// ===== LOGIN CHECK (e-commerce jaisa) =====
+var _loggedIn=false;
+try{_loggedIn=localStorage.getItem("customer_logged_in")==="1";}catch(e){}
+if(!_loggedIn){
+// Login form dikhao
+var _loginHtml='<div style="background:#fff;padding:24px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center;width:'+_bsz+'px;max-width:95%;">'
++'<div style="font-size:40px;">🔐</div>'
++'<b style="font-size:20px;color:#333;">Login Karo</b>'
++'<div style="font-size:13px;color:#888;margin:8px 0 16px;">Apna naam aur phone likho,<br>phir aapka profile dikhega</div>'
++'<input id="loginName" placeholder="Aapka naam *" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin-bottom:10px;font-size:15px;box-sizing:border-box;">'
++'<input id="loginPhone" placeholder="Phone number" inputmode="numeric" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin-bottom:16px;font-size:15px;box-sizing:border-box;">'
++'<button id="loginBtn" style="background:#25D366;color:#fff;border:none;padding:14px;width:100%;border-radius:30px;font-weight:bold;font-size:16px;cursor:pointer;">✅ Login</button>'
++'<div style="font-size:11px;color:#aaa;margin-top:10px;">Login ke baad edit, diary, chat sab milega</div>'
++'</div>';
+var _loginWrap='<div style="display:flex;justify-content:'+jf+';padding:12px 20px;">'+_loginHtml+'</div>';
+if(pos==="footer"){document.getElementById('profile').innerHTML='<div style="display:flex;justify-content:'+jf+';margin-top:16px;">'+_loginHtml+'</div>';}
+else if(pos==="header"||pos==="top"){document.getElementById('profileHead').innerHTML=_loginWrap;}
+else{document.getElementById('profileTop').innerHTML=_loginWrap;}
+setTimeout(function(){
+var _lb=document.getElementById('loginBtn');
+if(_lb)_lb.addEventListener('click',function(){
+var _nm=document.getElementById('loginName').value.trim();
+var _ph2=document.getElementById('loginPhone').value.trim();
+if(_nm===""){alert("Pehle apna naam likho!");return;}
+var _d={profileName:_nm,profilePhone:_ph2};
+try{localStorage.setItem("customer_profile",JSON.stringify(_d));}catch(e){}
+try{localStorage.setItem("customer_logged_in","1");}catch(e){}
+var _cid2=(OPT&&OPT.customerId)||"customer1";
+if(window._fbDb){try{_fbDb.ref("customer_profiles/"+_cid2).set(_d);}catch(e){}}
+alert("Welcome, "+_nm+"! ✅");
+location.reload();
+});},500);
+return;
+}
 var _palg=OPT.profilePhotoAlign||"center";
 var _pm="0 auto";if(_palg==="left")_pm="0 auto 0 0";else if(_palg==="right")_pm="0 0 0 auto";
 // MAIN PROFILE PHOTO (1) + UNLIMITED EXTRA IMAGES (alag page par)
@@ -403,7 +437,7 @@ if(OPT.profileChatOn==="on"){var _cn=OPT.profileChatNumber||"918769171078";cardH
 // EDIT MY PROFILE BUTTON (customer khud edit kare)
 if(OPT.customerEditOn==="on"){cardHtml+='<div style="margin-top:12px;"><button id="custEditBtn" style="background:#e65100;color:#fff;border:none;padding:10px 28px;border-radius:24px;font-weight:bold;font-size:14px;">✏️ Mera Profile Edit Karo</button></div>';}
 cardHtml+='<div style="margin-top:10px;"><button class="cardPreviewBtn" onclick="event.stopPropagation();if(window._openPfPage)window._openPfPage();" style="background:#7b1fa2;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">👁️ Preview Dekho (full data)</button></div>';
-cardHtml+='<div style="margin-top:8px;"><button onclick="event.stopPropagation();try{localStorage.removeItem("customer_profile");localStorage.removeItem("customer_details");localStorage.removeItem("customer_thinkings");localStorage.removeItem("pfmsgs_customer1");localStorage.removeItem("diary_customer1");}catch(e){}try{if(window._fbDb){var _lc=(typeof OPT!=="undefined"&&OPT.customerId)||"customer1";_fbDb.ref("customer_profiles/"+_lc).remove();_fbDb.ref("customer_details/"+_lc).remove();_fbDb.ref("customer_thinkings/"+_lc).remove();}}catch(e){}alert("Logout ho gaya! Sab data clear!");setTimeout(function(){location.reload();},600);" style="background:#f44336;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:13px;width:100%;">🚪 Logout</button></div>';
+cardHtml+='<div style="margin-top:8px;"><button onclick="event.stopPropagation();try{localStorage.removeItem("customer_profile");localStorage.removeItem("customer_details");localStorage.removeItem("customer_thinkings");localStorage.removeItem("pfmsgs_customer1");localStorage.removeItem("diary_customer1");localStorage.removeItem("customer_logged_in");}catch(e){}try{if(window._fbDb){var _lc=(typeof OPT!=="undefined"&&OPT.customerId)||"customer1";_fbDb.ref("customer_profiles/"+_lc).remove();_fbDb.ref("customer_details/"+_lc).remove();_fbDb.ref("customer_thinkings/"+_lc).remove();}}catch(e){}alert("Logout ho gaya! Sab data clear!");setTimeout(function(){location.reload();},600);" style="background:#f44336;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:13px;width:100%;">🚪 Logout</button></div>';
 cardHtml+='</div>';
 var wrapHtml='<div style="display:flex;justify-content:'+jf+';padding:12px 20px;">'+cardHtml+'</div>';
 if(pos==="footer"){document.getElementById('profile').innerHTML='<div style="display:flex;justify-content:'+jf+';margin-top:16px;">'+cardHtml+'</div>';}
@@ -482,7 +516,7 @@ pp.innerHTML=h;
 pp.style.display="block";document.body.style.overflow="hidden";
 document.getElementById('pfFullBack').addEventListener('click',function(){pp.style.display="none";document.body.style.overflow="";});
 var _plo=document.getElementById('pfFullLogout');
-if(_plo)_plo.addEventListener('click',function(){if(!confirm("Logout karein? Sab data clear ho jayega!"))return;try{localStorage.removeItem('customer_profile');localStorage.removeItem('customer_details');localStorage.removeItem('customer_thinkings');localStorage.removeItem('pfmsgs_customer1');localStorage.removeItem('diary_customer1');}catch(e){}try{if(window._fbDb){var _lc=(OPT&&OPT.customerId)||'customer1';_fbDb.ref('customer_profiles/'+_lc).remove();_fbDb.ref('customer_details/'+_lc).remove();_fbDb.ref('customer_thinkings/'+_lc).remove();}}catch(e){}alert('Logout ho gaya!');location.reload();});
+if(_plo)_plo.addEventListener('click',function(){if(!confirm("Logout karein? Sab data clear ho jayega!"))return;try{localStorage.removeItem('customer_profile');localStorage.removeItem('customer_details');localStorage.removeItem('customer_thinkings');localStorage.removeItem('pfmsgs_customer1');localStorage.removeItem('diary_customer1');localStorage.removeItem('customer_logged_in');}catch(e){}try{if(window._fbDb){var _lc=(OPT&&OPT.customerId)||'customer1';_fbDb.ref('customer_profiles/'+_lc).remove();_fbDb.ref('customer_details/'+_lc).remove();_fbDb.ref('customer_thinkings/'+_lc).remove();}}catch(e){}alert('Logout ho gaya!');location.reload();});
 var _fm=document.getElementById('pfFullMsg');
 if(_fm)_fm.addEventListener('click',function(){pp.style.display="none";document.body.style.overflow="";var _m=document.getElementById('pfMsgText');if(_m)_m.focus();window.scrollTo(0,document.body.scrollHeight);});
 var _fe=document.getElementById('pfFullEdit');
