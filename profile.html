@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="hi"><head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mera Profile</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#fff8f0;color:#333}
+#hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
+#brand{font-size:22px;font-weight:bold;color:#000;flex:1}
+#ftr{background:#4e342e;color:#fff;text-align:center;padding:24px 16px}
+.btn2{display:inline-block;background:#25D366;color:#fff;font-weight:bold;padding:12px 24px;border-radius:30px;text-decoration:none;font-size:16px}
+#pcard{background:#fff;border-radius:20px;margin:16px;box-shadow:0 2px 12px rgba(0,0,0,.1);overflow:hidden;position:relative}
+.ptop{position:relative;min-height:60px}
+.pphoto-big{position:absolute;top:10px;right:16px;width:70px;height:70px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:40px;overflow:hidden}
+.pphoto-big img{width:100%;height:100%;object-fit:cover}
+.pbody{padding:16px;text-align:center}
+.photosbtn{display:inline-block;background:#e65100;color:#fff;font-weight:bold;padding:10px 24px;border-radius:24px;font-size:15px;border:none;cursor:pointer;margin-bottom:10px}
+.pname{font-size:22px;font-weight:bold}
+.pphone{color:#e65100;font-size:16px;margin-top:4px}
+.status-bubble{display:inline-block;background:#e8f5e9;border-radius:20px;padding:8px 16px;margin:10px 0;font-size:14px}
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.tab{background:#f5f5f5;border-radius:16px;padding:6px 14px;font-size:13px;font-weight:bold;cursor:pointer;border:none}
+.msgsec{text-align:left;margin-top:12px;border-top:1px solid #eee;padding-top:12px}
+.msgsec h3{color:#e65100;font-size:17px}
+.msgsec p{font-size:13px;color:#888;margin:4px 0 10px}
+.inp{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin-bottom:10px;font-size:15px;box-sizing:border-box}
+textarea.inp{resize:vertical;min-height:80px}
+.pbtn{display:block;width:100%;padding:14px;border:none;border-radius:30px;font-weight:bold;font-size:16px;margin-top:10px;color:#fff;cursor:pointer;text-decoration:none;box-sizing:border-box;text-align:center}
+.bigbtn{display:block;width:100%;padding:15px;border:none;font-weight:bold;font-size:17px;color:#fff;cursor:pointer;text-decoration:none;text-align:center;box-sizing:border-box}
+.backbtn{background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;text-decoration:none;font-size:14px}
+.entry{background:#fff8f0;border-radius:10px;padding:10px;margin-top:8px;font-size:13px;text-align:left}
+.entry .edt{color:#e65100;font-weight:bold}
+.thinkbox{background:#fffbe6;border-left:4px solid #ffc107;padding:10px;border-radius:0 10px 10px 0;margin-top:8px;text-align:left;font-size:13px}
+</style></head>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+// ===== FIREBASE CONFIG =====
+var FIREBASE_CONFIG = {
+apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"
+  
+};
+var _fbDb = null;
+try {
+if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "") {
+firebase.initializeApp(FIREBASE_CONFIG);
+_fbDb = firebase.database();
+}
+} catch(e) {}
+</script>
+<body>
+<header id="hdr">
+<a class="backbtn" href="index.html">← Back</a>
+<div id="brand" style="text-align:center">👤 Mera Profile</div>
+<div style="width:70px"></div>
+</header>
+<div id="pcard">
+<div class="ptop"><div class="pphoto-big" id="bigPhoto">👩</div></div>
+<div class="pbody" id="pbody"></div>
+</div>
+<footer id="ftr">
+<b>Restro Apka | Pilibanga</b><br><br>
+<a class="btn2" href="https://wa.me/918769171078">WhatsApp: 8769171078</a><br><br>
+<span style="font-size:12px">meragharandworld.web.app</span>
+</footer>
+<a class="bigbtn" href="album.html" style="background:#7b1fa2;">📸 Album Dekho</a>
+<a class="bigbtn" href="timedatalist.html" style="background:#2196F3;">📅 Timeline Dekho</a>
+<script>
+function esc(t){return String(t==null?"":t).split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');}
+function getProfile(){try{return JSON.parse(localStorage.getItem("my_profile")||"{}");}catch(e){return{};}}
+function getLogin(){try{return JSON.parse(localStorage.getItem("customer_login")||"null");}catch(e){return null;}}
+function getDetails(){try{return JSON.parse(localStorage.getItem("customer_details")||"[]");}catch(e){return[];}}
+function getThinks(){try{return JSON.parse(localStorage.getItem("customer_thinkings")||"[]");}catch(e){return[];}}
+function render(){
+var p=getProfile();var login=getLogin();var body=document.getElementById('pbody');var bigPhoto=document.getElementById('bigPhoto');
+if(!login){
+body.innerHTML='<div style="padding:20px;"><div style="font-size:20px;font-weight:bold;margin-bottom:10px;">🔐 Login Karo</div><p style="color:#888;font-size:14px;margin-bottom:12px;">Apna naam aur phone likho,<br>phir aapka profile dikhega</p><a class="pbtn" style="background:#7b1fa2;" href="customerlogin.html">🔐 Customer Login</a></div>';return;}
+var name=esc(p.name||login.name||"Manisha");var phone=esc(p.phone||login.phone||"9660834888");var status=esc(p.status||"Hi cky man tak tak");var photoCount=(p.extraPhotos||[]).length+(p.photo?1:0);
+var details=getDetails();var thinks=getThinks();
+if(p.photo)bigPhoto.innerHTML='<img src="'+p.photo+'">';
+var h='<button class="photosbtn" onclick="location.href=\'album.html\'">📸 Photos Dekho ('+photoCount+')</button>'
++'<div class="pname">'+name+'</div><div class="pphone">📞 '+phone+'</div>'
++'<div><span class="status-bubble">🟢 '+status+'</span></div>'
++'<div class="tabs"><button class="tab" onclick="location.href=\'album.html\'">📸 '+photoCount+' Photos</button><button class="tab" style="background:#e8f5e9;">🟢 Status</button><button class="tab" style="background:#fff8e1;">💭 Thinking</button><button class="tab" style="background:#f3e5f5;">💬 Messages</button></div>';
+// ===== DETAIL ENTRIES (footer jaisa) =====
+if(details.length>0){
+h+='<div style="text-align:left;margin-top:10px;"><b style="color:#e65100;font-size:16px;">📝 Detail</b>';
+details.forEach(function(d){
+h+='<div class="entry"><span class="edt">📅 '+esc(d.date||"")+'</span><div style="color:#333;margin-top:4px;">'+esc(d.text||"")+'</div></div>';
+});
+h+='</div>';
+}
+// ===== THINKING ENTRIES (footer jaisa) =====
+if(thinks.length>0){
+h+='<div style="text-align:left;margin-top:10px;"><b style="color:#f57f00;font-size:16px;">💭 Thinking</b>';
+thinks.forEach(function(d){
+h+='<div class="thinkbox"><b>📅 '+esc(d.date||"")+'</b><div style="color:#555;margin-top:4px;">'+esc(d.text||"")+'</div></div>';
+});
+h+='</div>';
+}
+// ===== MESSAGE SECTION =====
+h+='<div class="msgsec"><h3>Message Bhejo</h3><p>Yahan apna message likho. Unlimited words likh sakte ho.</p><input class="inp" id="msgName" placeholder="Aapka naam"><textarea class="inp" id="msgText" placeholder="Apna message likho (unlimited words)..."></textarea><button class="pbtn" style="background:#22c55e;" onclick="sendMsg()">📩 Message Bhejo</button></div>'
++'<div style="text-align:center;margin-top:10px;"><a class="pbtn" style="background:#22c55e;width:auto;display:inline-block;padding:12px 32px;" href="https://wa.me/918769171078">💬 Chat Karo</a><div style="font-size:11px;color:#999;margin-top:4px;">Unlimited chatting - WhatsApp par</div></div>'
++'<div style="text-align:center;margin-top:8px;"><a class="pbtn" style="background:#e65100;width:auto;display:inline-block;padding:12px 32px;" href="editprofile.html">✏️ Mera Profile Edit Karo</a></div>'
++'<a class="pbtn" style="background:#7b1fa2;" href="friends.html">📩 Meri Friend Requests</a>'
++'<button class="pbtn" style="background:#7b1fa2;" onclick="preview()">👁️ Preview Dekho (full data)</button>'
++'<button class="pbtn" style="background:#2196F3;" onclick="location.href=\'friends.html\'">👥 Friends ko kaisa dikhega</button>'
++'<button class="pbtn" style="background:#f44336;" onclick="logout()">🚪 Logout</button>';
+body.innerHTML=h;
+}
+function sendMsg(){var t=document.getElementById('msgText').value.trim();if(!t){alert("Message likho!");return;}var n=document.getElementById('msgName').value.trim()||"Anonymous";var msgs=[];try{msgs=JSON.parse(localStorage.getItem("profile_msgs")||"[]");}catch(e){}msgs.push({name:n,text:t,time:new Date().toLocaleString()});localStorage.setItem("profile_msgs",JSON.stringify(msgs));alert("✅ Message bhej diya!");document.getElementById('msgText').value="";}
+function preview(){var p=getProfile();alert("Naam: "+(p.name||"-")+"\nPhone: "+(p.phone||"-")+"\nPhotos: "+((p.extraPhotos||[]).length+(p.photo?1:0))+"\nDetails: "+getDetails().length+"\nThinkings: "+getThinks().length);}
+function logout(){if(confirm("Logout?")){localStorage.removeItem("customer_login");location.href="index.html";}}
+render();
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>

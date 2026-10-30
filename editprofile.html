@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="hi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mera Profile Edit Karo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#fffaf3;color:#333}
+#hdr{background:#e65100;color:#fff;padding:12px 16px;display:flex;align-items:center;position:sticky;top:0;z-index:10}
+#hdr .backbtn{background:#fff;border:none;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;color:#e65100;font-weight:bold}
+#hdr h1{font-size:20px;margin-left:12px;flex:1}
+#wrap{padding:16px;max-width:600px;margin:0 auto}
+.fld{margin-bottom:16px}
+.fld .lbl{color:#e65100;font-weight:bold;font-size:16px;margin-bottom:8px}
+.fld .lbl small{color:#999;font-weight:normal;font-size:12px}
+.inp{width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;font-size:15px;box-sizing:border-box;background:#fff}
+textarea.inp{resize:vertical;min-height:70px}
+.mainphoto{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.mainphoto .pp{width:80px;height:80px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:40px;overflow:hidden;flex-shrink:0;border:3px solid #ffcc80}
+.mainphoto .pp img{width:100%;height:100%;object-fit:cover}
+.upbtn{background:#ffcc80;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px}
+.exphotos{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.exphoto{position:relative;width:80px;height:80px}
+.exphoto img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.exphoto .x{position:absolute;top:-8px;right:-8px;background:#f44336;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;font-weight:bold}
+.addrow{display:flex;gap:8px;align-items:center}
+.addrow .inp{flex:1}
+.plusbtn{background:#e65100;color:#fff;border:none;width:44px;height:44px;border-radius:50%;font-size:24px;cursor:pointer;flex-shrink:0}
+.entry{background:#fffaf0;border-radius:12px;padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.entry .dt{font-size:13px;flex:1}
+.entry .ebtn{background:#fff;border:1px solid #eee;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px}
+.addentry{background:#ffcc80;border:none;width:100%;padding:14px;border-radius:24px;font-weight:bold;font-size:15px;cursor:pointer;margin-top:4px}
+.pvbtn{background:#7b1fa2;color:#fff;border:none;width:100%;padding:15px;border-radius:28px;font-weight:bold;font-size:16px;cursor:pointer;margin-top:16px}
+.savebtn{background:#22c55e;color:#fff;border:none;width:100%;padding:16px;border-radius:28px;font-weight:bold;font-size:17px;cursor:pointer;margin-top:10px}
+.note{text-align:center;color:#999;font-size:13px;margin-top:8px}
+</style></head>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+// ===== FIREBASE CONFIG =====
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"
+};
+var _fbDb = null;
+try {
+if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "") {
+firebase.initializeApp(FIREBASE_CONFIG);
+_fbDb = firebase.database();
+}
+} catch(e) {}
+</script>
+<body>
+<header id="hdr">
+<button class="backbtn" onclick="location.href='index.html'">←</button>
+<h1>✏️ Mera Profile Edit Karo</h1>
+</header>
+<div id="wrap">
+<div class="fld">
+<div class="lbl">📸 Main Photo</div>
+<div class="mainphoto">
+<div class="pp" id="mainPp">👤</div>
+<div><label class="upbtn">📤 Photo Upload<input type="file" id="mainFile" accept="image/*" style="display:none"></label></div>
+</div>
+<input class="inp" id="mainLink" placeholder="ya photo link paste karo" style="margin-top:8px">
+<button class="upbtn" style="margin-top:8px" onclick="addMainLink()">Link se Add Karo</button>
+</div>
+<div class="fld">
+<div class="lbl">🖼️ Extra Photos (unlimited)</div>
+<div class="exphotos" id="exPhotos"></div>
+<div class="addrow">
+<label class="upbtn">📤 Photo Add<input type="file" id="exFile" accept="image/*" multiple style="display:none"></label>
+<input class="inp" id="exLink" placeholder="ya link paste karo">
+<button class="plusbtn" onclick="addExLink()">+</button>
+</div>
+</div>
+<div class="fld">
+<div class="lbl">👤 Naam</div>
+<input class="inp" id="fName" placeholder="Manisha">
+</div>
+<div class="fld">
+<div class="lbl">📞 Phone</div>
+<input class="inp" id="fPhone" placeholder="9660834888" type="tel">
+</div>
+<div class="fld">
+<div class="lbl">🟢 Status <small>(unlimited words)</small></div>
+<textarea class="inp" id="fStatus" placeholder="Hi cky man tak tak"></textarea>
+</div>
+<div class="fld">
+<div class="lbl">📝 Detail <small>(unlimited entries - date + photo/video)</small></div>
+<div id="detailList"></div>
+<button class="addentry" onclick="addDetail()">+ Detail Entry Add Karo</button>
+</div>
+<div class="fld">
+<div class="lbl">💭 Thinking <small>(unlimited entries - date + photo/video)</small></div>
+<div id="thinkList"></div>
+<button class="addentry" onclick="addThinking()">+ Thinking Entry Add Karo</button>
+</div>
+<button class="pvbtn" onclick="preview()">👁️ Preview Dekho (friends ko kaisa dikhega)</button>
+<button class="savebtn" onclick="saveAll()">💾 Save Karo</button>
+<div class="note">Save karte hi sab friends ko dikhega!</div>
+<!-- ✅ FIX 1: Edit panel button AB BODY me hai (script ke andar nahi) -->
+<button id="custEditBtn" style="background:#e65100;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:14px;width:100%;margin-top:12px;cursor:pointer;">✏️ Edit Panel Kholo</button>
+</div>
+<script>
+var P={};try{P=JSON.parse(localStorage.getItem("my_profile")||"{}");}catch(e){P={};}
+var exPhotos=P.extraPhotos||[];var details=P.details||[];var thinkings=P.thinkings||[];
+function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function render(){
+document.getElementById('fName').value=P.name||"";
+document.getElementById('fPhone').value=P.phone||"";
+document.getElementById('fStatus').value=P.status||"";
+if(P.photo)document.getElementById('mainPp').innerHTML='<img src="'+P.photo+'">';
+renderEx();renderDetails();renderThink();}
+function renderEx(){var d=document.getElementById('exPhotos');var h="";
+exPhotos.forEach(function(p,i){h+='<div class="exphoto"><img src="'+p+'"><button class="x" onclick="delEx('+i+')">×</button></div>';});
+d.innerHTML=h;}
+function delEx(i){exPhotos.splice(i,1);renderEx();}
+function renderDetails(){var d=document.getElementById('detailList');var h="";
+details.forEach(function(e,i){h+='<div class="entry"><span class="dt">📅 '+esc(e.date)+' '+esc(e.text).substring(0,40)+'</span><button class="ebtn" onclick="editDetail('+i+')">✏️</button><button class="ebtn" onclick="delDetail('+i+')">🗑️</button></div>';});
+d.innerHTML=h;}
+function renderThink(){var d=document.getElementById('thinkList');var h="";
+thinkings.forEach(function(e,i){h+='<div class="entry"><span class="dt">📅 '+esc(e.date)+' '+esc(e.text).substring(0,40)+'</span><button class="ebtn" onclick="editThink('+i+')">✏️</button><button class="ebtn" onclick="delThink('+i+')">🗑️</button></div>';});
+d.innerHTML=h;}
+function addDetail(){var t=prompt("Detail likho:");if(t===null)return;var today=new Date().toISOString().split('T')[0];details.push({date:today,text:t,media:""});renderDetails();}
+function editDetail(i){var t=prompt("Edit karo:",details[i].text);if(t===null)return;details[i].text=t;renderDetails();}
+function delDetail(i){if(confirm("Hatao?")){details.splice(i,1);renderDetails();}}
+function addThinking(){var t=prompt("Thinking likho:");if(t===null)return;var today=new Date().toISOString().split('T')[0];thinkings.push({date:today,text:t,media:""});renderThink();}
+function editThink(i){var t=prompt("Edit karo:",thinkings[i].text);if(t===null)return;thinkings[i].text=t;renderThink();}
+function delThink(i){if(confirm("Hatao?")){thinkings.splice(i,1);renderThink();}}
+document.getElementById('mainFile').onchange=function(){var f=this.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){P.photo=e.target.result;document.getElementById('mainPp').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);};
+function addMainLink(){var l=document.getElementById('mainLink').value.trim();if(!l){alert("Link paste karo!");return;}P.photo=l;document.getElementById('mainPp').innerHTML='<img src="'+l+'">';document.getElementById('mainLink').value="";}
+document.getElementById('exFile').onchange=function(){var fs=this.files;for(var j=0;j<fs.length;j++){(function(f){var r=new FileReader();r.onload=function(e){exPhotos.push(e.target.result);renderEx();};r.readAsDataURL(f);})(fs[j]);}this.value="";};
+function addExLink(){var l=document.getElementById('exLink').value.trim();if(!l){alert("Link paste karo!");return;}exPhotos.push(l);renderEx();document.getElementById('exLink').value="";}
+function preview(){var w=window.open("","_blank","width=400,height=600");w.document.write("<h2>"+esc(document.getElementById('fName').value||"Manisha")+"</h2><p>📞 "+esc(document.getElementById('fPhone').value)+"</p><p>🟢 "+esc(document.getElementById('fStatus').value)+"</p>");}
+function saveAll(){P.name=document.getElementById('fName').value.trim();P.phone=document.getElementById('fPhone').value.trim();P.status=document.getElementById('fStatus').value.trim();P.extraPhotos=exPhotos;P.details=details;P.thinkings=thinkings;localStorage.setItem("my_profile",JSON.stringify(P));alert("✅ Save ho gaya!");location.href="profile.html";}
+render();
+
+// ✅ FIX 2: OPT object define karo (panel code ke liye) - P se data lekar
+var OPT = {
+  customerEditOn: "on",
+  customerId: "customer1",
+  profileName: P.name || "",
+  profilePhone: P.phone || "",
+  profilePhoto: P.photo || "",
+  customerStatus: P.status || "",
+  profileDetail: (P.details && P.details[0]) ? P.details[0].text : "",
+  profileThinking: (P.thinkings && P.thinkings[0]) ? P.thinkings[0].text : ""
+};
+for(var _oq=0; _oq<14; _oq++){ OPT['profilePhoto'+(_oq+2)] = (P.extraPhotos && P.extraPhotos[_oq]) || ""; }
+</script>
+
+
+<script>
+// ===== EDIT PANEL (correction: my_profile se sync) =====
+(function(){
+if(OPT.customerEditOn!=="on")return;
+var ep=document.createElement('div');
+ep.id="custEditPage";
+ep.style.cssText="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff8f0;z-index:300;overflow-y:auto;";
+ep.innerHTML='<div style="position:sticky;top:0;background:#e65100;color:#fff;padding:14px 16px;display:flex;align-items:center;z-index:2;"><button id="custEditBack" style="background:#fff;color:#e65100;border:none;min-width:36px;height:36px;border-radius:50%;font-size:18px;font-weight:bold;margin-right:12px;">←</button><b style="font-size:18px;">✏️ Mera Profile Edit Karo</b></div>'
++'<div style="padding:16px;max-width:500px;margin:0 auto;">'
++'<b style="color:#e65100;">📸 Main Photo</b>'
++'<div style="display:flex;gap:10px;align-items:center;margin:8px 0;">'
++'<img id="cePhotoPrev" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #ffcc80;display:none;">'
++'<div id="cePhotoEmoji" style="width:80px;height:80px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:40px;border:3px solid #ffcc80;"></div>'
++'<div><button id="cePhotoUp" style="background:#ffcc80;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;">📤 Photo Upload</button><br>'
++'<input id="cePhotoUrl" placeholder="ya photo link paste karo" style="margin-top:8px;padding:8px;border:1px solid #ddd;border-radius:8px;width:200px;font-size:13px;">'
++'<input type="file" id="cePhotoFile" accept="image/*" style="display:none;"></div></div>'
++'<b style="color:#e65100;">🖼️ Extra Photos (unlimited)</b><div id="ceExtraList" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;"></div>'
++'<div style="display:flex;gap:8px;margin-bottom:8px;"><button id="ceExtraUp" style="background:#ffcc80;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;">📤 Photo Add</button>'
++'<input id="ceExtraUrl" placeholder="ya link paste karo" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;">'
++'<button id="ceExtraUrlAdd" style="background:#e65100;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-weight:bold;">+</button>'
++'<input type="file" id="ceExtraFile" accept="image/*" style="display:none;"></div>'
++'<b style="color:#e65100;">👤 Naam</b><input id="ceName" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 12px;font-size:15px;">'
++'<b style="color:#e65100;">📞 Phone</b><input id="cePhone" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 12px;font-size:15px;">'
++'<b style="color:#e65100;">🟢 Status <span style="font-size:11px;color:#999;">(unlimited words)</span></b><textarea id="ceStatus" rows="2" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 12px;font-size:14px;"></textarea>'
++'<b style="color:#e65100;">📝 Detail <span style="font-size:11px;color:#999;">(unlimited entries - date + photo/video)</span></b><div id="ceDetailList" style="margin:6px 0;"></div><button type="button" id="ceDetailAdd" style="background:#ffcc80;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:14px;margin-bottom:12px;width:100%;">+ Detail Entry Add Karo</button>'
++'<b style="color:#e65100;">💭 Thinking <span style="font-size:11px;color:#999;">(unlimited entries - date + photo/video)</span></b><div id="ceThinkList" style="margin:6px 0;"></div><button type="button" id="ceThinkAdd" style="background:#ffcc80;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:14px;margin-bottom:12px;width:100%;">+ Thinking Entry Add Karo</button>'
++'<button id="cePreview" style="background:#7b1fa2;color:#fff;border:none;padding:14px;width:100%;border-radius:30px;font-weight:bold;font-size:16px;margin-bottom:10px;">👁️ Preview Dekho</button><button id="ceSave" style="background:#25D366;color:#fff;border:none;padding:16px;width:100%;border-radius:30px;font-weight:bold;font-size:17px;">💾 Save Karo</button>'
++'<div style="font-size:12px;color:#999;text-align:center;margin-top:8px;">Save karte hi sab friends ko dikhega!</div>'
++'<div style="height:30px;"></div></div>';
+document.body.appendChild(ep);
+function _compress(img,cb){var c=document.createElement('canvas');var w=img.width,h=img.height;var mx=500;
+if(w>mx||h>mx){var r=Math.min(mx/w,mx/h);w=Math.round(w*r);h=Math.round(h*r);}
+c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.6));}
+function _fileToData(file,cb){var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){_compress(img,cb);};img.src=rd.result;};rd.readAsDataURL(file);}
+var _cePhotos=[];
+var _ceDetails=[];var _ceThinks=[];
+function _todayD(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0');}
+function _openEdit(){
+document.getElementById('ceName').value=OPT.profileName||"";
+document.getElementById('cePhone').value=OPT.profilePhone||"";
+document.getElementById('ceStatus').value=OPT.customerStatus||"";
+_ceDetails=[];_ceThinks=[];
+try{var _dd=JSON.parse(localStorage.getItem("customer_details")||"[]");if(_dd.length>0)_ceDetails=_dd;}catch(e){}
+try{var _tt=JSON.parse(localStorage.getItem("customer_thinkings")||"[]");if(_tt.length>0)_ceThinks=_tt;}catch(e){}
+// ✅ FIX: my_profile (is file ka format) se bhi load karo
+try{var _mpf=JSON.parse(localStorage.getItem("my_profile")||"{}");
+if(_ceDetails.length===0&&_mpf.details&&_mpf.details.length>0)_ceDetails=_mpf.details;
+if(_ceThinks.length===0&&_mpf.thinkings&&_mpf.thinkings.length>0)_ceThinks=_mpf.thinkings;}catch(e){}
+if(_ceDetails.length===0&&OPT.profileDetail&&OPT.profileDetail!==""){_ceDetails.push({date:_todayD(),text:OPT.profileDetail,photo:"",video:""});}
+if(_ceThinks.length===0&&OPT.profileThinking&&OPT.profileThinking!==""){_ceThinks.push({date:_todayD(),text:OPT.profileThinking,photo:"",video:""});}
+_renderDetailList();_renderThinkList();
+var mp=OPT.profilePhoto||"👩";
+if(mp.indexOf("http")===0||mp.indexOf("data:")===0){
+document.getElementById('cePhotoPrev').src=mp;document.getElementById('cePhotoPrev').style.display="block";
+document.getElementById('cePhotoEmoji').style.display="none";
+}else{document.getElementById('cePhotoPrev').style.display="none";
+document.getElementById('cePhotoEmoji').style.display="flex";document.getElementById('cePhotoEmoji').textContent=mp;}
+_cePhotos=[];
+try{var _lp=JSON.parse(localStorage.getItem("my_profile")||"{}");
+if(_lp.extraPhotos&&_lp.extraPhotos.length>0){_cePhotos=_lp.extraPhotos.slice();}
+else{for(var q=2;q<=15;q++){var xp=_lp['profilePhoto'+q]||OPT['profilePhoto'+q];if(xp&&xp!=="")_cePhotos.push(xp);}}
+}catch(e){for(var q=2;q<=15;q++){var xp2=OPT['profilePhoto'+q];if(xp2&&xp2!=="")_cePhotos.push(xp2);}}
+_renderExtra();
+ep.style.display="block";document.body.style.overflow="hidden";}
+function _renderExtra(){var box=document.getElementById('ceExtraList');var h='';
+for(var q=0;q<_cePhotos.length;q++){var p=_cePhotos[q];
+var th=p.indexOf("http")===0||p.indexOf("data:")===0?'<img src="'+p+'" style="width:70px;height:70px;object-fit:cover;border-radius:10px;">':'<div style="width:70px;height:70px;background:#ffe0b2;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:32px;">'+p+'</div>';
+h+='<div style="position:relative;">'+th+'<button class="ceDel" data-q="'+q+'" style="position:absolute;top:-8px;right:-8px;background:#f44336;color:#fff;border:none;width:24px;height:24px;border-radius:50%;font-size:14px;font-weight:bold;">×</button></div>';}
+if(_cePhotos.length===0)h='<span style="color:#aaa;font-size:13px;">Koi extra photo nahi</span>';
+box.innerHTML=h;
+box.querySelectorAll('.ceDel').forEach(function(b){b.addEventListener('click',function(){_cePhotos.splice(parseInt(b.getAttribute('data-q')),1);_renderExtra();});});}
+function _renderDetailList(){var box=document.getElementById('ceDetailList');if(!box)return;var h='';
+for(var q=0;q<_ceDetails.length;q++){var e=_ceDetails[q];
+h+='<div style="background:#fff3e0;border-radius:10px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;"><b>📅 '+e.date+'</b> '+(e.text?e.text.substring(0,40):'')+(e.photo?' 📸':'')+(e.video?' 🎥':'')+'</span><span><button class="ceDEd" data-q="'+q+'" style="background:#fff;color:#e65100;border:none;padding:4px 10px;border-radius:10px;font-size:12px;margin-right:4px;">✏️</button><button class="ceDDel" data-q="'+q+'" style="background:#ffebee;color:#c62828;border:none;padding:4px 10px;border-radius:10px;font-size:12px;">🗑️</button></span></div>';}
+if(_ceDetails.length===0)h='<div style="color:#aaa;font-size:13px;padding:8px;">Koi detail entry nahi</div>';
+box.innerHTML=h;
+box.querySelectorAll('.ceDEd').forEach(function(b){b.addEventListener('click',function(){_showEntryForm('detail',parseInt(b.getAttribute('data-q')));});});
+box.querySelectorAll('.ceDDel').forEach(function(b){b.addEventListener('click',function(){_ceDetails.splice(parseInt(b.getAttribute('data-q')),1);_renderDetailList();});});}
+function _renderThinkList(){var box=document.getElementById('ceThinkList');if(!box)return;var h='';
+for(var q=0;q<_ceThinks.length;q++){var e=_ceThinks[q];
+h+='<div style="background:#fff8e1;border-radius:10px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;"><b>📅 '+e.date+'</b> '+(e.text?e.text.substring(0,40):'')+(e.photo?' 📸':'')+(e.video?' 🎥':'')+'</span><span><button class="ceTEd" data-q="'+q+'" style="background:#fff;color:#f57f00;border:none;padding:4px 10px;border-radius:10px;font-size:12px;margin-right:4px;">✏️</button><button class="ceTDel" data-q="'+q+'" style="background:#ffebee;color:#c62828;border:none;padding:4px 10px;border-radius:10px;font-size:12px;">🗑️</button></span></div>';}
+if(_ceThinks.length===0)h='<div style="color:#aaa;font-size:13px;padding:8px;">Koi thinking entry nahi</div>';
+box.innerHTML=h;
+box.querySelectorAll('.ceTEd').forEach(function(b){b.addEventListener('click',function(){_showEntryForm('thinking',parseInt(b.getAttribute('data-q')));});});
+box.querySelectorAll('.ceTDel').forEach(function(b){b.addEventListener('click',function(){_ceThinks.splice(parseInt(b.getAttribute('data-q')),1);_renderThinkList();});});}
+function _showEntryForm(type,editIdx){
+var old=document.getElementById('ceEntryForm');if(old)old.remove();
+var ov=document.createElement('div');ov.id="ceEntryForm";
+ov.style.cssText="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:310;display:flex;align-items:center;justify-content:center;padding:20px;";
+var isEdit=editIdx!==undefined&&editIdx>=0;
+var ed=isEdit?(type==='detail'?_ceDetails[editIdx]:_ceThinks[editIdx]):{date:_todayD(),text:"",photo:"",video:""};
+ov.innerHTML='<div style="background:#fff;border-radius:16px;padding:20px;width:100%;max-width:400px;max-height:90%;overflow-y:auto;">'
++'<b style="color:#e65100;">'+(type==='detail'?'📝':'💭')+(isEdit?' Edit ':' Nayi ')+(type==='detail'?'Detail':'Thinking')+'</b>'
++'<div style="margin:10px 0;"><b style="font-size:13px;">📅 Date</b><input type="date" id="ceEFDate" value="'+ed.date+'" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;margin-top:4px;"></div>'
++'<div style="margin:10px 0;"><b style="font-size:13px;">✏️ Text <span style="color:#999;">(unlimited words)</span></b><textarea id="ceEFText" rows="4" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;margin-top:4px;font-size:14px;">'+ed.text.replace(/</g,"&lt;")+'</textarea></div>'
++'<div style="margin:10px 0;"><b style="font-size:13px;">📸 Photo / 🎥 Video</b><br><img id="ceEFPhotoPrev" src="'+(ed.photo||"")+'" style="width:100%;max-height:150px;object-fit:cover;border-radius:10px;margin:6px 0;'+(ed.photo?'':'display:none;')+'"><video id="ceEFVideoPrev" src="'+(ed.video||"")+'" controls style="width:100%;max-height:150px;border-radius:10px;margin:6px 0;'+(ed.video?'':'display:none;')+'"></video><div style="display:flex;gap:8px;"><button type="button" id="ceEFPhotoBtn" style="flex:1;background:#f3e5f5;border:none;padding:10px;border-radius:16px;font-weight:bold;color:#7b1fa2;font-size:13px;">📸 Photo</button><button type="button" id="ceEFVideoBtn" style="flex:1;background:#f3e5f5;border:none;padding:10px;border-radius:16px;font-weight:bold;color:#7b1fa2;font-size:13px;">🎥 Video</button></div><input type="file" id="ceEFPhotoFile" accept="image/*" style="display:none;"><input type="file" id="ceEFVideoFile" accept="video/*" style="display:none;"></div>'
++'<div style="display:flex;gap:10px;"><button id="ceEFCancel" style="flex:1;background:#eee;border:none;padding:12px;border-radius:20px;font-weight:bold;">Cancel</button><button id="ceEFSave" style="flex:2;background:#e65100;color:#fff;border:none;padding:12px;border-radius:20px;font-weight:bold;">💾 Save</button></div></div>';
+document.body.appendChild(ov);
+if(ed.photo)document.getElementById('ceEFPhotoPrev').dataset.val=ed.photo;
+if(ed.video)document.getElementById('ceEFVideoPrev').dataset.val=ed.video;
+document.getElementById('ceEFCancel').addEventListener('click',function(){ov.remove();});
+document.getElementById('ceEFPhotoBtn').addEventListener('click',function(){document.getElementById('ceEFPhotoFile').click();});
+document.getElementById('ceEFPhotoFile').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;
+_fileToData(f,function(dt){var p=document.getElementById('ceEFPhotoPrev');p.src=dt;p.style.display='block';p.dataset.val=dt;});e.target.value='';});
+document.getElementById('ceEFVideoBtn').addEventListener('click',function(){document.getElementById('ceEFVideoFile').click();});
+document.getElementById('ceEFVideoFile').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;
+if(f.size>8*1024*1024){alert('Video 8MB se chhota ho');return;}
+var rd=new FileReader();rd.onload=function(){var v=document.getElementById('ceEFVideoPrev');v.src=rd.result;v.style.display='block';v.dataset.val=rd.result;};rd.readAsDataURL(f);e.target.value='';});
+document.getElementById('ceEFSave').addEventListener('click',function(){
+var entry={date:document.getElementById('ceEFDate').value||_todayD(),
+text:document.getElementById('ceEFText').value.replace(/</g,"&lt;"),
+photo:document.getElementById('ceEFPhotoPrev').dataset.val||"",
+video:document.getElementById('ceEFVideoPrev').dataset.val||""};
+if(!entry.text&&!entry.photo&&!entry.video){alert('Kuch likho ya add karo!');return;}
+if(type==='detail'){if(isEdit)_ceDetails[editIdx]=entry;else _ceDetails.push(entry);_renderDetailList();}
+else{if(isEdit)_ceThinks[editIdx]=entry;else _ceThinks.push(entry);_renderThinkList();}
+try{localStorage.setItem("customer_details",JSON.stringify(_ceDetails));}catch(e){}
+try{localStorage.setItem("customer_thinkings",JSON.stringify(_ceThinks));}catch(e){}
+var _cidS=OPT.customerId||"customer1";
+if(window._fbDb){try{_fbDb.ref("customer_details/"+_cidS).set(_ceDetails);}catch(e){}
+try{_fbDb.ref("customer_thinkings/"+_cidS).set(_ceThinks);}catch(e){}}
+ov.remove();});}
+document.getElementById('custEditBack').addEventListener('click',function(){ep.style.display="none";document.body.style.overflow="";});
+document.getElementById('cePhotoUp').addEventListener('click',function(){document.getElementById('cePhotoFile').click();});
+document.getElementById('cePhotoFile').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;
+_fileToData(f,function(dt){document.getElementById('cePhotoPrev').src=dt;document.getElementById('cePhotoPrev').style.display="block";document.getElementById('cePhotoEmoji').style.display="none";document.getElementById('cePhotoPrev').dataset.val=dt;});e.target.value="";});
+document.getElementById('cePhotoUrl').addEventListener('change',function(e){var u=e.target.value.trim();if(!u)return;
+document.getElementById('cePhotoPrev').src=u;document.getElementById('cePhotoPrev').style.display="block";document.getElementById('cePhotoEmoji').style.display="none";document.getElementById('cePhotoPrev').dataset.val=u;e.target.value="";});
+document.getElementById('ceExtraUp').addEventListener('click',function(){document.getElementById('ceExtraFile').click();});
+document.getElementById('ceDetailAdd').addEventListener('click',function(){_showEntryForm('detail');});
+document.getElementById('ceThinkAdd').addEventListener('click',function(){_showEntryForm('thinking');});
+document.getElementById('ceExtraFile').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;
+_fileToData(f,function(dt){_cePhotos.push(dt);_renderExtra();});e.target.value="";});
+document.getElementById('ceExtraUrlAdd').addEventListener('click',function(){var u=document.getElementById('ceExtraUrl').value.trim();if(!u)return;_cePhotos.push(u);document.getElementById('ceExtraUrl').value="";_renderExtra();});
+// ✅ FIX: Preview ab profile.html par le jayega (is file me _openPfPage nahi hai)
+document.getElementById('cePreview').addEventListener('click',function(){alert("Preview dekhne ke liye Save karo!");document.getElementById('ceSave').click();});
+document.getElementById('ceSave').addEventListener('click',function(){
+var d={};
+d.profileName=document.getElementById('ceName').value;
+d.profilePhone=document.getElementById('cePhone').value;
+d.customerStatus=document.getElementById('ceStatus').value;
+try{localStorage.setItem("customer_details",JSON.stringify(_ceDetails));}catch(e){}
+try{localStorage.setItem("customer_thinkings",JSON.stringify(_ceThinks));}catch(e){}
+d.profileDetail=_ceDetails.length>0?_ceDetails[0].text:"";
+d.profileThinking=_ceThinks.length>0?_ceThinks[0].text:"";
+var _td=new Date();d.updatedDate=_td.getFullYear()+"-"+String(_td.getMonth()+1).padStart(2,'0')+"-"+String(_td.getDate()).padStart(2,'0');
+var pv=document.getElementById('cePhotoPrev');
+if(pv.dataset.val){d.profilePhoto=pv.dataset.val;}
+else if(pv.style.display!=="none"&&pv.src){d.profilePhoto=pv.src;}
+for(var q=2;q<=15;q++){d['profilePhoto'+q]=_cePhotos[q-2]||"";}
+try{localStorage.setItem("customer_profile",JSON.stringify(d));}
+catch(e){alert("⚠️ Photo bahut badi hai! Chhoti photo use karo. ("+e.message+")");return;}
+// ✅ FIX: my_profile me bhi sync karo (is file ka format - profile.html yahi padhta hai)
+try{localStorage.setItem("my_profile",JSON.stringify({name:d.profileName,phone:d.profilePhone,status:d.customerStatus,photo:d.profilePhoto,extraPhotos:_cePhotos,details:_ceDetails,thinkings:_ceThinks}));}catch(e){}
+var cid=OPT.customerId||"customer1";
+if(window._fbDb){try{
+_fbDb.ref("customer_details/"+cid).set(_ceDetails);
+_fbDb.ref("customer_thinkings/"+cid).set(_ceThinks);
+_fbDb.ref("customer_profiles/"+cid).set(d,function(err){if(!err){alert("✅ Save ho gaya! Sab friends ko dikhega!");location.href="profile.html";}else{alert("Firebase error: "+err.message);}});}catch(e){alert("✅ Save ho gaya (local)!");location.href="profile.html";}}
+else{alert("✅ Save ho gaya (local)!");location.href="profile.html";}
+});
+setTimeout(function(){var b=document.getElementById('custEditBtn');if(b){b.addEventListener('click',_openEdit);}},800);
+})();
+</script>
+</body></html>
+  

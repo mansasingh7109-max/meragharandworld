@@ -66,7 +66,70 @@ body{background:#fff8f0;color:#333}
 .card .ob{background:#e65100;color:#fff;border:none;padding:8px 20px;border-radius:20px;font-weight:bold;font-size:14px}
 #ftr{background:#4e342e;color:#fff;text-align:center;padding:24px 16px;margin-top:10px}
 #ftr a{color:#ffcc80}
-</style></head><body>
+
+
+
+.reqcard{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;border-left:4px solid #ff9800}
+.reqcard .fp{width:52px;height:52px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.reqcard .info{flex:1}
+.reqcard .fn{font-weight:bold;font-size:15px}
+.reqcard .tm{font-size:11px;color:#999}
+.accbtn{background:#4caf50;color:#fff;border:none;padding:8px 16px;border-radius:18px;font-weight:bold;cursor:pointer;font-size:13px;margin-right:6px}
+.rejbtn{background:#f44336;color:#fff;border:none;padding:8px 16px;border-radius:18px;font-weight:bold;cursor:pointer;font-size:13px}
+.sendbtn{background:#e65100;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px;width:100%;margin-top:8px}
+
+.chat-head{background:#e65100;color:#fff;padding:12px 16px;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:10px}
+.chat-head .fp{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px}
+.chat-head .nm{font-weight:bold;flex:1}
+#chatMsgs{background:#fff;height:300px;overflow-y:auto;padding:12px;border-left:1px solid #eee;border-right:1px solid #eee}
+.msg{max-width:75%;padding:8px 12px;border-radius:12px;margin-bottom:8px;font-size:14px;word-wrap:break-word}
+.msg.me{background:#dcf8c6;margin-left:auto;text-align:right}
+.msg.them{background:#f1f1f1;margin-right:auto}
+.msg img{max-width:100%;border-radius:8px;margin-top:4px}
+.msg .tm{font-size:10px;color:#999;margin-top:4px}
+.chat-input{display:flex;gap:8px;padding:10px;background:#fff;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none}
+.chat-input input{flex:1;padding:10px;border:1px solid #ddd;border-radius:20px;outline:none;font-size:14px}
+.attachbtn{background:#fff;border:1px solid #ddd;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;flex-shrink:0}
+.sendchatbtn{background:#25D366;color:#fff;border:none;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;flex-shrink:0}
+
+
+
+  .mycard{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px}
+.mycard .fp{width:52px;height:52px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden}
+.mycard .info{flex:1}
+.mycard .fn{font-weight:bold;font-size:15px}
+.mycard .st{font-size:12px;color:#4caf50}
+.chatbtn{background:#25D366;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px}
+  
+</style></head>
+  
+  <body>
+
+<div style="background:#e65100;padding:10px;text-align:center;position:sticky;top:0;z-index:99;"><a href="friends.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">👥 Friends</a><a href="profile.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">👤 Profile</a><a href="editprofile.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">✏️ Edit</a><a href="album.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">📸 Album</a><a href="timedatalist.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">📅 Timeline</a></div>
+    
+  
+<div class="sec" id="reqSec">
+<h2>📩 Meri Friend Requests</h2>
+<div id="reqList"></div>
+</div>    
+
+
+
+    
+<div id="chatPage" style="display:none;padding:16px;max-width:600px;margin:0 auto;">
+<button onclick="document.getElementById('chatPage').style.display='none'" style="background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;margin-bottom:12px;">← Wapas</button>
+<div class="chat-head" id="chatHead"></div>
+<div id="chatMsgs"></div>
+<div class="chat-input">
+<label class="attachbtn" style="display:flex;align-items:center;justify-content:center;cursor:pointer">📎<input type="file" id="chatFile" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none" onchange="sendFile(this)"></label>
+<input id="chatText" placeholder="Message likho..." onkeypress="if(event.key==='Enter')sendMsg()">
+<button class="sendchatbtn" onclick="sendMsg()">➤</button>
+</div>
+</div>
+
+
+
+    
 <script>
 var OPT = {
 nameAlign: "left",
@@ -286,11 +349,286 @@ friend6Chat: "", // OPTION: dost 6 ka WhatsApp number (khali = chat button nahi)
 <section id="ordermenu" style="padding:0 20px 10px"></section>
 <section id="friends" style="padding:10px 20px"></section>
 <footer id="ftr">
-<b>Restro Apka</b> | Pilibanga<br><br>
+<b></b> <br><br>
 <a class="btn2" href="https://wa.me/918769171078">WhatsApp: 8769171078</a><br><br>
 <span style="font-size:12px">meragharandworld.web.app</span>
 <div id="profile"></div>
 </footer>
+
+
+
+
+<!-- ===== FIREBASE FRIENDS SEARCH (website accounts) ===== -->
+<div id="fbSearchWrap" style="padding:0 16px;margin-top:12px;">
+<div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+<b style="color:#e65100;font-size:16px;">🌍 Friends Search</b>
+<div style="font-size:12px;color:#888;margin:4px 0 10px;">searching</div>
+<div style="display:flex;gap:8px;">
+<input id="fbSearchInp" type="search" placeholder="🔍 Naam likho..." style="flex:1;padding:12px;border:1px solid #ddd;border-radius:24px;font-size:14px;" oninput="searchFbFriends(this.value)">
+<button onclick="searchFbFriends(document.getElementById('fbSearchInp').value)" style="background:#e65100;color:#fff;border:none;padding:12px 20px;border-radius:24px;font-weight:bold;">🔍</button>
+</div>
+<div id="fbSearchResults" style="margin-top:10px;"></div>
+</div>
+</div>
+<script>
+
+// ===== LOCALSTORAGE =====
+function getRequests(){ try{return JSON.parse(localStorage.getItem("fr_requests")||"[]");}catch(e){return[];} }
+function saveRequests(r){ localStorage.setItem("fr_requests", JSON.stringify(r)); }
+function getMyFriends(){ try{return JSON.parse(localStorage.getItem("fr_myfriends")||"[]");}catch(e){return[];} }
+function saveMyFriends(f){ localStorage.setItem("fr_myfriends", JSON.stringify(f)); }
+
+// ===== REQUEST BHEJO =====
+function sendRequest(i){
+  var f = FRIENDS[i];
+  var reqs = getRequests();
+  if(reqs.some(function(r){return r.name === f.name;})){
+    alert("Request pehle se bheji hui hai!");
+    return;
+  }
+  var now = new Date();
+  var time = now.getDate()+"/"+(now.getMonth()+1)+" "+now.getHours()+":"+String(now.getMinutes()).padStart(2,"0");
+  reqs.push({name: f.name, time: time});
+  saveRequests(reqs);
+  alert("✅ "+f.name+" ko friend request bhej di!");
+  renderRequests();
+}
+
+// ===== REQUEST LIST DIKHAO =====
+function renderRequests(){
+  var list = document.getElementById('reqList');
+  var reqs = getRequests();
+  var sec = document.getElementById('reqSec');
+  if(reqs.length === 0){ sec.style.display = "none"; return; }
+  sec.style.display = "block";
+  var html = "";
+  reqs.forEach(function(r, i){
+    html += '<div class="reqcard">'
+      + '<div class="fp">👤</div>'
+      + '<div class="info"><div class="fn">'+r.name+'</div><div class="tm">📩 '+r.time+'</div></div>'
+      + '<div><button class="accbtn" onclick="acceptReq('+i+')">✅ Accept</button>'
+      + '<button class="rejbtn" onclick="rejectReq('+i+')">❌</button></div>'
+      + '</div>';
+  });
+  list.innerHTML = html;
+}
+
+// ===== ACCEPT KARO =====
+function acceptReq(i){
+  var reqs = getRequests();
+  var r = reqs[i];
+  if(!r) return;
+  var myF = getMyFriends();
+  if(myF.indexOf(r.name) === -1){
+    myF.push(r.name);
+    saveMyFriends(myF);
+  }
+  reqs.splice(i, 1);
+  saveRequests(reqs);
+  alert("🎉 "+r.name+" ab aapka dost hai!");
+  renderRequests();
+}
+
+// ===== REJECT KARO =====
+function rejectReq(i){
+  var reqs = getRequests();
+  var r = reqs[i];
+  reqs.splice(i, 1);
+  saveRequests(reqs);
+  alert(r.name+" ki request hata di.");
+  renderRequests();
+}
+
+
+
+// ===== CHAT STORAGE =====
+function getChats(){ try{return JSON.parse(localStorage.getItem("fr_chats")||"{}");}catch(e){return{};} }
+function saveChats(c){ localStorage.setItem("fr_chats", JSON.stringify(c)); }
+var chatWith = "";
+
+// ===== CHAT KHOLO =====
+function openChat(name){
+  chatWith = name;
+  document.getElementById('chatHead').innerHTML =
+    '<div class="fp">👤</div><div class="nm">💬 '+name+'</div>';
+  document.getElementById('chatPage').style.display = "block";
+  loadMsgs();
+  window.scrollTo(0,0);
+}
+
+// ===== MESSAGES LOAD KARO =====
+function loadMsgs(){
+  var chats = getChats();
+  var msgs = chats[chatWith] || [];
+  var box = document.getElementById('chatMsgs');
+  var html = "";
+  if(msgs.length === 0){
+    html = '<div style="text-align:center;color:#999;padding:20px;">👋 '+chatWith+' se chat shuru karo!</div>';
+  } else {
+    msgs.forEach(function(m){
+      var cls = m.me ? "me" : "them";
+      var content = "";
+      if(m.type === "image"){
+        content = '<img src="'+m.text+'">';
+      } else if(m.type === "video"){
+        content = '<video src="'+m.text+'" controls style="max-width:100%;border-radius:8px;"></video>';
+      } else if(m.type === "file"){
+        content = '📎 <a href="'+m.text+'" download="'+m.fname+'">'+m.fname+'</a>';
+      } else {
+        content = m.text.replace(/</g,"&lt;");
+      }
+      html += '<div class="msg '+cls+'">'+content+'<div class="tm">'+m.time+'</div></div>';
+    });
+  }
+  box.innerHTML = html;
+  box.scrollTop = box.scrollHeight;
+}
+
+function getTime(){
+  var n = new Date();
+  return n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
+}
+
+// ===== TEXT MESSAGE BHEJO =====
+function sendMsg(){
+  var inp = document.getElementById('chatText');
+  var txt = inp.value.trim();
+  if(!txt) return;
+  var chats = getChats();
+  if(!chats[chatWith]) chats[chatWith] = [];
+  chats[chatWith].push({me:true, type:"text", text:txt, time:getTime()});
+  saveChats(chats);
+  inp.value = "";
+  loadMsgs();
+  // Demo auto-reply
+  setTimeout(function(){
+    var chats2 = getChats();
+    var replies = ["Haan ji! 😊", "Achha!", "OK 👍", "Bahut badhiya!"];
+    var r = replies[Math.floor(Math.random()*replies.length)];
+    chats2[chatWith].push({me:false, type:"text", text:r, time:getTime()});
+    saveChats(chats2);
+    if(chatWith) loadMsgs();
+  }, 1500);
+}
+
+// ===== PHOTO/VIDEO/FILE BHEJO =====
+function sendFile(input){
+  var file = input.files[0];
+  if(!file) return;
+  if(file.size > 5*1024*1024){
+    alert("File 5MB se chhoti honi chahiye!");
+    input.value = "";
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var chats = getChats();
+    if(!chats[chatWith]) chats[chatWith] = [];
+    var type = "file";
+    if(file.type.indexOf("image") === 0) type = "image";
+    else if(file.type.indexOf("video") === 0) type = "video";
+    chats[chatWith].push({me:true, type:type, text:e.target.result, fname:file.name, time:getTime()});
+    saveChats(chats);
+    loadMsgs();
+    input.value = "";
+  };
+  reader.readAsDataURL(file);
+}
+
+
+  
+
+
+
+
+
+
+
+
+  
+// ===== FIREBASE FRIENDS SEARCH + REQUEST =====
+var _fbUsers = [];
+function loadFbUsers(){
+  if(!window._fbDb){
+    document.getElementById('fbSearchResults').innerHTML = '<div style="font-size:12px;color:#999;">Firebase connect nahi hai</div>';
+    return;
+  }
+  window._fbDb.ref("customer_profiles").once("value", function(snap){
+    _fbUsers = [];
+    snap.forEach(function(ch){
+      var v = ch.val();
+      v._key = ch.key;
+      _fbUsers.push(v);
+    });
+    searchFbFriends(document.getElementById('fbSearchInp').value || "");
+  });
+}
+function searchFbFriends(q){
+  var box = document.getElementById('fbSearchResults');
+  q = (q||"").toLowerCase().trim();
+  var myLogin = null;
+  try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
+  var myName = (myLogin && myLogin.name || "").toLowerCase();
+  var myPhone = (myLogin && myLogin.phone || "");
+  var results = _fbUsers.filter(function(u){
+    var nm = (u.profileName || u.name || "").toLowerCase();
+    var ph = (u.profilePhone || u.phone || "");
+    if(myName && nm === myName) return false;
+    if(myPhone && ph === myPhone) return false;
+    if(!q) return true;
+    return nm.indexOf(q) !== -1 || ph.indexOf(q) !== -1;
+  });
+  if(results.length === 0){
+    box.innerHTML = '<div style="text-align:center;color:#aaa;font-size:13px;padding:12px;">' + (q ? 'Koi account nahi mila' : 'Search karo ya sab dekho') + '</div>';
+    return;
+  }
+  var h = '';
+  results.slice(0, 20).forEach(function(u, i){
+    var nm = u.profileName || u.name || "Naam nahi";
+    var ph = u.profilePhone || u.phone || "";
+    var photo = u.profilePhoto || "";
+    var pHtml = photo
+      ? '<img src="'+photo+'" style="width:50px;height:50px;border-radius:50%;object-fit:cover;">'
+      : '<div style="width:50px;height:50px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:26px;">👤</div>';
+    var ukey = u._key || '';
+    h += '<div onclick="openFbProfile(\'' + ukey.replace(/'/g,"") + '\')" style="display:flex;align-items:center;gap:10px;background:#f9f9f9;border-radius:12px;padding:10px;margin-bottom:8px;cursor:pointer;">'
+      + pHtml
+      + '<div style="flex:1;"><b style="font-size:14px;">' + nm.replace(/</g,"&lt;") + '</b>'
+      + (ph ? '<div style="font-size:12px;color:#e65100;">📞 ' + ph.replace(/</g,"&lt;") + '</div>' : '')
+      + '</div>'
+      + '<button onclick="sendFbRequest(\'' + ukey.replace(/'/g,"") + '\',this)" style="background:#25D366;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-weight:bold;font-size:13px;white-space:nowrap;">➕ Request</button>'
+      + '</div>';
+  });
+  if(results.length > 20) h += '<div style="text-align:center;font-size:11px;color:#999;">+' + (results.length-20) + ' aur</div>';
+  box.innerHTML = h;
+}
+function sendFbRequest(userKey, btn){
+  var myLogin = null;
+  try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
+  if(!myLogin){ alert("Pehle login karo!"); return; }
+  var myName = myLogin.name || "Unknown";
+  var myPhone = myLogin.phone || "";
+  if(!window._fbDb){ alert("Firebase connect nahi hai!"); return; }
+  var reqData = { fromName: myName, fromPhone: myPhone, toKey: userKey, time: Date.now(), status: "pending" };
+  window._fbDb.ref("friend_requests/" + userKey).push(reqData, function(err){
+    if(err){ alert("Error: " + err.message); }
+    else {
+      btn.textContent = "✅ Bheji!";
+      btn.style.background = "#999";
+      btn.disabled = true;
+      alert("✅ Friend request bhej di!");
+    }
+  });
+}
+setTimeout(loadFbUsers, 1000);
+</script>
+
+    
+
+
+
+
+    
 <script>
 var b=document.getElementById('brand');
 if(OPT.nameAlign==="center"){b.style.textAlign="center";}
@@ -385,7 +723,9 @@ if(_lb)_lb.addEventListener('click',function(){
 var _nm=document.getElementById('loginName').value.trim();
 var _ph2=document.getElementById('loginPhone').value.trim();
 if(_nm===""){alert("Pehle apna naam likho!");return;}
-var _d={profileName:_nm,profilePhone:_ph2};
+  
+var _d={};try{_d=JSON.parse(localStorage.getItem("customer_profile")||"{}");}catch(e){_d={};}_d.profileName=_nm;_d.profilePhone=_ph2;
+  
 try{localStorage.setItem("customer_profile",JSON.stringify(_d));}catch(e){}
 try{localStorage.setItem("customer_logged_in","1");}catch(e){}
 var _cid2=(OPT&&OPT.customerId)||"customer1";
@@ -437,8 +777,21 @@ if(OPT.profileMsgOn==="on"){cardHtml+='<div style="margin-top:14px;padding-top:1
 if(OPT.profileChatOn==="on"){var _cn=OPT.profileChatNumber||"918769171078";cardHtml+='<div style="margin-top:12px;"><a href="https://wa.me/'+_cn+'?text='+encodeURIComponent("Hi "+(OPT.profileName||"")+"!")+'" style="display:inline-block;background:#25D366;color:#fff;font-weight:bold;padding:12px 32px;border-radius:30px;text-decoration:none;font-size:16px;">💬 '+(OPT.profileChatText||"Chat Karo")+'</a><div style="font-size:11px;color:#999;margin-top:4px;">Unlimited chatting - WhatsApp par</div></div>';}
 // EDIT MY PROFILE BUTTON (customer khud edit kare)
 if(OPT.customerEditOn==="on"){cardHtml+='<div style="margin-top:12px;"><button id="custEditBtn" style="background:#e65100;color:#fff;border:none;padding:10px 28px;border-radius:24px;font-weight:bold;font-size:14px;">✏️ Mera Profile Edit Karo</button></div>';}
+
+
+
+
+
+
+cardHtml+='<div style="margin-top:8px;"><button onclick="event.stopPropagation();if(!confirm(\'Logout karein?\'))return;try{localStorage.removeItem(\'customer_logged_in\');}catch(e){}alert(\'Logout ho gaya! 👋\');location.reload();" style="background:#f44336;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:13px;width:100%;">🚪 Logout</button></div>';
+            
+            
+
+
+            
 cardHtml+='<div style="margin-top:10px;"><button class="cardPreviewBtn" onclick="event.stopPropagation();if(window._openPfPage)window._openPfPage();" style="background:#7b1fa2;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">👁️ Preview Dekho (full data)</button></div>';
-cardHtml+='<div style="margin-top:8px;"><button onclick="event.stopPropagation();try{localStorage.removeItem("customer_profile");localStorage.removeItem("customer_details");localStorage.removeItem("customer_thinkings");localStorage.removeItem("pfmsgs_customer1");localStorage.removeItem("diary_customer1");localStorage.removeItem("customer_logged_in");}catch(e){}try{if(window._fbDb){var _lc=(typeof OPT!=="undefined"&&OPT.customerId)||"customer1";_fbDb.ref("customer_profiles/"+_lc).remove();_fbDb.ref("customer_details/"+_lc).remove();_fbDb.ref("customer_thinkings/"+_lc).remove();}}catch(e){}alert("Logout ho gaya! Sab data clear!");setTimeout(function(){location.reload();},600);" style="background:#f44336;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:13px;width:100%;">🚪 Logout</button></div>';
+
+            
 cardHtml+='</div>';
 var wrapHtml='<div style="display:flex;justify-content:'+jf+';padding:12px 20px;">'+cardHtml+'</div>';
 if(pos==="footer"){document.getElementById('profile').innerHTML='<div style="display:flex;justify-content:'+jf+';margin-top:16px;">'+cardHtml+'</div>';}
@@ -515,7 +868,7 @@ h+='<div style="margin-top:10px;"><button id="pfFullLogout" style="background:#f
 h+='<div style="height:30px;"></div></div>';
 pp.innerHTML=h;
 pp.style.display="block";document.body.style.overflow="hidden";
-document.getElementById('pfFullBack').addEventListener('click',function(){pp.style.display="none";document.body.style.overflow="";});
+var _pfb=document.getElementById('pfFullBack');if(_pfb)_pfb.addEventListener('click',function(){pp.style.display="none";document.body.style.overflow="";});
 var _plo=document.getElementById('pfFullLogout');
 if(_plo)_plo.addEventListener('click',function(){if(!confirm("Logout karein? Sab data clear ho jayega!"))return;try{localStorage.removeItem('customer_profile');localStorage.removeItem('customer_details');localStorage.removeItem('customer_thinkings');localStorage.removeItem('pfmsgs_customer1');localStorage.removeItem('diary_customer1');localStorage.removeItem('customer_logged_in');}catch(e){}try{if(window._fbDb){var _lc=(OPT&&OPT.customerId)||'customer1';_fbDb.ref('customer_profiles/'+_lc).remove();_fbDb.ref('customer_details/'+_lc).remove();_fbDb.ref('customer_thinkings/'+_lc).remove();}}catch(e){}alert('Logout ho gaya!');location.reload();});
 var _fm=document.getElementById('pfFullMsg');
@@ -536,6 +889,14 @@ _openPfPage();});
 // "Poora dekho" hint add
 if(!c.querySelector('.pfHint')){var hint=document.createElement('div');hint.className='pfHint';hint.style.cssText='font-size:11px;color:#999;margin-top:8px;';hint.textContent='👆 Tap karo - poora profile dekho';c.appendChild(hint);}
 if(!c.querySelector('.pfPrevBtn')){var pb=document.createElement('button');pb.className='pfPrevBtn';pb.style.cssText='background:#7b1fa2;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:13px;margin-top:8px;width:100%;';pb.textContent='👁️ Preview Dekho';pb.addEventListener('click',function(e){e.stopPropagation();if(window._openPfPage)window._openPfPage();});c.appendChild(pb);}
+  if(!c.querySelector('.pfLogoutBtn')){var lb=document.createElement('button');lb.className='pfLogoutBtn';lb.style.cssText='background:#f44336;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;font-size:13px;margin-top:8px;width:100%;';lb.textContent='🚪 Logout';lb.addEventListener('click',function(e){e.stopPropagation();logoutNow();});c.appendChild(lb);}
+
+
+
+if(_plo)_plo.addEventListener('click',function(){if(!confirm("Logout karein?"))return;try{localStorage.removeItem('customer_logged_in');}catch(e){}alert('Logout ho gaya!');location.reload();});
+
+  
+  
 // Card me Detail/Thinking latest entries dikhao
 (function(){
 function _fd(d){try{var p=d.split("-");var mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return p[2].replace(/^0/,"")+" "+mn[parseInt(p[1])-1];}catch(e){return d;}}
@@ -1066,8 +1427,204 @@ document.getElementById('_lbClose').addEventListener('click',function(){lb.remov
 lb.addEventListener('click',function(e){if(e.target===lb)lb.remove();});
 };
 </script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();
+
+
+
+
+
+
+
+
+// ===== NAAM SE DETAIL KHOLO =====
+function openDetailByName(name){
+  var i = FRIENDS.findIndex(function(x){return x.name === name;});
+  if(i !== -1) openDetail(i);
+}
+
+
+
+
+
+
+// ===== DEMO FRIENDS (sirf tumko dikhenge) =====
+var DEMO_FRIENDS = [
+{photo:"👦", name:"Rahul", role:"Chef", detail:"Rahul hamara best chef hai. 5 saal se kaam kar raha hai."},
+{photo:"👧", name:"Priya", role:"Manager", detail:"Priya sab manage karti hai. Bahut smart hai."},
+{photo:"👨", name:"Amit", role:"Delivery Boy", detail:"Amit tez delivery karta hai. Sabka favourite."},
+{photo:"👩", name:"Sneha", role:"Waiter", detail:"Sneha customers ko bahut achhe se handle karti hai."},
+{photo:"🧑", name:"Vikash", role:"Cook", detail:"Vikash ke haath ka khana sabko pasand hai."},
+{photo:"👴", name:"Ramesh", role:"Helper", detail:"Ramesh ji sabki madad karte hain."}
+];
+var FRIENDS = DEMO_FRIENDS.slice();
+
+// ===== REAL FRIENDS FROM FIREBASE =====
+function loadRealFriends(){
+  if(!window._fbDb) return;
+  window._fbDb.ref("customer_profiles").once("value", function(snap){
+    var realList = [];
+    snap.forEach(function(ch){
+      var u = ch.val();
+      var nm = u.profileName || u.name || "";
+      if(!nm) return;
+      realList.push({
+        photo: u.profilePhoto
+          ? '<img src="'+u.profilePhoto+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+          : "👤",
+        name: nm,
+        role: u.profilePhone || u.phone || "",
+        detail: (u.profileDetail || "") + "<br>📞 " + (u.profilePhone || u.phone || "")
+      });
+    });
+    // Apna khud ka naam hatao
+    var myLogin = null;
+    try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
+    var myName = (myLogin && myLogin.name || "").toLowerCase();
+    // Sirf tumko (Manisha) demo dikhega
+    var isOwner = myName === "manisha";
+    if(isOwner){
+      FRIENDS = DEMO_FRIENDS.concat(realList);
+    } else {
+      FRIENDS = realList;
+    }
+    // Apna naam list se hatao
+    if(myName){
+      FRIENDS = FRIENDS.filter(function(f){ return f.name.toLowerCase() !== myName; });
+    }
+    renderFriends(document.getElementById('frSearch').value || "");
+    renderMyFriends();
+    renderRequests();
+  });
+}
+setTimeout(loadRealFriends, 1500);
+
+
+
+
+
+  // ===== FRIEND DETAIL PAGE KHOLO =====
+var currentFriend = -1;
+function openDetail(i){
+  currentFriend = i;
+  var f = FRIENDS[i];
+  if(!f) return;
+  var myF = getMyFriends();
+  var reqs = getRequests();
+  var isFriend = myF.indexOf(f.name) !== -1;
+  var hasReq = reqs.some(function(r){return r.name === f.name;});
+
+  var btnHtml = "";
+  if(isFriend){
+    btnHtml = '<button style="background:#25D366;color:#fff;border:none;padding:14px;font-size:16px;margin-top:10px;width:100%;border-radius:20px;font-weight:bold;cursor:pointer;" onclick="openChat(\''+f.name.replace(/'/g,"")+'\')">💬 Chat Karo</button>'
+      + '<div style="color:#4caf50;font-weight:bold;margin-top:10px;">✅ Ye aapka dost hai</div>';
+  } else if(hasReq){
+    btnHtml = '<div style="color:#ff9800;font-weight:bold;margin-top:10px;">⏳ Request bhej di hai!</div>';
+  } else {
+    btnHtml = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>';
+  }
+
+  var photoHtml = f.photo;
+  // Agar photo me img tag nahi hai to div me wrap karo
+  if(photoHtml.indexOf('<img') === -1){
+    photoHtml = '<div style="width:100px;height:100px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:56px;margin:0 auto;overflow:hidden;">'+photoHtml+'</div>';
+  } else {
+    photoHtml = '<div style="width:100px;height:100px;border-radius:50%;overflow:hidden;margin:0 auto;">'+photoHtml+'</div>';
+  }
+
+  document.getElementById('detailCard').innerHTML =
+    photoHtml
+    + '<h2 style="font-size:22px;margin:12px 0 4px;">'+f.name+'</h2>'
+    + '<div style="color:#e65100;font-weight:bold;margin-bottom:10px;">'+f.role+'</div>'
+    + '<div style="font-size:14px;color:#666;text-align:left;margin:12px 0;line-height:1.6;">'+f.detail+'</div>'
+    + btnHtml;
+
+  document.getElementById('detailPage').style.display = "block";
+  window.scrollTo(0,0);
+}
+function closeDetail(){
+  document.getElementById('detailPage').style.display = "none";
+}
+
+
+// ===== FIREBASE USER KA PROFILE KHOLO =====
+function openFbProfile(userKey){
+  var u = null;
+  for(var i=0; i<_fbUsers.length; i++){
+    if(_fbUsers[i]._key === userKey){ u = _fbUsers[i]; break; }
+  }
+  if(!u) return;
+  var nm = u.profileName || u.name || "Naam nahi";
+  var ph = u.profilePhone || u.phone || "";
+  var photo = u.profilePhoto || "";
+  var pHtml = photo
+    ? '<img src="'+photo+'" style="width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto;display:block;">'
+    : '<div style="width:100px;height:100px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:56px;margin:0 auto;">👤</div>';
+
+  document.getElementById('detailCard').innerHTML =
+    pHtml
+    + '<h2 style="font-size:22px;margin:12px 0 4px;">'+nm.replace(/</g,"&lt;")+'</h2>'
+    + (ph ? '<div style="color:#e65100;font-weight:bold;margin-bottom:10px;">📞 '+ph.replace(/</g,"&lt;")+'</div>' : '')
+    + '<div style="font-size:14px;color:#666;margin:12px 0;">'+(u.profileDetail||"").replace(/</g,"&lt;")+'</div>'
+    + '<button onclick="sendFbRequest(\''+userKey+'\',this)" style="background:#25D366;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;">➕ Friend Request Bhejo</button>';
+
+  document.getElementById('detailPage').style.display = "block";
+  window.scrollTo(0,0);
+}
+
+
+
+
+// ===== MERE DOST LIST =====
+function renderMyFriends(){
+  var list = document.getElementById('myFriendsList');
+  if(!list) return;
+  var myF = getMyFriends();
+  var sec = document.getElementById('myFriendsSec');
+  if(myF.length === 0){ if(sec) sec.style.display = "none"; return; }
+  if(sec) sec.style.display = "block";
+  var html = "";
+  myF.forEach(function(name){
+    html += '<div style="background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;">'
+      + '<div style="width:52px;height:52px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;cursor:pointer;" onclick="openDetailByName(\''+name.replace(/'/g,"")+'\')">👤</div>'
+      + '<div style="flex:1;cursor:pointer;" onclick="openDetailByName(\''+name.replace(/'/g,"")+'\')"><div style="font-weight:bold;font-size:15px;">'+name+'</div><div style="font-size:12px;color:#4caf50;">✅ Dost</div></div>'
+      + '<button onclick="openChat(\''+name.replace(/'/g,"")+'\')" style="background:#25D366;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px;">💬 Chat</button>'
+      + '</div>';
+  });
+  list.innerHTML = html;
+}
+
+
+
+
+ setTimeout(function(){ renderRequests(); renderMyFriends(); }, 1500); 
+
+
+function logoutNow(){
+if(!confirm("Logout karein?"))return;
+try{localStorage.removeItem("customer_logged_in");}catch(e){}
+alert("Logout ho gaya! 👋");
+location.reload();
+}
+  
+  
+</script>
 
 <button onclick="var _c=(typeof OPT!=='undefined'&&OPT.customerId)||'customer1';location.href='album.html?cid='+_c" style="background:#9C27B0;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">📸 Album Dekho</button>  
 <button onclick="location.href='timedatalist.html'" style="background:#2196F3;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">📅 Timeline Dekho</button>
+
+
+
+
+<!-- ===== MERE DOST (ACCEPTED) SECTION ===== -->
+<div style="padding:10px 20px;max-width:560px;margin:0 auto;" id="myFriendsSec">
+<h2 style="color:#e65100;text-align:center;margin:16px 0 12px;font-size:22px;">💚 Mere Dost</h2>
+<div id="myFriendsList"></div>
+</div>
+
+<!-- ===== FRIEND DETAIL PAGE (profile dekhne ke liye) ===== -->
+<div id="detailPage" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#fff8f0;z-index:500;overflow-y:auto;padding:16px;box-sizing:border-box;">
+<button onclick="closeDetail()" style="background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;margin-bottom:12px;">← Wapas</button>
+<div id="detailCard" style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center;max-width:500px;margin:0 auto;"></div>
+</div>
+    
 </body></html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="hi"><head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mere Dost - Friend List</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#fff8f0;color:#333}
+#hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
+#brand{font-size:20px;font-weight:bold;color:#000;flex:1}
+.backbtn{background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;text-decoration:none;font-size:14px}
+#hero{background:linear-gradient(135deg,#ff7043,#e65100);color:#fff;padding:30px 20px;text-align:center}
+#hero h1{font-size:28px;margin-bottom:6px}
+#hero p{font-size:14px}
+#searchWrap{padding:16px 20px 0;max-width:560px;margin:0 auto}
+#frSearch{width:100%;padding:12px 16px;border:2px solid #e65100;border-radius:24px;font-size:15px;box-sizing:border-box;outline:none}
+#frSearch:focus{border-color:#ff7043;box-shadow:0 0 8px rgba(230,81,0,.2)}
+.hint{text-align:center;font-size:11px;color:#999;margin-top:6px}
+.sec{padding:10px 20px;max-width:560px;margin:0 auto}
+.sec h2{color:#e65100;text-align:center;margin:16px 0 12px;font-size:22px}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.fcard{background:#fff;border-radius:14px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08);cursor:pointer}
+.fcard .fp{width:64px;height:64px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 8px;overflow:hidden}
+.fcard .fp img{width:100%;height:100%;object-fit:cover}
+.fcard .fn{font-weight:bold;font-size:15px}
+.fcard .fr{color:#e65100;font-size:13px;font-weight:bold}
+.fcard .fd{font-size:11px;color:#777;margin-top:6px}
+.fcard .tap{font-size:11px;color:#999;margin-top:6px}
+.mycard{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px}
+.mycard .fp{width:52px;height:52px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden}
+.mycard .fp img{width:100%;height:100%;object-fit:cover}
+.mycard .info{flex:1}
+.mycard .fn{font-weight:bold;font-size:15px}
+.mycard .st{font-size:12px;color:#4caf50}
+.chatbtn{background:#25D366;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px}
+.reqcard{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;border-left:4px solid #ff9800}
+.reqcard .fp{width:52px;height:52px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.reqcard .info{flex:1}
+.reqcard .fn{font-weight:bold;font-size:15px}
+.reqcard .tm{font-size:11px;color:#999}
+.accbtn{background:#4caf50;color:#fff;border:none;padding:8px 16px;border-radius:18px;font-weight:bold;cursor:pointer;font-size:13px;margin-right:6px}
+.rejbtn{background:#f44336;color:#fff;border:none;padding:8px 16px;border-radius:18px;font-weight:bold;cursor:pointer;font-size:13px}
+.sendbtn{background:#e65100;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px;width:100%;margin-top:8px}
+.empty{text-align:center;color:#999;padding:20px;font-size:14px}
+#ftr{background:#4e342e;color:#fff;text-align:center;padding:24px 16px;margin-top:20px}
+#ftr a{color:#ffcc80}
+/* Friend Detail Page */
+#detailPage,#chatPage{padding:16px;max-width:600px;margin:0 auto;display:none}
+.detail-card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center}
+.detail-card .bigphoto{width:100px;height:100px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:56px;margin:0 auto 12px;overflow:hidden}
+.detail-card .bigphoto img{width:100%;height:100%;object-fit:cover}
+.detail-card h2{font-size:22px;margin-bottom:4px}
+.detail-card .role{color:#e65100;font-weight:bold;margin-bottom:10px}
+.detail-card .desc{font-size:14px;color:#666;text-align:left;margin:12px 0;line-height:1.6}
+/* Chat */
+.chat-head{background:#e65100;color:#fff;padding:12px 16px;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:10px}
+.chat-head .fp{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px}
+.chat-head .nm{font-weight:bold;flex:1}
+#chatMsgs{background:#fff;height:300px;overflow-y:auto;padding:12px;border-left:1px solid #eee;border-right:1px solid #eee}
+.msg{max-width:75%;padding:8px 12px;border-radius:12px;margin-bottom:8px;font-size:14px;word-wrap:break-word}
+.msg.me{background:#dcf8c6;margin-left:auto;text-align:right}
+.msg.them{background:#f1f1f1;margin-right:auto}
+.msg img{max-width:100%;border-radius:8px;margin-top:4px}
+.msg .tm{font-size:10px;color:#999;margin-top:4px}
+.chat-input{display:flex;gap:8px;padding:10px;background:#fff;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none}
+.chat-input input{flex:1;padding:10px;border:1px solid #ddd;border-radius:20px;outline:none;font-size:14px}
+.attachbtn{background:#fff;border:1px solid #ddd;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;flex-shrink:0}
+.sendchatbtn{background:#25D366;color:#fff;border:none;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;flex-shrink:0}
+.hidden{display:none!important}
+</style></head>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script>
+// ===== FIREBASE CONFIG =====
+var FIREBASE_CONFIG = {
+  
+  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"
+
+};
+var _fbDb = null;
+try {
+if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "") {
+firebase.initializeApp(FIREBASE_CONFIG);
+_fbDb = firebase.database();
+}
+} catch(e) {}
+</script>
+<body>
+
+<!-- ============ MAIN LIST VIEW ============ -->
+<div id="listView">
+<header id="hdr">
+<a class="backbtn" href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImhpIj48aGVhZD48bWV0YSBjaGFyc2V0PSJVVEYtOCI+PG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEiPgo8dGl0bGU+UmVzdHJvIEFwa2E8L3RpdGxlPgo8c3R5bGU+Cip7bWFyZ2luOjA7cGFkZGluZzowO2JveC1zaXppbmc6Ym9yZGVyLWJveDtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmfQpib2R5e2JhY2tncm91bmQ6I2ZmZjhmMDtjb2xvcjojMzMzfQojaGRye2JhY2tncm91bmQ6I2ZmZjtwYWRkaW5nOjEycHggMTZweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2JveC1zaGFkb3c6MCAycHggNnB4IHJnYmEoMCwwLDAsLjEpO3Bvc2l0aW9uOnN0aWNreTt0b3A6MDt6LWluZGV4OjEwfQojYnJhbmR7Zm9udC1zaXplOjIycHg7Zm9udC13ZWlnaHQ6Ym9sZDtjb2xvcjojMDAwO2ZsZXg6MX0KI25hdntkaXNwbGF5OmZsZXg7Z2FwOjE0cHh9CiNuYXYgYXt0ZXh0LWRlY29yYXRpb246bm9uZTtjb2xvcjojZTY1MTAwO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjE1cHg7cGFkZGluZzo2cHggOHB4fQojbmF2IGE6YWN0aXZle2JhY2tncm91bmQ6I2ZmZTBiMjtib3JkZXItcmFkaXVzOjZweH0KI2hlcm97YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNmZjcwNDMsI2U2NTEwMCk7Y29sb3I6I2ZmZjtwYWRkaW5nOjQwcHggMjBweDtib3JkZXItcmFkaXVzOjAgMCAyNHB4IDI0cHh9CiNoZXJvIGgxe2ZvbnQtc2l6ZTozMnB4O21hcmdpbi1ib3R0b206OHB4fQojaGVybyBwe2ZvbnQtc2l6ZToxNnB4O21hcmdpbi1ib3R0b206MTZweH0KLmJ0bjJ7ZGlzcGxheTppbmxpbmUtYmxvY2s7YmFja2dyb3VuZDojMjVEMzY2O2NvbG9yOiNmZmY7Zm9udC13ZWlnaHQ6Ym9sZDtwYWRkaW5nOjEycHggMjRweDtib3JkZXItcmFkaXVzOjMwcHg7dGV4dC1kZWNvcmF0aW9uOm5vbmU7Zm9udC1zaXplOjE2cHh9CiNpdGVtc3twYWRkaW5nOjIwcHg7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDoxNHB4fQouY2FyZHtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXJhZGl1czoxNHB4O292ZXJmbG93OmhpZGRlbjtib3gtc2hhZG93OjAgMnB4IDhweCByZ2JhKDAsMCwwLC4xKTt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nLWJvdHRvbToxMnB4fQouY2FyZCAucGh7aGVpZ2h0OjExMHB4O2JhY2tncm91bmQ6I2ZmZTBiMjtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQ0cHh9Ci5jYXJkIGgze2ZvbnQtc2l6ZToxNnB4O21hcmdpbjo4cHggNHB4IDJweH0KLmNhcmQgLnBye2NvbG9yOiNlNjUxMDA7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTZweH0KLmNhcmQgLmRze2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM4ODg7bWFyZ2luOjJweCA2cHggOHB4fQouY2FyZCAub2J7YmFja2dyb3VuZDojZTY1MTAwO2NvbG9yOiNmZmY7Ym9yZGVyOm5vbmU7cGFkZGluZzo4cHggMjBweDtib3JkZXItcmFkaXVzOjIwcHg7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTRweH0KI2Z0cntiYWNrZ3JvdW5kOiM0ZTM0MmU7Y29sb3I6I2ZmZjt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nOjI0cHggMTZweDttYXJnaW4tdG9wOjEwcHh9CiNmdHIgYXtjb2xvcjojZmZjYzgwfQo8L3N0eWxlPjwvaGVhZD48Ym9keT4KPHNjcmlwdD4KdmFyIE9QVCA9IHsKbmFtZUFsaWduOiAibGVmdCIsIC8vIE9QVElPTjogImxlZnQiPW5hYW0gbGVmdCBtZSwgImNlbnRlciI9bmFhbSBiZWVjaCBtZSwgInJpZ2h0Ij1uYWFtIHJpZ2h0IG1lCm1lbnVIb21lOiAib24iLCAvLyBPUFRJT046ICJvbiI9SG9tZSBkaWtoZWdhLCAib2ZmIj1Ib21lIGNoaHVwZWdhCm1lbnVNZW51OiAib24iLCAvLyBPUFRJT046ICJvbiI9TWVudSBkaWtoZWdhLCAib2ZmIj1NZW51IGNoaHVwZWdhCm1lbnVPcmRlcnM6ICJvbiIsIC8vIE9QVElPTjogIm9uIj1PcmRlcnMgZGlraGVnYSwgIm9mZiI9T3JkZXJzIGNoaHVwZWdhCm1lbnVDb250YWN0OiAib24iLCAvLyBPUFRJT046ICJvbiI9Q29udGFjdCBkaWtoZWdhLCAib2ZmIj1Db250YWN0IGNoaHVwZWdhCm9yZGVyQnRuOiAib24iLCAvLyBPUFRJT046ICJvbiI9T3JkZXIgYnV0dG9uIGRpa2hlZ2EsICJvZmYiPU9yZGVyIGJ1dHRvbiBjaGh1cGVnYQppdGVtc1NlYzogIm9uIiAvLyBPUFRJT046ICJvbiI9ZGlzaGVzIGRpa2hlbmdlLCAib2ZmIj1kaXNoZXMgY2hodXBlbmdlCn07Cjwvc2NyaXB0Pgo8aGVhZGVyIGlkPSJoZHIiPgo8ZGl2IGlkPSJicmFuZCI+UmVzdHJvIEFwa2E8L2Rpdj4KPG5hdiBpZD0ibmF2Ij4KPGEgaWQ9Im1IIiBocmVmPSIjIj5Ib21lPC9hPjxhIGlkPSJtTSIgaHJlZj0iI2l0ZW1zIj5NZW51PC9hPjxhIGlkPSJtTyIgaHJlZj0iIyI+T3JkZXJzPC9hPjxhIGlkPSJtQyIgaHJlZj0iI2Z0ciI+Q29udGFjdDwvYT4KPC9uYXY+PC9oZWFkZXI+CjxzZWN0aW9uIGlkPSJoZXJvIj48ZGl2IGlkPSJoZXJvSW4iPgo8aDE+QmFyZmkgU3BlY2lhbDwvaDE+CjxwPjMwLW1pbiBkZWxpdmVyeSBpbiBQaWxpYmFuZ2EgfCB0YWF6YSBiYXJmaSwgaGFyIHJvejwvcD4KPGEgaWQ9Im9yZEJ0biIgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5PcmRlciBvbiBXaGF0c0FwcDwvYT4KPC9kaXY+PC9zZWN0aW9uPgo8c2VjdGlvbiBpZD0iaXRlbXMiPjwvc2VjdGlvbj4KPGZvb3RlciBpZD0iZnRyIj4KPGI+UmVzdHJvIEFwa2E8L2I+IHwgUGlsaWJhbmdhPGJyPjxicj4KPGEgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5XaGF0c0FwcDogODc2OTE3MTA3ODwvYT48YnI+PGJyPgo8c3BhbiBzdHlsZT0iZm9udC1zaXplOjEycHgiPnJlc3Ryb2ZvcnlvdS53ZWIuYXBwPC9zcGFuPgo8L2Zvb3Rlcj4KPHNjcmlwdD4KLy8gRklYRUQ6IHBlaGxlIGNlbnRlciBvcHRpb24gbWlzc2luZyB0aGEsIGFiIHRlZW5vIGthYW0ga2FyZW5nZQp2YXIgYj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYnJhbmQnKTsKaWYoT1BULm5hbWVBbGlnbj09PSJjZW50ZXIiKXtiLnN0eWxlLnRleHRBbGlnbj0iY2VudGVyIjt9CmVsc2UgaWYoT1BULm5hbWVBbGlnbj09PSJyaWdodCIpe2Iuc3R5bGUudGV4dEFsaWduPSJyaWdodCI7fQplbHNle2Iuc3R5bGUudGV4dEFsaWduPSJsZWZ0Ijt9CmlmKE9QVC5tZW51SG9tZT09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtSCcpLnN0eWxlLmRpc3BsYXk9Im5vbmUiOwppZihPUFQubWVudU1lbnU9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU0nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVPcmRlcnM9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU8nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVDb250YWN0PT09Im9mZiIpZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21DJykuc3R5bGUuZGlzcGxheT0ibm9uZSI7CmlmKE9QVC5vcmRlckJ0bj09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdvcmRCdG4nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKdmFyIGl0ZW1zPVtbIvCfjbIiLCJWZWcgTW9tb3MgMTBwY3MiLCJScyAxNDkiLCJHYXIgbWEgZ2FyYW0gbW9tb3MiXSxbIvCfjZUiLCJWZWcgQ2hlZXNlIFBpenphIiwiUnMgMjk5IiwiQ2hlZXN5IHRhc3R5IHBpenphIl0sWyLwn42bIiwiQmlyeWFuaSIsIlJzIDE5OSIsIktodXNoYnVkYWFyIGJpcnlhbmkiXSxbIvCfpaoiLCJWZWcgU2FuZHdpY2giLCJScyA5OSIsIkZyZXNoIHZlZyBzYW5kd2ljaCJdXTsKaWYoT1BULml0ZW1zU2VjPT09Im9mZiIpe2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpdGVtcycpLnN0eWxlLmRpc3BsYXk9Im5vbmUiO30KZWxzZXt2YXIgaD0iIjtmb3IodmFyIGk9MDtpPGl0ZW1zLmxlbmd0aDtpKyspe2grPSc8ZGl2IGNsYXNzPSJjYXJkIj48ZGl2IGNsYXNzPSJwaCI+JytpdGVtc1tpXVswXSsnPC9kaXY+PGgzPicraXRlbXNbaV1bMV0rJzwvaDM+PGRpdiBjbGFzcz0icHIiPicraXRlbXNbaV1bMl0rJzwvZGl2PjxkaXYgY2xhc3M9ImRzIj4nK2l0ZW1zW2ldWzNdKyc8L2Rpdj48YnV0dG9uIGNsYXNzPSJvYiIgZGF0YS1ubT0iJytpdGVtc1tpXVsxXSsnIj5PcmRlcjwvYnV0dG9uPjwvZGl2Pic7fQpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaXRlbXMnKS5pbm5lckhUTUw9aDsKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2l0ZW1zJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLGZ1bmN0aW9uKGUpe3ZhciB0PWUudGFyZ2V0O2lmKHQuY2xhc3NOYW1lPT09J29iJyl7bG9jYXRpb24uaHJlZj0naHR0cHM6Ly93YS5tZS85MTg3NjkxNzEwNzg/dGV4dD0nK2VuY29kZVVSSUNvbXBvbmVudCgnT3JkZXI6ICcrdC5nZXRBdHRyaWJ1dGUoJ2RhdGEtbm0nKSk7fX0pO30KPC9zY3JpcHQ+CjwvYm9keT48L2h0bWw+">← Back</a>
+<div id="brand" style="text-align:center">👥 Mere Dost</div>
+<div style="width:70px"></div>
+</header>
+
+<div id="hero">
+<h1>👥 Doston ki Duniya</h1>
+<p>Dost dhoondo, request bhejo, chat karo!</p>
+</div>
+
+<div id="searchWrap">
+<input id="frSearch" type="search" placeholder="🔍 Dost ka naam likho..." oninput="filterFriends(this.value)">
+<div class="hint">Naam likho - dost dhoondo, request bhejo!</div>
+</div>
+
+<!-- Mere Dost (Accepted) -->
+<div class="sec" id="myFriendsSec">
+<h2>💚 Mere Dost</h2>
+<div id="myFriendsList"></div>
+</div>
+
+<!-- Meri Requests -->
+<div class="sec" id="reqSec">
+<h2>📩 Meri Friend Requests</h2>
+<div id="reqList"></div>
+</div>
+
+<!-- Hamare Dost (All) -->
+<div class="sec">
+<h2>👥 Hamare Dost</h2>
+<div class="fgrid" id="friendsGrid"></div>
+</div>
+
+<footer id="ftr">
+<b>Mere Dost</b><br><br>
+<a href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImhpIj48aGVhZD48bWV0YSBjaGFyc2V0PSJVVEYtOCI+PG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEiPgo8dGl0bGU+UmVzdHJvIEFwa2E8L3RpdGxlPgo8c3R5bGU+Cip7bWFyZ2luOjA7cGFkZGluZzowO2JveC1zaXppbmc6Ym9yZGVyLWJveDtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmfQpib2R5e2JhY2tncm91bmQ6I2ZmZjhmMDtjb2xvcjojMzMzfQojaGRye2JhY2tncm91bmQ6I2ZmZjtwYWRkaW5nOjEycHggMTZweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2JveC1zaGFkb3c6MCAycHggNnB4IHJnYmEoMCwwLDAsLjEpO3Bvc2l0aW9uOnN0aWNreTt0b3A6MDt6LWluZGV4OjEwfQojYnJhbmR7Zm9udC1zaXplOjIycHg7Zm9udC13ZWlnaHQ6Ym9sZDtjb2xvcjojMDAwO2ZsZXg6MX0KI25hdntkaXNwbGF5OmZsZXg7Z2FwOjE0cHh9CiNuYXYgYXt0ZXh0LWRlY29yYXRpb246bm9uZTtjb2xvcjojZTY1MTAwO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjE1cHg7cGFkZGluZzo2cHggOHB4fQojbmF2IGE6YWN0aXZle2JhY2tncm91bmQ6I2ZmZTBiMjtib3JkZXItcmFkaXVzOjZweH0KI2hlcm97YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNmZjcwNDMsI2U2NTEwMCk7Y29sb3I6I2ZmZjtwYWRkaW5nOjQwcHggMjBweDtib3JkZXItcmFkaXVzOjAgMCAyNHB4IDI0cHh9CiNoZXJvIGgxe2ZvbnQtc2l6ZTozMnB4O21hcmdpbi1ib3R0b206OHB4fQojaGVybyBwe2ZvbnQtc2l6ZToxNnB4O21hcmdpbi1ib3R0b206MTZweH0KLmJ0bjJ7ZGlzcGxheTppbmxpbmUtYmxvY2s7YmFja2dyb3VuZDojMjVEMzY2O2NvbG9yOiNmZmY7Zm9udC13ZWlnaHQ6Ym9sZDtwYWRkaW5nOjEycHggMjRweDtib3JkZXItcmFkaXVzOjMwcHg7dGV4dC1kZWNvcmF0aW9uOm5vbmU7Zm9udC1zaXplOjE2cHh9CiNpdGVtc3twYWRkaW5nOjIwcHg7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDoxNHB4fQouY2FyZHtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXJhZGl1czoxNHB4O292ZXJmbG93OmhpZGRlbjtib3gtc2hhZG93OjAgMnB4IDhweCByZ2JhKDAsMCwwLC4xKTt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nLWJvdHRvbToxMnB4fQouY2FyZCAucGh7aGVpZ2h0OjExMHB4O2JhY2tncm91bmQ6I2ZmZTBiMjtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQ0cHh9Ci5jYXJkIGgze2ZvbnQtc2l6ZToxNnB4O21hcmdpbjo4cHggNHB4IDJweH0KLmNhcmQgLnBye2NvbG9yOiNlNjUxMDA7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTZweH0KLmNhcmQgLmRze2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM4ODg7bWFyZ2luOjJweCA2cHggOHB4fQouY2FyZCAub2J7YmFja2dyb3VuZDojZTY1MTAwO2NvbG9yOiNmZmY7Ym9yZGVyOm5vbmU7cGFkZGluZzo4cHggMjBweDtib3JkZXItcmFkaXVzOjIwcHg7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTRweH0KI2Z0cntiYWNrZ3JvdW5kOiM0ZTM0MmU7Y29sb3I6I2ZmZjt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nOjI0cHggMTZweDttYXJnaW4tdG9wOjEwcHh9CiNmdHIgYXtjb2xvcjojZmZjYzgwfQo8L3N0eWxlPjwvaGVhZD48Ym9keT4KPHNjcmlwdD4KdmFyIE9QVCA9IHsKbmFtZUFsaWduOiAibGVmdCIsIC8vIE9QVElPTjogImxlZnQiPW5hYW0gbGVmdCBtZSwgImNlbnRlciI9bmFhbSBiZWVjaCBtZSwgInJpZ2h0Ij1uYWFtIHJpZ2h0IG1lCm1lbnVIb21lOiAib24iLCAvLyBPUFRJT046ICJvbiI9SG9tZSBkaWtoZWdhLCAib2ZmIj1Ib21lIGNoaHVwZWdhCm1lbnVNZW51OiAib24iLCAvLyBPUFRJT046ICJvbiI9TWVudSBkaWtoZWdhLCAib2ZmIj1NZW51IGNoaHVwZWdhCm1lbnVPcmRlcnM6ICJvbiIsIC8vIE9QVElPTjogIm9uIj1PcmRlcnMgZGlraGVnYSwgIm9mZiI9T3JkZXJzIGNoaHVwZWdhCm1lbnVDb250YWN0OiAib24iLCAvLyBPUFRJT046ICJvbiI9Q29udGFjdCBkaWtoZWdhLCAib2ZmIj1Db250YWN0IGNoaHVwZWdhCm9yZGVyQnRuOiAib24iLCAvLyBPUFRJT046ICJvbiI9T3JkZXIgYnV0dG9uIGRpa2hlZ2EsICJvZmYiPU9yZGVyIGJ1dHRvbiBjaGh1cGVnYQppdGVtc1NlYzogIm9uIiAvLyBPUFRJT046ICJvbiI9ZGlzaGVzIGRpa2hlbmdlLCAib2ZmIj1kaXNoZXMgY2hodXBlbmdlCn07Cjwvc2NyaXB0Pgo8aGVhZGVyIGlkPSJoZHIiPgo8ZGl2IGlkPSJicmFuZCI+UmVzdHJvIEFwa2E8L2Rpdj4KPG5hdiBpZD0ibmF2Ij4KPGEgaWQ9Im1IIiBocmVmPSIjIj5Ib21lPC9hPjxhIGlkPSJtTSIgaHJlZj0iI2l0ZW1zIj5NZW51PC9hPjxhIGlkPSJtTyIgaHJlZj0iIyI+T3JkZXJzPC9hPjxhIGlkPSJtQyIgaHJlZj0iI2Z0ciI+Q29udGFjdDwvYT4KPC9uYXY+PC9oZWFkZXI+CjxzZWN0aW9uIGlkPSJoZXJvIj48ZGl2IGlkPSJoZXJvSW4iPgo8aDE+QmFyZmkgU3BlY2lhbDwvaDE+CjxwPjMwLW1pbiBkZWxpdmVyeSBpbiBQaWxpYmFuZ2EgfCB0YWF6YSBiYXJmaSwgaGFyIHJvejwvcD4KPGEgaWQ9Im9yZEJ0biIgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5PcmRlciBvbiBXaGF0c0FwcDwvYT4KPC9kaXY+PC9zZWN0aW9uPgo8c2VjdGlvbiBpZD0iaXRlbXMiPjwvc2VjdGlvbj4KPGZvb3RlciBpZD0iZnRyIj4KPGI+UmVzdHJvIEFwa2E8L2I+IHwgUGlsaWJhbmdhPGJyPjxicj4KPGEgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5XaGF0c0FwcDogODc2OTE3MTA3ODwvYT48YnI+PGJyPgo8c3BhbiBzdHlsZT0iZm9udC1zaXplOjEycHgiPnJlc3Ryb2ZvcnlvdS53ZWIuYXBwPC9zcGFuPgo8L2Zvb3Rlcj4KPHNjcmlwdD4KLy8gRklYRUQ6IHBlaGxlIGNlbnRlciBvcHRpb24gbWlzc2luZyB0aGEsIGFiIHRlZW5vIGthYW0ga2FyZW5nZQp2YXIgYj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYnJhbmQnKTsKaWYoT1BULm5hbWVBbGlnbj09PSJjZW50ZXIiKXtiLnN0eWxlLnRleHRBbGlnbj0iY2VudGVyIjt9CmVsc2UgaWYoT1BULm5hbWVBbGlnbj09PSJyaWdodCIpe2Iuc3R5bGUudGV4dEFsaWduPSJyaWdodCI7fQplbHNle2Iuc3R5bGUudGV4dEFsaWduPSJsZWZ0Ijt9CmlmKE9QVC5tZW51SG9tZT09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtSCcpLnN0eWxlLmRpc3BsYXk9Im5vbmUiOwppZihPUFQubWVudU1lbnU9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU0nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVPcmRlcnM9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU8nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVDb250YWN0PT09Im9mZiIpZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21DJykuc3R5bGUuZGlzcGxheT0ibm9uZSI7CmlmKE9QVC5vcmRlckJ0bj09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdvcmRCdG4nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKdmFyIGl0ZW1zPVtbIvCfjbIiLCJWZWcgTW9tb3MgMTBwY3MiLCJScyAxNDkiLCJHYXIgbWEgZ2FyYW0gbW9tb3MiXSxbIvCfjZUiLCJWZWcgQ2hlZXNlIFBpenphIiwiUnMgMjk5IiwiQ2hlZXN5IHRhc3R5IHBpenphIl0sWyLwn42bIiwiQmlyeWFuaSIsIlJzIDE5OSIsIktodXNoYnVkYWFyIGJpcnlhbmkiXSxbIvCfpaoiLCJWZWcgU2FuZHdpY2giLCJScyA5OSIsIkZyZXNoIHZlZyBzYW5kd2ljaCJdXTsKaWYoT1BULml0ZW1zU2VjPT09Im9mZiIpe2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpdGVtcycpLnN0eWxlLmRpc3BsYXk9Im5vbmUiO30KZWxzZXt2YXIgaD0iIjtmb3IodmFyIGk9MDtpPGl0ZW1zLmxlbmd0aDtpKyspe2grPSc8ZGl2IGNsYXNzPSJjYXJkIj48ZGl2IGNsYXNzPSJwaCI+JytpdGVtc1tpXVswXSsnPC9kaXY+PGgzPicraXRlbXNbaV1bMV0rJzwvaDM+PGRpdiBjbGFzcz0icHIiPicraXRlbXNbaV1bMl0rJzwvZGl2PjxkaXYgY2xhc3M9ImRzIj4nK2l0ZW1zW2ldWzNdKyc8L2Rpdj48YnV0dG9uIGNsYXNzPSJvYiIgZGF0YS1ubT0iJytpdGVtc1tpXVsxXSsnIj5PcmRlcjwvYnV0dG9uPjwvZGl2Pic7fQpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaXRlbXMnKS5pbm5lckhUTUw9aDsKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2l0ZW1zJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLGZ1bmN0aW9uKGUpe3ZhciB0PWUudGFyZ2V0O2lmKHQuY2xhc3NOYW1lPT09J29iJyl7bG9jYXRpb24uaHJlZj0naHR0cHM6Ly93YS5tZS85MTg3NjkxNzEwNzg/dGV4dD0nK2VuY29kZVVSSUNvbXBvbmVudCgnT3JkZXI6ICcrdC5nZXRBdHRyaWJ1dGUoJ2RhdGEtbm0nKSk7fX0pO30KPC9zY3JpcHQ+CjwvYm9keT48L2h0bWw+" style="color:#ffcc80">← Home wapas jao</a>
+</footer>
+</div>
+
+<!-- ============ FRIEND DETAIL VIEW ============ -->
+<div id="detailPage">
+<button class="backbtn" onclick="showList()">← Wapas</button>
+<div class="detail-card" id="detailCard"></div>
+</div>
+
+<!-- ============ CHAT VIEW ============ -->
+<div id="chatPage">
+<button class="backbtn" onclick="showList()" style="margin-bottom:12px">← Wapas</button>
+<div class="chat-head" id="chatHead"></div>
+<div id="chatMsgs"></div>
+<div class="chat-input">
+<label class="attachbtn" style="display:flex;align-items:center;justify-content:center;cursor:pointer">📎<input type="file" id="chatFile" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none" onchange="sendFile(this)"></label>
+<input id="chatText" placeholder="Message likho..." onkeypress="if(event.key==='Enter')sendMsg()">
+<button class="sendchatbtn" onclick="sendMsg()">➤</button>
+</div>
+</div>
+
+<script>
+// ===== DOSTON KA DATA (yahan apne dost add karo) =====
+// ===== DEMO FRIENDS (sirf tumko dikhenge) =====
+var DEMO_FRIENDS = [
+{photo:"👦", name:"Rahul", role:"Chef", detail:"Rahul hamara best chef hai. 5 saal se kaam kar raha hai."},
+{photo:"👧", name:"Priya", role:"Manager", detail:"Priya sab manage karti hai. Bahut smart hai."},
+{photo:"👨", name:"Amit", role:"Delivery Boy", detail:"Amit tez delivery karta hai. Sabka favourite."},
+{photo:"👩", name:"Sneha", role:"Waiter", detail:"Sneha customers ko bahut achhe se handle karti hai."},
+{photo:"🧑", name:"Vikash", role:"Cook", detail:"Vikash ke haath ka khana sabko pasand hai."},
+{photo:"👴", name:"Ramesh", role:"Helper", detail:"Ramesh ji sabki madad karte hain."}
+];
+var FRIENDS = DEMO_FRIENDS.slice();
+
+// ===== REAL FRIENDS FROM FIREBASE =====
+function loadRealFriends(){
+  if(!window._fbDb) return;
+  window._fbDb.ref("customer_profiles").once("value", function(snap){
+    var realList = [];
+    snap.forEach(function(ch){
+      var u = ch.val();
+      var nm = u.profileName || u.name || "";
+      if(!nm) return;
+      realList.push({
+        photo: u.profilePhoto
+          ? '<img src="'+u.profilePhoto+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+          : "👤",
+        name: nm,
+        role: u.profilePhone || u.phone || "",
+        detail: (u.profileDetail || "") + "<br>📞 " + (u.profilePhone || u.phone || "")
+      });
+    });
+    // Apna khud ka naam hatao
+    var myLogin = null;
+    try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
+    var myName = (myLogin && myLogin.name || "").toLowerCase();
+    // Sirf tumko (Manisha) demo dikhega
+    var isOwner = myName === "manisha";
+    if(isOwner){
+      FRIENDS = DEMO_FRIENDS.concat(realList);
+    } else {
+      FRIENDS = realList;
+    }
+    // Apna naam list se hatao
+    if(myName){
+      FRIENDS = FRIENDS.filter(function(f){ return f.name.toLowerCase() !== myName; });
+    }
+    renderFriends(document.getElementById('frSearch').value || "");
+    renderMyFriends();
+    renderRequests();
+  });
+}
+setTimeout(loadRealFriends, 1500);
+
+
+
+
+  
+// ===== LOCALSTORAGE KEYS =====
+function getRequests(){ try{return JSON.parse(localStorage.getItem("fr_requests")||"[]");}catch(e){return[];} }
+function saveRequests(r){ localStorage.setItem("fr_requests", JSON.stringify(r)); }
+function getMyFriends(){ try{return JSON.parse(localStorage.getItem("fr_myfriends")||"[]");}catch(e){return[];} }
+function saveMyFriends(f){ localStorage.setItem("fr_myfriends", JSON.stringify(f)); }
+function getChats(){ try{return JSON.parse(localStorage.getItem("fr_chats")||"{}");}catch(e){return{};} }
+function saveChats(c){ localStorage.setItem("fr_chats", JSON.stringify(c)); }
+
+// ===== RENDER ALL FRIENDS =====
+function renderFriends(filter){
+  var grid = document.getElementById('friendsGrid');
+  var html = "";
+  var q = (filter||"").toLowerCase();
+  var myF = getMyFriends();
+  var reqs = getRequests();
+  
+  FRIENDS.forEach(function(f, i){
+    if(q && f.name.toLowerCase().indexOf(q) === -1) return;
+    var isFriend = myF.indexOf(f.name) !== -1;
+    var hasReq = reqs.some(function(r){return r.name === f.name;});
+    var badge = "";
+    if(isFriend) badge = '<div style="font-size:11px;color:#4caf50;font-weight:bold;margin-top:4px;">✅ Dost</div>';
+    else if(hasReq) badge = '<div style="font-size:11px;color:#ff9800;font-weight:bold;margin-top:4px;">⏳ Request bheji</div>';
+    
+    html += '<div class="fcard" onclick="openDetail('+i+')">'
+      + '<div class="fp">'+f.photo+'</div>'
+      + '<div class="fn">'+f.name+'</div>'
+      + '<div class="fr">'+f.role+'</div>'
+      + badge
+      + '<div class="tap">Tap karo 👆</div></div>';
+  });
+  
+  grid.innerHTML = html || '<div class="empty">Koi dost nahi mila. Dusra naam try karo!</div>';
+}
+
+// ===== RENDER MY FRIENDS (ACCEPTED) =====
+function renderMyFriends(){
+  var list = document.getElementById('myFriendsList');
+  var myF = getMyFriends();
+  var sec = document.getElementById('myFriendsSec');
+  
+  if(myF.length === 0){
+    sec.style.display = "none";
+    return;
+  }
+  sec.style.display = "block";
+  
+  var html = "";
+  myF.forEach(function(name){
+    var f = FRIENDS.find(function(x){return x.name === name;});
+    var photo = f ? f.photo : "👤";
+    var role = f ? f.role : "";
+html += '<div class="mycard">'
+    + '<div style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;" onclick="openDetailByName(\''+name+'\')">'
+    + '<div class="fp">'+photo+'</div>'
+    + '<div class="info"><div class="fn">'+name+'</div><div class="st">✅ Dost • '+role+'</div></div>'
+    + '</div>'
+    + '<button class="chatbtn" onclick="openChat(\''+name+'\')">💬 Chat</button>'
+    + '</div>';
+  });
+  list.innerHTML = html;
+}
+
+// ===== RENDER REQUESTS =====
+function renderRequests(){
+  var list = document.getElementById('reqList');
+  var reqs = getRequests();
+  var sec = document.getElementById('reqSec');
+  
+  if(reqs.length === 0){
+    sec.style.display = "none";
+    return;
+  }
+  sec.style.display = "block";
+  
+  var html = "";
+  reqs.forEach(function(r, i){
+    var f = FRIENDS.find(function(x){return x.name === r.name;});
+    var photo = f ? f.photo : "👤";
+    html += '<div class="reqcard">'
+      + '<div class="fp">'+photo+'</div>'
+      + '<div class="info"><div class="fn">'+r.name+'</div><div class="tm">📩 '+r.time+'</div></div>'
+      + '<div><button class="accbtn" onclick="acceptReq('+i+')">✅ Accept</button>'
+      + '<button class="rejbtn" onclick="rejectReq('+i+')">❌</button></div>'
+      + '</div>';
+  });
+  list.innerHTML = html;
+}
+
+// ===== FILTER =====
+function filterFriends(q){
+  renderFriends(q);
+}
+
+// ===== OPEN FRIEND DETAIL =====
+var currentFriend = -1;
+function openDetail(i){
+  currentFriend = i;
+  var f = FRIENDS[i];
+  var myF = getMyFriends();
+  var reqs = getRequests();
+  var isFriend = myF.indexOf(f.name) !== -1;
+  var hasReq = reqs.some(function(r){return r.name === f.name;});
+  
+  var btnHtml = "";
+  if(isFriend){
+    btnHtml = '<button class="chatbtn" style="width:100%;padding:14px;font-size:16px;margin-top:10px;" onclick="openChat(\''+f.name+'\')">💬 Chat Karo</button>'
+      + '<div style="color:#4caf50;font-weight:bold;margin-top:10px;">✅ Ye aapka dost hai</div>';
+  } else if(hasReq){
+    btnHtml = '<div style="color:#ff9800;font-weight:bold;margin-top:10px;">⏳ Request bhej di hai. Accept ka intezaar karo!</div>'
+      + '<button class="sendbtn" style="background:#999" onclick="openMyRequests()">📩 Meri Requests Dekho</button>';
+  } else {
+    btnHtml = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>'
+      + '<div style="font-size:12px;color:#999;margin-top:8px;">Example: "Hi '+f.name+'! Mujhe dost banao 🙏"</div>';
+  }
+  
+  document.getElementById('detailCard').innerHTML =
+    '<div class="bigphoto">'+f.photo+'</div>'
+    + '<h2>'+f.name+'</h2>'
+    + '<div class="role">'+f.role+'</div>'
+    + '<div class="desc">'+f.detail+'</div>'
+    + btnHtml;
+  
+  document.getElementById('listView').style.display = "none";
+  document.getElementById('detailPage').style.display = "block";
+  document.getElementById('chatPage').style.display = "none";
+  window.scrollTo(0,0);
+}
+
+// ===== SEND FRIEND REQUEST =====
+function sendRequest(i){
+  var f = FRIENDS[i];
+  var reqs = getRequests();
+  if(reqs.some(function(r){return r.name === f.name;})){
+    alert("Request pehle se bheji hui hai!");
+    return;
+  }
+  var now = new Date();
+  var time = now.getDate()+"/"+(now.getMonth()+1)+" "+now.getHours()+":"+String(now.getMinutes()).padStart(2,"0");
+  reqs.push({name: f.name, time: time});
+  saveRequests(reqs);
+  alert("✅ "+f.name+" ko friend request bhej di!\n\nAb 'Meri Friend Requests' me jaakar Accept karo (demo).");
+  renderRequests();
+  openDetail(i); // refresh
+}
+
+// ===== ACCEPT / REJECT REQUEST =====
+function acceptReq(i){
+  var reqs = getRequests();
+  var r = reqs[i];
+  if(!r) return;
+  
+  var myF = getMyFriends();
+  if(myF.indexOf(r.name) === -1){
+    myF.push(r.name);
+    saveMyFriends(myF);
+  }
+  reqs.splice(i, 1);
+  saveRequests(reqs);
+  
+  alert("🎉 "+r.name+" ab aapka dost hai!\n\n'Mere Dost' list me dikhega. Chat karo!");
+  renderRequests();
+  renderMyFriends();
+  renderFriends(document.getElementById('frSearch').value);
+}
+
+function rejectReq(i){
+  var reqs = getRequests();
+  var r = reqs[i];
+  reqs.splice(i, 1);
+  saveRequests(reqs);
+  alert(r.name+" ki request hata di.");
+  renderRequests();
+  renderFriends(document.getElementById('frSearch').value);
+}
+
+function openMyRequests(){
+  showList();
+  document.getElementById('reqSec').scrollIntoView({behavior:'smooth'});
+}
+
+// ===== SHOW LIST VIEW =====
+function showList(){
+  document.getElementById('listView').style.display = "block";
+  document.getElementById('detailPage').style.display = "none";
+  document.getElementById('chatPage').style.display = "none";
+  renderMyFriends();
+  renderRequests();
+  renderFriends(document.getElementById('frSearch').value);
+  window.scrollTo(0,0);
+}
+
+// ===== CHAT =====
+var chatWith = "";
+function openChat(name){
+  chatWith = name;
+  var f = FRIENDS.find(function(x){return x.name === name;});
+  var photo = f ? f.photo : "👤";
+  
+  document.getElementById('chatHead').innerHTML =
+    '<div class="fp">'+photo+'</div><div class="nm">💬 '+name+'</div>';
+  
+  document.getElementById('listView').style.display = "none";
+  document.getElementById('detailPage').style.display = "none";
+  document.getElementById('chatPage').style.display = "block";
+  
+  loadMsgs();
+  window.scrollTo(0,0);
+}
+
+function loadMsgs(){
+  var chats = getChats();
+  var msgs = chats[chatWith] || [];
+  var box = document.getElementById('chatMsgs');
+  var html = "";
+  
+  if(msgs.length === 0){
+    html = '<div class="empty">👋 '+chatWith+' se chat shuru karo!<br>Neeche message likho ya 📎 se photo/video bhejo.</div>';
+  } else {
+    msgs.forEach(function(m){
+      var cls = m.me ? "me" : "them";
+      var content = "";
+      if(m.type === "image"){
+        content = '<img src="'+m.text+'">';
+      } else if(m.type === "video"){
+        content = '<video src="'+m.text+'" controls style="max-width:100%;border-radius:8px;"></video>';
+      } else if(m.type === "file"){
+        content = '📎 <a href="'+m.text+'" download="'+m.fname+'">'+m.fname+'</a>';
+      } else {
+        content = m.text.replace(/</g,"&lt;");
+      }
+      html += '<div class="msg '+cls+'">'+content+'<div class="tm">'+m.time+'</div></div>';
+    });
+  }
+  
+  box.innerHTML = html;
+  box.scrollTop = box.scrollHeight;
+}
+
+function getTime(){
+  var n = new Date();
+  return n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
+}
+
+function sendMsg(){
+  var inp = document.getElementById('chatText');
+  var txt = inp.value.trim();
+  if(!txt) return;
+  
+  var chats = getChats();
+  if(!chats[chatWith]) chats[chatWith] = [];
+  chats[chatWith].push({me:true, type:"text", text:txt, time:getTime()});
+  saveChats(chats);
+  
+  inp.value = "";
+  loadMsgs();
+  
+  // Demo auto-reply
+  setTimeout(function(){
+    var chats2 = getChats();
+    var replies = ["Haan ji! 😊", "Achha!", "OK 👍", "Bahut badhiya!", "Samajh gaya!"];
+    var r = replies[Math.floor(Math.random()*replies.length)];
+    chats2[chatWith].push({me:false, type:"text", text:r, time:getTime()});
+    saveChats(chats2);
+    if(chatWith) loadMsgs();
+  }, 1500);
+}
+
+function sendFile(input){
+  var file = input.files[0];
+  if(!file) return;
+  
+  if(file.size > 5*1024*1024){
+    alert("File 5MB se chhoti honi chahiye!");
+    input.value = "";
+    return;
+  }
+  
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var chats = getChats();
+    if(!chats[chatWith]) chats[chatWith] = [];
+    var type = "file";
+    if(file.type.indexOf("image") === 0) type = "image";
+    else if(file.type.indexOf("video") === 0) type = "video";
+    
+    chats[chatWith].push({me:true, type:type, text:e.target.result, fname:file.name, time:getTime()});
+    saveChats(chats);
+    loadMsgs();
+    input.value = "";
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== INIT =====
+renderFriends("");
+renderMyFriends();
+renderRequests();
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();
+
+
+
+
+// ===== NAAM SE DETAIL KHOLO =====
+function openDetailByName(name){
+  var i = FRIENDS.findIndex(function(x){return x.name === name;});
+  if(i !== -1) openDetail(i);
+}
+</script></body></html>
