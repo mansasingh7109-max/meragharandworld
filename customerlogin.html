@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Customer Login</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:linear-gradient(135deg,#ff7043,#e65100);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#fff;border-radius:20px;padding:32px 24px;max-width:360px;width:100%;text-align:center}
+.box h1{font-size:24px;color:#e65100;margin-bottom:8px}
+.box p{font-size:14px;color:#888;margin-bottom:12px}
+.box input{width:100%;padding:14px;border:2px solid #ffe0b2;border-radius:12px;font-size:16px;margin-bottom:12px;outline:none}
+.pin-inp{text-align:center;letter-spacing:8px;font-size:18px}
+.btn{width:100%;padding:14px;border:none;border-radius:30px;font-weight:bold;font-size:16px;margin-bottom:10px;cursor:pointer}
+.btn-login{background:#25D366;color:#fff}
+.btn-set{background:#2196F3;color:#fff}
+.btn-logout{background:#f44336;color:#fff}
+.btn-back{background:#f5f5f5;color:#666}
+.msg{font-size:14px;margin-top:10px;min-height:20px}
+.msg.ok{color:#25D366}.msg.err{color:#f44336}
+.status{font-size:13px;color:#999;margin-bottom:16px}
+.status b{color:#25D366}
+.warn{background:#ffebee;border:2px solid #f44336;border-radius:10px;padding:12px;font-size:13px;color:#c62828;margin-top:10px;text-align:left;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>Login</h1>
+<p>mera ghar and world</p>
+<div class="status" id="st"></div>
+<div id="setSec" style="display:none;">
+<div style="background:#e3f2fd;border-radius:10px;padding:12px;margin-bottom:16px;">
+<div style="font-size:18px;font-weight:bold;color:#1565c0;">🔐 Apna PIN Set Karo</div>
+<div style="font-size:12px;color:#666;margin-top:4px;">Pehli baar hai! Neeche apni details bharo</div>
+</div>
+<p>🔢 PIN banao (4-digit):</p>
+<input type="password" id="newPin" class="pin-inp" maxlength="4" inputmode="numeric" placeholder="jaise: 1234">
+<p style="font-size:13px;">🔑 Password likho:</p>
+<input type="text" id="pwd" placeholder="jaise: meri billi">
+<p style="font-size:13px;">📱 Mobile number likho:</p>
+<input type="tel" id="mob" maxlength="10" inputmode="numeric" placeholder="jaise: 9876543210">
+<p style="font-size:13px;">📧 Email ID likho:</p>
+<input type="email" id="eml" placeholder="jaise: aapka@email.com">
+<button class="btn btn-set" onclick="setPin()">Save</button>
+<div class="warn">⚠️ <b>Remember your PIN & Password!</b><br>📝 <b>Kahin NOTE karke rakho</b> (diary/copy me)!<br>❌ Bhool gaye to RESET karna padega!<br>🗑️ Reset par <b>SARA DATA</b> (photo, message) <b>mit jayega!</b></div>
+</div>
+<div id="loginSec" style="display:none;">
+<p>Apna PIN likho:</p>
+<input type="password" id="pin" class="pin-inp" maxlength="4" inputmode="numeric" placeholder="apna PIN likho">
+<button class="btn btn-login" onclick="doLogin()">Login</button>
+<button class="btn btn-back" onclick="forgotPin()" style="color:#f44336;">PIN Bhool Gaye?</button>
+<button class="btn btn-back" onclick="masterReset()" style="color:#999;font-size:13px;">Sab Reset Karo</button>
+<div class="warn">⚠️ Reset par <b>sara data mit jayega!</b><br>PIN/Password <b>yaad rakho!</b></div>
+</div>
+<div id="logoutSec" style="display:none;">
+<button class="btn btn-logout" onclick="doLogout()">Logout</button>
+</div>
+<div class="msg" id="msg"></div>
+<button class="btn btn-back" onclick="location.href='index.html'" style="margin-top:10px;">Wapas</button>
+</div>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+// ===== FIREBASE CONFIG - API keys yahan bharo =====
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"
+};
+var _fbDb = null;
+try {
+  if (FIREBASE_CONFIG.apiKey !== "TUMHARI_API_KEY") {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    _fbDb = firebase.database();
+  }
+} catch(e) {}
+// ===== FIREBASE END =====
+function _g(k){try{return localStorage.getItem(k)||"";}catch(e){return"";}}
+function _s(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function _r(k){try{localStorage.removeItem(k);}catch(e){}}
+function _enc(t){try{return btoa("x_"+t);}catch(e){return t;}}
+function _dec(t){try{return atob(t).replace(/^x_/,"");}catch(e){return"";}}
+function show(m,ok){var e=document.getElementById('msg');e.textContent=m;e.className='msg '+(ok?'ok':'err');}
+function refresh(){
+var pin=_g("customer_pin"),lg=_g("customer_logged_in")==="1";
+document.getElementById('setSec').style.display="none";
+document.getElementById('loginSec').style.display="none";
+document.getElementById('logoutSec').style.display="none";
+var st=document.getElementById('st');
+if(!pin){st.innerHTML="PIN set nahi hai";document.getElementById('setSec').style.display="block";}
+else if(lg){var _sm=_g("customer_mobile"),_se=_g("customer_email");
+st.innerHTML="Status: <b>Logged In</b>"+(_sm?"<br>📱 "+_sm:"")+(_se?"<br>📧 "+_se:"");
+document.getElementById('logoutSec').style.display="block";}
+else{st.innerHTML="Status: Logged Out";document.getElementById('loginSec').style.display="block";}
+}
+function setPin(){
+var p=document.getElementById('newPin').value.trim();
+var w=document.getElementById('pwd').value.trim();
+if(p.length<4){show("4-digit PIN likho!",false);return;}
+if(w.length<3){show("Password likho!",false);return;}
+var _mb="",_el="";
+try{_mb=document.getElementById('mob').value.trim();}catch(e){}
+try{_el=document.getElementById('eml').value.trim();}catch(e){}
+// Phone me save
+_s("customer_pin",_enc(p));_s("customer_pwd",_enc(w.toLowerCase()));
+if(_mb)_s("customer_mobile",_mb);
+if(_el)_s("customer_email",_el);
+_s("customer_logged_in","1");
+// Firebase me save (private - sirf owner dekhega)
+try{
+if(_fbDb){
+_fbDb.ref('customer_login/customer1').set({
+pin:_enc(p),
+pwd:_enc(w.toLowerCase()),
+mobile:_mb||"",
+email:_el||"",
+time:Date.now()
+});
+}
+}catch(e){}
+show("PIN set!",true);setTimeout(function(){location.href='index.html';},1000);
+}
+function doLogin(){
+var p=document.getElementById('pin').value.trim();
+if(p===_dec(_g("customer_pin"))&&p!==""){_s("customer_logged_in","1");show("Login!",true);setTimeout(function(){location.href='index.html';},800);}
+else show("Galat PIN!",false);
+}
+function forgotPin(){
+var w=prompt("Password likho:");
+if(!w)return;
+if(w.trim().toLowerCase()===_dec(_g("customer_pwd"))){
+var np=prompt("Sahi! Naya PIN:");
+if(!np||np.length<4){alert("4-digit likho!");return;}
+_s("customer_pin",_enc(np));_s("customer_logged_in","1");alert("Naya PIN set!");location.href='index.html';
+}else alert("Galat Password!");
+}
+function masterReset(){
+if(!confirm("SAB DELETE hoga! Pakka?"))return;
+if(!confirm("Photo, message sab jayega! Pakka?"))return;
+var c=prompt("RESET likho:");
+if(c!=="RESET")return;
+try{localStorage.clear();}catch(e){}
+alert("Sab clear!");location.reload();
+}
+function doLogout(){
+if(!confirm("Logout?"))return;
+_r("customer_profile");_r("customer_details");_r("customer_thinkings");_r("diary_customer1");_r("customer_logged_in");
+alert("Logout!");refresh();
+}
+refresh();
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>
