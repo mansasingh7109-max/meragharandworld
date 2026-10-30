@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Timeline - mera ghar and world</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#fff8f0;color:#333}
+#hdr{background:#e65100;color:#fff;padding:14px 16px;display:flex;align-items:center;position:sticky;top:0;z-index:10}
+#hdr button{background:#fff;color:#e65100;border:none;min-width:36px;height:36px;border-radius:50%;font-size:18px;font-weight:bold;margin-right:12px}
+#hdr b{font-size:18px}
+#tabs{display:flex;background:#fff;position:sticky;top:64px;z-index:9;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+#tabs button{flex:1;background:none;border:none;padding:14px;font-size:15px;font-weight:bold;color:#888;border-bottom:3px solid transparent}
+#tabs button.on{color:#e65100;border-bottom:3px solid #e65100}
+#list{padding:16px;max-width:600px;margin:0 auto}
+.entry{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.entry .dt{font-size:13px;color:#e65100;font-weight:bold;margin-bottom:8px}
+.entry .tx{font-size:15px;color:#333;line-height:1.7;margin-bottom:8px;white-space:pre-wrap}
+.entry img{width:100%;border-radius:10px;margin-top:8px}
+.entry video{width:100%;border-radius:10px;margin-top:8px}
+.empty{text-align:center;color:#aaa;padding:40px 20px;font-size:15px}
+.sec-h{font-size:16px;font-weight:bold;color:#e65100;margin:16px 0 10px}
+</style>
+</head>
+<body>
+<div id="hdr">
+<button onclick="history.back()">←</button>
+<b>📅 Timeline</b>
+</div>
+<div id="tabs">
+<button id="tD" class="on" onclick="show('d')">📝 Detail</button>
+<button id="tT" onclick="show('t')">💭 Thinking</button>
+<button id="tM" onclick="show('m')">💬 Messages</button>
+</div>
+  <button onclick="location.href='album.html'" style="background:#9C27B0;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;margin:10px;">📸 Album</button>
+<div id="list"></div>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+// ===== FIREBASE CONFIG (apni keys yahan bharo) =====
+var FIREBASE_CONFIG = {
+apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"
+};
+var _fbDb = null;
+try {
+if (FIREBASE_CONFIG.apiKey !== "TUMHARI_API_KEY") {
+firebase.initializeApp(FIREBASE_CONFIG);
+_fbDb = firebase.database();
+}
+} catch(e) { console.log("Firebase nahi laga:", e); }
+</script>
+
+
+  
+<script>
+// URL se customer ID lo (default customer1)
+var _p=new URLSearchParams(location.search);
+var cid=_p.get('cid')||'customer1';
+// localStorage keys (customer ID ke hisaab se)
+function _key(k){return k+"_"+cid;}
+var _mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function _fd(d){try{var p=d.split("-");return p[2].replace(/^0/,"")+" "+_mn[parseInt(p[1])-1]+" "+p[0];}catch(e){return d;}}
+function _today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0');}
+function _tag(dt){var t=_today();return dt<t?'📌 Past':dt===t?'🟢 Aaj':'🔮 Future';}
+function _sort(arr){arr.sort(function(a,b){var x=(a.date||'')+''+(a.time||'');var y=(b.date||'')+''+(b.time||'');return x>y?-1:x<y?1:0;});return arr;}
+function _load(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):[];}catch(e){return[];}}
+function _esc(t){return String(t||"").replace(/</g,"&lt;");}
+function show(which){
+document.getElementById('tD').className=which==='d'?'on':'';
+document.getElementById('tT').className=which==='t'?'on':'';
+document.getElementById('tM').className=which==='m'?'on':'';
+var box=document.getElementById('list');var h='';
+if(which==='d'){
+var arr=_sort(_load("customer_details"));
+h='<div class="sec-h">📝 Detail Timeline ('+arr.length+')</div>';
+if(arr.length===0)h+='<div class="empty">Koi detail entry nahi</div>';
+for(var i=0;i<arr.length;i++){var e=arr[i];
+h+='<div class="entry"><div class="dt">'+_tag(e.date)+' 📅 '+_fd(e.date)+'</div>';
+if(e.text)h+='<div class="tx">'+_esc(e.text)+'</div>';
+if(e.photo)h+='<img src="'+e.photo+'">';
+if(e.video)h+='<video src="'+e.video+'" controls></video>';
+h+='</div>';}
+}else if(which==='t'){
+var arr2=_sort(_load("customer_thinkings"));
+h='<div class="sec-h">💭 Thinking Timeline ('+arr2.length+')</div>';
+if(arr2.length===0)h+='<div class="empty">Koi thinking entry nahi</div>';
+for(var j=0;j<arr2.length;j++){var e2=arr2[j];
+h+='<div class="entry" style="border-left:4px solid #ffc107;"><div class="dt" style="color:#f57f00;">'+_tag(e2.date)+' 📅 '+_fd(e2.date)+'</div>';
+if(e2.text)h+='<div class="tx">'+_esc(e2.text)+'</div>';
+if(e2.photo)h+='<img src="'+e2.photo+'">';
+if(e2.video)h+='<video src="'+e2.video+'" controls></video>';
+h+='</div>';}
+}else{
+var arr3=_sort(_load("pfmsgs_"+cid));
+h='<div class="sec-h">💬 Messages Timeline ('+arr3.length+')</div>';
+if(arr3.length===0)h+='<div class="empty">Koi message nahi</div>';
+for(var k=0;k<arr3.length;k++){var e3=arr3[k];
+h+='<div class="entry" style="border-left:4px solid #7b1fa2;"><div class="dt" style="color:#7b1fa2;">'+_tag(e3.date)+' 📅 '+_fd(e3.date)+'</div>';
+if(e3.text)h+='<div class="tx">'+_esc(e3.text)+'</div>';
+if(e3.photo)h+='<img src="'+e3.photo+'">';
+if(e3.video)h+='<video src="'+e3.video+'" controls></video>';
+h+='</div>';}
+}
+box.innerHTML=h;
+}
+show('d');
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>
