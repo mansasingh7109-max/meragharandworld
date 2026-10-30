@@ -114,10 +114,11 @@ document.getElementById('setSec').style.display="none";
 document.getElementById('loginSec').style.display="none";
 document.getElementById('logoutSec').style.display="none";
 var st=document.getElementById('st');
-if(!pin){st.innerHTML="PIN set nahi hai";document.getElementById('setSec').style.display="block";}
-else if(lg){var _sm=_g("customer_mobile"),_se=_g("customer_email");
-st.innerHTML="Status: <b>Logged In</b>"+(_sm?"<br>📱 "+_sm:"")+(_se?"<br>📧 "+_se:"");
+// PEHLE logged_in check karo (dono login sync!)
+if(lg){var _sm=_g("customer_mobile"),_se=_g("customer_email");
+st.innerHTML="Status: <b>✅ Logged In</b>"+(_sm?"<br>📱 "+_sm:"")+(_se?"<br>📧 "+_se:"");
 document.getElementById('logoutSec').style.display="block";}
+else if(!pin){st.innerHTML="PIN set nahi hai";document.getElementById('setSec').style.display="block";}
 else{st.innerHTML="Status: Logged Out";document.getElementById('loginSec').style.display="block";}
 }
 function setPin(){
@@ -139,7 +140,7 @@ if(_fbDb){
 _fbDb.ref('customer_login/customer1').set({
 pin:_enc(p),
 pwd:_enc(w.toLowerCase()),
-mobile:_mb||"",
+e:_mb||"",
 email:_el||"",
 time:Date.now()
 });
