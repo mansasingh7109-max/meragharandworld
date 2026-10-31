@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="hi"><head><style>
+<html lang="hi"><head>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="auth.js"></script>
+  <style>
 @font-face {
   font-family: "Optimistic";
   font-style: normal;
@@ -22,8 +27,9 @@
 }
 </style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>mera ghar and world</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  
+
+  
 <script>
 // ===== FIREBASE CONFIG (apni keys yahan bharo) =====
 var FIREBASE_CONFIG = {
