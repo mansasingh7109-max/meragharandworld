@@ -119,7 +119,7 @@ _fbDb = firebase.database();
 <header id="hdr">
 <a class="backbtn" href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImhpIj48aGVhZD48bWV0YSBjaGFyc2V0PSJVVEYtOCI+PG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEiPgo8dGl0bGU+UmVzdHJvIEFwa2E8L3RpdGxlPgo8c3R5bGU+Cip7bWFyZ2luOjA7cGFkZGluZzowO2JveC1zaXppbmc6Ym9yZGVyLWJveDtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmfQpib2R5e2JhY2tncm91bmQ6I2ZmZjhmMDtjb2xvcjojMzMzfQojaGRye2JhY2tncm91bmQ6I2ZmZjtwYWRkaW5nOjEycHggMTZweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2JveC1zaGFkb3c6MCAycHggNnB4IHJnYmEoMCwwLDAsLjEpO3Bvc2l0aW9uOnN0aWNreTt0b3A6MDt6LWluZGV4OjEwfQojYnJhbmR7Zm9udC1zaXplOjIycHg7Zm9udC13ZWlnaHQ6Ym9sZDtjb2xvcjojMDAwO2ZsZXg6MX0KI25hdntkaXNwbGF5OmZsZXg7Z2FwOjE0cHh9CiNuYXYgYXt0ZXh0LWRlY29yYXRpb246bm9uZTtjb2xvcjojZTY1MTAwO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjE1cHg7cGFkZGluZzo2cHggOHB4fQojbmF2IGE6YWN0aXZle2JhY2tncm91bmQ6I2ZmZTBiMjtib3JkZXItcmFkaXVzOjZweH0KI2hlcm97YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNmZjcwNDMsI2U2NTEwMCk7Y29sb3I6I2ZmZjtwYWRkaW5nOjQwcHggMjBweDtib3JkZXItcmFkaXVzOjAgMCAyNHB4IDI0cHh9CiNoZXJvIGgxe2ZvbnQtc2l6ZTozMnB4O21hcmdpbi1ib3R0b206OHB4fQojaGVybyBwe2ZvbnQtc2l6ZToxNnB4O21hcmdpbi1ib3R0b206MTZweH0KLmJ0bjJ7ZGlzcGxheTppbmxpbmUtYmxvY2s7YmFja2dyb3VuZDojMjVEMzY2O2NvbG9yOiNmZmY7Zm9udC13ZWlnaHQ6Ym9sZDtwYWRkaW5nOjEycHggMjRweDtib3JkZXItcmFkaXVzOjMwcHg7dGV4dC1kZWNvcmF0aW9uOm5vbmU7Zm9udC1zaXplOjE2cHh9CiNpdGVtc3twYWRkaW5nOjIwcHg7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDoxNHB4fQouY2FyZHtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXJhZGl1czoxNHB4O292ZXJmbG93OmhpZGRlbjtib3gtc2hhZG93OjAgMnB4IDhweCByZ2JhKDAsMCwwLC4xKTt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nLWJvdHRvbToxMnB4fQouY2FyZCAucGh7aGVpZ2h0OjExMHB4O2JhY2tncm91bmQ6I2ZmZTBiMjtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQ0cHh9Ci5jYXJkIGgze2ZvbnQtc2l6ZToxNnB4O21hcmdpbjo4cHggNHB4IDJweH0KLmNhcmQgLnBye2NvbG9yOiNlNjUxMDA7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTZweH0KLmNhcmQgLmRze2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM4ODg7bWFyZ2luOjJweCA2cHggOHB4fQouY2FyZCAub2J7YmFja2dyb3VuZDojZTY1MTAwO2NvbG9yOiNmZmY7Ym9yZGVyOm5vbmU7cGFkZGluZzo4cHggMjBweDtib3JkZXItcmFkaXVzOjIwcHg7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTRweH0KI2Z0cntiYWNrZ3JvdW5kOiM0ZTM0MmU7Y29sb3I6I2ZmZjt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nOjI0cHggMTZweDttYXJnaW4tdG9wOjEwcHh9CiNmdHIgYXtjb2xvcjojZmZjYzgwfQo8L3N0eWxlPjwvaGVhZD48Ym9keT4KPHNjcmlwdD4KdmFyIE9QVCA9IHsKbmFtZUFsaWduOiAibGVmdCIsIC8vIE9QVElPTjogImxlZnQiPW5hYW0gbGVmdCBtZSwgImNlbnRlciI9bmFhbSBiZWVjaCBtZSwgInJpZ2h0Ij1uYWFtIHJpZ2h0IG1lCm1lbnVIb21lOiAib24iLCAvLyBPUFRJT046ICJvbiI9SG9tZSBkaWtoZWdhLCAib2ZmIj1Ib21lIGNoaHVwZWdhCm1lbnVNZW51OiAib24iLCAvLyBPUFRJT046ICJvbiI9TWVudSBkaWtoZWdhLCAib2ZmIj1NZW51IGNoaHVwZWdhCm1lbnVPcmRlcnM6ICJvbiIsIC8vIE9QVElPTjogIm9uIj1PcmRlcnMgZGlraGVnYSwgIm9mZiI9T3JkZXJzIGNoaHVwZWdhCm1lbnVDb250YWN0OiAib24iLCAvLyBPUFRJT046ICJvbiI9Q29udGFjdCBkaWtoZWdhLCAib2ZmIj1Db250YWN0IGNoaHVwZWdhCm9yZGVyQnRuOiAib24iLCAvLyBPUFRJT046ICJvbiI9T3JkZXIgYnV0dG9uIGRpa2hlZ2EsICJvZmYiPU9yZGVyIGJ1dHRvbiBjaGh1cGVnYQppdGVtc1NlYzogIm9uIiAvLyBPUFRJT046ICJvbiI9ZGlzaGVzIGRpa2hlbmdlLCAib2ZmIj1kaXNoZXMgY2hodXBlbmdlCn07Cjwvc2NyaXB0Pgo8aGVhZGVyIGlkPSJoZHIiPgo8ZGl2IGlkPSJicmFuZCI+UmVzdHJvIEFwa2E8L2Rpdj4KPG5hdiBpZD0ibmF2Ij4KPGEgaWQ9Im1IIiBocmVmPSIjIj5Ib21lPC9hPjxhIGlkPSJtTSIgaHJlZj0iI2l0ZW1zIj5NZW51PC9hPjxhIGlkPSJtTyIgaHJlZj0iIyI+T3JkZXJzPC9hPjxhIGlkPSJtQyIgaHJlZj0iI2Z0ciI+Q29udGFjdDwvYT4KPC9uYXY+PC9oZWFkZXI+CjxzZWN0aW9uIGlkPSJoZXJvIj48ZGl2IGlkPSJoZXJvSW4iPgo8aDE+QmFyZmkgU3BlY2lhbDwvaDE+CjxwPjMwLW1pbiBkZWxpdmVyeSBpbiBQaWxpYmFuZ2EgfCB0YWF6YSBiYXJmaSwgaGFyIHJvejwvcD4KPGEgaWQ9Im9yZEJ0biIgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5PcmRlciBvbiBXaGF0c0FwcDwvYT4KPC9kaXY+PC9zZWN0aW9uPgo8c2VjdGlvbiBpZD0iaXRlbXMiPjwvc2VjdGlvbj4KPGZvb3RlciBpZD0iZnRyIj4KPGI+UmVzdHJvIEFwa2E8L2I+IHwgUGlsaWJhbmdhPGJyPjxicj4KPGEgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5XaGF0c0FwcDogODc2OTE3MTA3ODwvYT48YnI+PGJyPgo8c3BhbiBzdHlsZT0iZm9udC1zaXplOjEycHgiPnJlc3Ryb2ZvcnlvdS53ZWIuYXBwPC9zcGFuPgo8L2Zvb3Rlcj4KPHNjcmlwdD4KLy8gRklYRUQ6IHBlaGxlIGNlbnRlciBvcHRpb24gbWlzc2luZyB0aGEsIGFiIHRlZW5vIGthYW0ga2FyZW5nZQp2YXIgYj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYnJhbmQnKTsKaWYoT1BULm5hbWVBbGlnbj09PSJjZW50ZXIiKXtiLnN0eWxlLnRleHRBbGlnbj0iY2VudGVyIjt9CmVsc2UgaWYoT1BULm5hbWVBbGlnbj09PSJyaWdodCIpe2Iuc3R5bGUudGV4dEFsaWduPSJyaWdodCI7fQplbHNle2Iuc3R5bGUudGV4dEFsaWduPSJsZWZ0Ijt9CmlmKE9QVC5tZW51SG9tZT09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtSCcpLnN0eWxlLmRpc3BsYXk9Im5vbmUiOwppZihPUFQubWVudU1lbnU9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU0nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVPcmRlcnM9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU8nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVDb250YWN0PT09Im9mZiIpZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21DJykuc3R5bGUuZGlzcGxheT0ibm9uZSI7CmlmKE9QVC5vcmRlckJ0bj09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdvcmRCdG4nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKdmFyIGl0ZW1zPVtbIvCfjbIiLCJWZWcgTW9tb3MgMTBwY3MiLCJScyAxNDkiLCJHYXIgbWEgZ2FyYW0gbW9tb3MiXSxbIvCfjZUiLCJWZWcgQ2hlZXNlIFBpenphIiwiUnMgMjk5IiwiQ2hlZXN5IHRhc3R5IHBpenphIl0sWyLwn42bIiwiQmlyeWFuaSIsIlJzIDE5OSIsIktodXNoYnVkYWFyIGJpcnlhbmkiXSxbIvCfpaoiLCJWZWcgU2FuZHdpY2giLCJScyA5OSIsIkZyZXNoIHZlZyBzYW5kd2ljaCJdXTsKaWYoT1BULml0ZW1zU2VjPT09Im9mZiIpe2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpdGVtcycpLnN0eWxlLmRpc3BsYXk9Im5vbmUiO30KZWxzZXt2YXIgaD0iIjtmb3IodmFyIGk9MDtpPGl0ZW1zLmxlbmd0aDtpKyspe2grPSc8ZGl2IGNsYXNzPSJjYXJkIj48ZGl2IGNsYXNzPSJwaCI+JytpdGVtc1tpXVswXSsnPC9kaXY+PGgzPicraXRlbXNbaV1bMV0rJzwvaDM+PGRpdiBjbGFzcz0icHIiPicraXRlbXNbaV1bMl0rJzwvZGl2PjxkaXYgY2xhc3M9ImRzIj4nK2l0ZW1zW2ldWzNdKyc8L2Rpdj48YnV0dG9uIGNsYXNzPSJvYiIgZGF0YS1ubT0iJytpdGVtc1tpXVsxXSsnIj5PcmRlcjwvYnV0dG9uPjwvZGl2Pic7fQpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaXRlbXMnKS5pbm5lckhUTUw9aDsKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2l0ZW1zJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLGZ1bmN0aW9uKGUpe3ZhciB0PWUudGFyZ2V0O2lmKHQuY2xhc3NOYW1lPT09J29iJyl7bG9jYXRpb24uaHJlZj0naHR0cHM6Ly93YS5tZS85MTg3NjkxNzEwNzg/dGV4dD0nK2VuY29kZVVSSUNvbXBvbmVudCgnT3JkZXI6ICcrdC5nZXRBdHRyaWJ1dGUoJ2RhdGEtbm0nKSk7fX0pO30KPC9zY3JpcHQ+CjwvYm9keT48L2h0bWw+">← Back</a>
 <div id="brand" style="text-align:center">👥 Mere Dost</div>
-<div style="width:70px"></div>
+<div style="width:70px"><a href="settings.html" style="font-size:24px;text-decoration:none;">⚙️</a></></div>
 </header>
 
 <div id="hero">
@@ -138,6 +138,11 @@ _fbDb = firebase.database();
 <div id="myFriendsList"></div>
 </div>
 
+<div class="sec" id="blockSec" style="display:none;">
+<h2 style="color:#000;">🔴 Block List</h2>
+<div id="blockList"></div>
+</div>
+  
 <!-- Meri Requests -->
 <div class="sec" id="reqSec">
 <h2>📩 Meri Friend Requests</h2>
@@ -171,6 +176,7 @@ _fbDb = firebase.database();
 <label class="attachbtn" style="display:flex;align-items:center;justify-content:center;cursor:pointer">📎<input type="file" id="chatFile" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none" onchange="sendFile(this)"></label>
 <input id="chatText" placeholder="Message likho..." onkeypress="if(event.key==='Enter')sendMsg()">
 <button class="sendchatbtn" onclick="sendMsg()">➤</button>
+  <button onclick="blockUser(chatWith)" style="background:#000;color:#fff;border:none;padding:8px 12px;border-radius:16px;font-size:12px;">🔴 Block</button> 
 </div>
 </div>
 
@@ -246,8 +252,12 @@ function renderFriends(filter){
   var q = (filter||"").toLowerCase();
   var myF = getMyFriends();
   var reqs = getRequests();
+  var blocked=getBlocked();
   
-  FRIENDS.forEach(function(f, i){
+FRIENDS.forEach(function(f, i){
+if(blocked.indexOf(f.name)!==-1) return;
+if(q && f.name.toLowerCase().indexOf(q) === -1) return;
+  
     if(q && f.name.toLowerCase().indexOf(q) === -1) return;
     var isFriend = myF.indexOf(f.name) !== -1;
     var hasReq = reqs.some(function(r){return r.name === f.name;});
@@ -279,7 +289,9 @@ function renderMyFriends(){
   sec.style.display = "block";
   
   var html = "";
+  var blocked=getBlocked();
   myF.forEach(function(name){
+  if(blocked.indexOf(name)!==-1) return;  
     var f = FRIENDS.find(function(x){return x.name === name;});
     var photo = f ? f.photo : "👤";
     var role = f ? f.role : "";
@@ -402,6 +414,8 @@ function rejectReq(i){
   var r = reqs[i];
   reqs.splice(i, 1);
   saveRequests(reqs);
+  var rej=[];try{rej=JSON.parse(localStorage.getItem("fr_rejected")||"[]");}catch(e){}
+if(rej.indexOf(r.name)===-1){rej.push(r.name);localStorage.setItem("fr_rejected",JSON.stringify(rej));}
   alert(r.name+" ki request hata di.");
   renderRequests();
   renderFriends(document.getElementById('frSearch').value);
@@ -419,6 +433,7 @@ function showList(){
   document.getElementById('chatPage').style.display = "none";
   renderMyFriends();
   renderRequests();
+  renderBlockList();
   renderFriends(document.getElementById('frSearch').value);
   window.scrollTo(0,0);
 }
@@ -529,6 +544,7 @@ function sendFile(input){
 renderFriends("");
 renderMyFriends();
 renderRequests();
+renderBlockList();  
 </script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();
 
@@ -540,4 +556,58 @@ function openDetailByName(name){
   var i = FRIENDS.findIndex(function(x){return x.name === name;});
   if(i !== -1) openDetail(i);
 }
-</script></body></html>
+
+function blockUser(name){
+if(!confirm("🔴 "+name+" ko block kar dein?")) return;
+var blocked=[];
+try{blocked=JSON.parse(localStorage.getItem("fr_blocked")||"[]");}catch(e){}
+if(blocked.indexOf(name)===-1){
+blocked.push(name);
+try{localStorage.setItem("fr_blocked",JSON.stringify(blocked));}catch(e){}
+}
+alert("🔴 "+name+" block ho gaya!");
+showList();
+renderBlockList();
+}
+
+function unblockUser(name){
+if(!confirm("🟢 "+name+" ko unblock kar dein?")) return;
+var blocked=[];
+try{blocked=JSON.parse(localStorage.getItem("fr_blocked")||"[]");}catch(e){}
+blocked=blocked.filter(function(n){return n!==name;});
+try{localStorage.setItem("fr_blocked",JSON.stringify(blocked));}catch(e){}
+alert("🟢 "+name+" unblock ho gaya!");
+renderBlockList();
+renderMyFriends();
+renderFriends(document.getElementById('frSearch').value||"");
+}
+function getBlocked(){
+try{return JSON.parse(localStorage.getItem("fr_blocked")||"[]");}catch(e){return[];}
+}
+function renderBlockList(){
+var list=document.getElementById('blockList');
+if(!list) return;
+var sec=document.getElementById('blockSec');
+var blocked=getBlocked();
+if(blocked.length===0){sec.style.display="none";return;}
+sec.style.display="block";
+var html="";
+blocked.forEach(function(name){
+var f=FRIENDS.find(function(x){return x.name===name;});
+var photo=f?f.photo:"👤";
+html+='<div class="mycard" style="border-left:4px solid #000;">'
++'<div class="fp">'+photo+'</div>'
++'<div class="info"><div class="fn">'+name+'</div><div class="st" style="color:#f44336;">🔴 Blocked</div></div>'
++'<button onclick="unblockUser(\''+name.replace(/'/g,"")+'\')" style="background:#4caf50;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;font-size:14px;">🟢 Unblock</button>'
++'</div>';
+});
+list.innerHTML=html;
+}
+  
+</script>
+<script src="privacy.js"></script>
+<script>PRIV_placeBtn("friendsPublic","hdr");PRIV_placeBtn("showInSearch","hdr");</script>
+<script src="block-check.js"></script>
+
+  
+</body></html>
