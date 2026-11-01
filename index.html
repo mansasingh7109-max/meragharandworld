@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="hi"><head>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="auth.js"></script>
   <style>
@@ -25,10 +24,15 @@
 :where(code, pre, kbd, samp) {
   font-family: "Optimistic Mono", ui-monospace, monospace;
 }
-</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>mera ghar and world</title>
+</style><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   
+<title>mera ghar and world</title>
 
+  
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   
 <script>
 // ===== FIREBASE CONFIG (apni keys yahan bharo) =====
@@ -50,7 +54,20 @@ _fbDb = firebase.database();
 }
 } catch(e) { console.log("Firebase nahi laga:", e); }
 </script>
+
+  
 <style>
+
+
+#infobox div{background:#F48FB1!important;border:3px solid #F48FB1!important;border-radius:20px!important;padding:20px!important;margin:10px!important;}
+#infobox h3{color:#FFFFFF!important;font-size:22px!important;}
+#infobox p{color:#FFFFFF!important;font-size:16px!important;}
+
+
+  
+
+  
+  
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#fff8f0;color:#333}
 #hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
@@ -109,7 +126,9 @@ body{background:#fff8f0;color:#333}
   
 </style></head>
   
-  <body>
+ 
+   
+ 
 
 <div style="background:#e65100;padding:10px;text-align:center;position:sticky;top:0;z-index:99;"><a href="friends.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">👥 Friends</a><a href="profile.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">👤 Profile</a><a href="editprofile.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">✏️ Edit</a><a href="album.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">📸 Album</a><a href="timedatalist.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">📅 Timeline</a></div>
     
@@ -178,10 +197,10 @@ col4Width: "auto",
 row1Height: "auto",
 row2Height: "auto",
 boxCount: "1",
-box1Text: "Tip: Taaza barfi roz subah banti hai. WhatsApp par order karo!",
+box1Text: " make friends and chat and share your thinking !",
 box1Shape: "round",
 box1Pos: "center",
-box1Detail: "Box 1 ka lamba detail yahan likho.",
+box1Detail: "make new friends connect friends .",
 box2Text: "Offer: 2 pizza par 1 cold drink free!",
 box2Shape: "rectangle",
 box2Pos: "left",
@@ -250,7 +269,7 @@ profileDetail: "Customer ka lamba detail yahan likho.", // OPTION: lamba detail
 profileThinking: "", // OPTION: customer kya soch raha hai - thinking box (unlimited words, khaali = nahi dikhega)
 customerStatus: "", // OPTION: customer ki status line (unlimited words, khaali = nahi dikhega)
 customerEditOn: "on", // OPTION: "on"=customer khud apna profile edit kar sake (photo, detail, status sab), "off"=sirf aap edit karo
-customerId: "customer1", // OPTION: customer ki unique ID (Firebase me save hogi, har customer ki alag rakho)
+ customerId: (window.AUTH_UID || "customer1"),// OPTION: customer ki unique ID (Firebase me save hogi, har customer ki alag rakho)
 diaryOn: "on", // OPTION: "on"=📖 Diary/Timeline - date-wise photo/video/message entries, date search ke saath
 adminEditOn: "on", // OPTION: "on"=aap (admin) page se hi message edit/delete kar sakte ho, "off"=band
 profileMsgTimelineOn: "on", // OPTION: "on"=profile full page par 💬 Messages Timeline - past/present/future date wale save messages, edit/delete ke saath
@@ -338,15 +357,24 @@ friend6Chat: "", // OPTION: dost 6 ka WhatsApp number (khali = chat button nahi)
 };
 </script>
 <header id="hdr">
-<div id="brand">mera ghar and world</div>
+
+
+
+<h1 id="siteTitleHead" style="background:#FFF176;color:#BA68C8;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">mera ghar and world</h1>
+  
+<div id="brand"></div>
 <nav id="nav">
 <a id="mH" href="#">Home</a><a id="mM" href="#items">Menu</a><a id="mO" href="#">Orders</a><a id="mC" href="#ftr">Contact</a>
 </nav></header>
-  <button onclick="location.href='customerlogin.html'" style="background:#7b1fa2;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">🔐 Customer Login</button>
+  <button onclick="location.href='customerlogin.html'" style="background:#7b1f;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">🔐 Customer Login</button>
 <div id="profileHead"></div>
 <section id="hero"><div id="heroIn">
-<h1>home Special</h1>
-<p>hello</p>
+
+
+<h1 id="siteTitleHead" style="background:#FFF176;color:#0000FF;border:none;padding:10px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">make friends and chat and share your thinking !........ mera ghar and world</h1>
+  
+<h1 id="siteTitleHead2" style="background:#FFF176;color:#0000FF;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">make friends connect with friends</h1>
+<h1 id="helloHead" style="background:#FFF176;color:#0000FF;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">hello</h1>
 <a id="ordBtn" class="btn2" href="https://wa.me/918769171078">Order on WhatsApp</a>
 </div></section>
 <div id="profileTop"></div>
@@ -660,7 +688,7 @@ while(1){if(i>_bc)break;var tx=OPT['box'+i+'Text'];if(tx===undefined)break;
 var sh=OPT['box'+i+'Shape'],ps=OPT['box'+i+'Pos'],dt=OPT['box'+i+'Detail'];
 var br="28px";if(sh==="square")br="0px";else if(sh==="rectangle")br="12px";
 var jf="center";if(ps==="left")jf="flex-start";else if(ps==="right")jf="flex-end";
-h+='<div style="display:flex;justify-content:'+jf+';margin-top:12px"><div style="width:85%;background:#fff3e0;border:2px solid #e65100;padding:14px;border-radius:'+br+'"><b style="color:#e65100">Jankari '+i+'</b><br><span style="font-size:14px">'+tx+'</span>'+(dt?'<br><br><span style="font-size:13px;color:#555">'+dt+'</span>':'')+'</div></div>';i++;}
+h+='<div style="display:flex;justify-content:'+jf+';margin-top:12px"><div style="width:85%;background:#fff3e0;border:2px solid #e65100;padding:14px;border-radius:'+br+'"><b style="color:#e65100">Welcome '+i+'</b><br><span style="font-size:14px">'+tx+'</span>'+(dt?'<br><br><span style="font-size:13px;color:#555">'+dt+'</span>':'')+'</div></div>';i++;}
 document.getElementById('infobox').innerHTML=h;})();
 var items=[],_d=1;
 while(1){var dn=OPT['dish'+_d+'Name'];if(dn===undefined)break;
@@ -1632,7 +1660,59 @@ location.reload();
 <button onclick="closeDetail()" style="background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;margin-bottom:12px;">← Wapas</button>
 <div id="detailCard" style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center;max-width:500px;margin:0 auto;"></div>
 </div>
-    <script src="usage-monitor.js"></script>
+
+
+ <script src="usage-monitor.js"></script>
 <script src="loading-guard.js"></script>
-<script src="fastorderprocess.js"></script>
+<script src="fastorderprocess.js"></script>   
+
+<script src="privacy.js"></script>
+
+
+
+
+  
+
+
+
+<script>
+(function(){
+try{
+var o=JSON.parse(localStorage.getItem("site_options")||"{}");
+var h=document.getElementById('siteTitleHead');
+if(h){
+if(o.siteTitle)h.textContent=o.siteTitle;
+if(o.siteTitleFont)h.style.fontFamily=o.siteTitleFont;
+if(o.siteTitleColor)h.style.color=o.siteTitleColor;
+if(o.siteTitleSize)h.style.fontSize=o.siteTitleSize+"px";
+if(o.siteTitleStyle){
+if(o.siteTitleStyle.indexOf("bold")>=0)h.style.fontWeight="bold";
+if(o.siteTitleStyle.indexOf("italic")>=0)h.style.fontStyle="italic";
+}
+}
+}catch(e){}
+})();
+</script>
+
+
+  <script>
+(function(){
+try{
+var o=JSON.parse(localStorage.getItem("site_options")||"{}");
+var bg=o.boxBg||"#FFF8E1";
+var tc=o.boxColor||"#333333";
+var hc=o.boxHeadColor||"#E65100";
+// Sab info boxes dhundo aur colour lagao
+document.querySelectorAll('[id^="box"],[class*="box"],[id^="jankari"]').forEach(function(el){
+el.style.background=bg;
+});
+document.querySelectorAll('[id^="box"] h3,[id^="box"] h2,[class*="box"] h3').forEach(function(el){
+el.style.color=hc;
+});
+document.querySelectorAll('[id^="box"] p,[class*="box"] p').forEach(function(el){
+el.style.color=tc;
+});
+}catch(e){}
+})();
+</script>
 </body></html>
