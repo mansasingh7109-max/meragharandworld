@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="hi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚙️ Friend Settings</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#fff8f0;color:#333}
+#hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
+#brand{font-size:20px;font-weight:bold;color:#000;flex:1;text-align:center}
+.backbtn{background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;text-decoration:none;font-size:14px}
+.sec{padding:10px 20px;max-width:560px;margin:0 auto}
+.sec h2{text-align:center;margin:16px 0 12px;font-size:22px}
+.mycard{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px}
+.mycard .fp{width:52px;height:52px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.mycard .info{flex:1}
+.mycard .fn{font-weight:bold;font-size:15px}
+.mycard .st{font-size:12px;color:#999}
+.ubtn{background:#4caf50;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px}
+.bbtn{background:#000;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px}
+.rbtn{background:#f44336;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px}
+.empty{text-align:center;color:#999;padding:20px;font-size:14px}
+.danger{background:#fff;border-radius:14px;padding:16px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:4px solid #f44336}
+.danger h3{color:#f44336;margin-bottom:8px}
+.danger button{background:#f44336;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;cursor:pointer;margin:4px}
+#ftr{background:#4e342e;color:#fff;text-align:center;padding:24px 16px;margin-top:20px}
+</style></head>
+<body>
+<header id="hdr">
+<a class="backbtn" href="friends.html">← Back</a>
+<div id="brand">⚙️ Friend Settings</div>
+<div style="width:70px"></div>
+</header>
+<div class="sec">
+<h2 style="color:#000;">🔴 Block List</h2>
+<div id="setBlockList"></div>
+</div>
+<div class="sec">
+<h2 style="color:#4caf50;">💚 Mere Dost</h2>
+<div id="setFriendList"></div>
+</div>
+<div class="sec">
+<h2 style="color:#f44336;">❌ Reject Kiye Hue</h2>
+<div id="setRejectList"></div>
+</div>
+<div class="sec">
+<div class="danger">
+<h3>⚠️ Danger Zone</h3>
+<p style="font-size:13px;color:#666;margin-bottom:10px;">Sab data delete ho jayega!</p>
+<button onclick="clearAllData()">🗑️ Sab Clear Karo</button>
+</div>
+</div>
+<footer id="ftr">
+<b>Friend Settings</b><br><br>
+<a href="friends.html" style="color:#ffcc80">← Friends par wapas jao</a>
+</footer>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+// ===== FIREBASE CONFIG - YAHAN API KEY DALO =====
+var FIREBASE_CONFIG = {
+apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"
+};
+try{if(FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.apiKey!=="TUMHARI_API_KEY_YAHAN"){firebase.initializeApp(FIREBASE_CONFIG);}}catch(e){}
+</script>
+<script>
+function getBlocked(){try{return JSON.parse(localStorage.getItem("fr_blocked")||"[]");}catch(e){return[];}}
+function getMyFriends(){try{return JSON.parse(localStorage.getItem("fr_myfriends")||"[]");}catch(e){return[];}}
+function getRejected(){try{return JSON.parse(localStorage.getItem("fr_rejected")||"[]");}catch(e){return[];}}
+function renderSettings(){
+var blocked=getBlocked();
+var bl=document.getElementById('setBlockList');
+if(blocked.length===0){bl.innerHTML='<div class="empty">Koi blocked nahi hai 👍</div>';}
+else{var h="";blocked.forEach(function(n){h+='<div class="mycard" style="border-left:4px solid #000;">'+'<div class="fp">👤</div>'+'<div class="info"><div class="fn">'+n+'</div><div class="st" style="color:#f44336;">🔴 Blocked</div></div>'+'<button class="ubtn" onclick="unblockSet(\''+n.replace(/'/g,"")+'\')">🟢 Unblock</button>'+'</div>';});bl.innerHTML=h;}
+var myF=getMyFriends().filter(function(n){return blocked.indexOf(n)===-1;});
+var fl=document.getElementById('setFriendList');
+if(myF.length===0){fl.innerHTML='<div class="empty">Koi dost nahi hai</div>';}
+else{var h2="";myF.forEach(function(n){h2+='<div class="mycard">'+'<div class="fp">👤</div>'+'<div class="info"><div class="fn">'+n+'</div><div class="st" style="color:#4caf50;">✅ Dost</div></div>'+'<button class="bbtn" onclick="blockSet(\''+n.replace(/'/g,"")+'\')">🔴 Block</button> '+'<button class="rbtn" onclick="removeSet(\''+n.replace(/'/g,"")+'\')">🗑️ Hatao</button>'+'</div>';});fl.innerHTML=h2;}
+var rej=getRejected();
+var rl=document.getElementById('setRejectList');
+if(rej.length===0){rl.innerHTML='<div class="empty">Koi reject nahi hai 👍</div>';}
+else{var h3="";rej.forEach(function(n){h3+='<div class="mycard" style="border-left:4px solid #f44336;">'+'<div class="fp">👤</div>'+'<div class="info"><div class="fn">'+n+'</div><div class="st" style="color:#f44336;">❌ Rejected</div></div>'+'<button class="ubtn" onclick="reAddSet(\''+n.replace(/'/g,"")+'\')">➕ Add Karo</button>'+'</div>';});rl.innerHTML=h3;}
+}
+function unblockSet(name){if(!confirm("🟢 "+name+" ko unblock kar dein?"))return;var b=getBlocked().filter(function(n){return n!==name;});localStorage.setItem("fr_blocked",JSON.stringify(b));alert("🟢 Unblock ho gaya!");renderSettings();}
+function blockSet(name){if(!confirm("🔴 "+name+" ko block kar dein?"))return;var b=getBlocked();if(b.indexOf(name)===-1)b.push(name);localStorage.setItem("fr_blocked",JSON.stringify(b));alert("🔴 Block ho gaya!");renderSettings();}
+function removeSet(name){if(!confirm("🗑️ "+name+" ko dost list se hata dein?"))return;var f=getMyFriends().filter(function(n){return n!==name;});localStorage.setItem("fr_myfriends",JSON.stringify(f));alert("🗑️ Hata diya!");renderSettings();}
+function reAddSet(name){if(!confirm("➕ "+name+" ko wapas add kar dein?"))return;var r=getRejected().filter(function(n){return n!==name;});localStorage.setItem("fr_rejected",JSON.stringify(r));var f=getMyFriends();if(f.indexOf(name)===-1)f.push(name);localStorage.setItem("fr_myfriends",JSON.stringify(f));alert("✅ "+name+" wapas dost ban gaya!");renderSettings();}
+function clearAllData(){if(!confirm("⚠️ SACH ME sab delete karna hai?\nDost, Block, Requests sab jayega!"))return;if(!confirm("Last chance! Pakka?"))return;localStorage.removeItem("fr_blocked");localStorage.removeItem("fr_myfriends");localStorage.removeItem("fr_requests");localStorage.removeItem("fr_chats");localStorage.removeItem("fr_rejected");alert("🗑️ Sab clear ho gaya!");renderSettings();}
+renderSettings();
+</script>
+</body></html>
