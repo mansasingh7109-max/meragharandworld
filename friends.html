@@ -375,18 +375,12 @@ function openDetail(i){
 // ===== SEND FRIEND REQUEST =====
 function sendRequest(i){
   var f = FRIENDS[i];
-  var reqs = getRequests();
-  if(reqs.some(function(r){return r.name === f.name;})){
-    alert("Request pehle se bheji hui hai!");
+  var friendUid = f._uid || f.uid;
+  if(!friendUid){
+    alert("Friend ka UID nahi mila! Pehle Firebase se friends load karo.");
     return;
   }
-  var now = new Date();
-  var time = now.getDate()+"/"+(now.getMonth()+1)+" "+now.getHours()+":"+String(now.getMinutes()).padStart(2,"0");
-  reqs.push({name: f.name, time: time});
-  saveRequests(reqs);
-  alert("✅ "+f.name+" ko friend request bhej di!\n\nAb 'Meri Friend Requests' me jaakar Accept karo (demo).");
-  renderRequests();
-  openDetail(i); // refresh
+  sendFriendRequest(friendUid, f.name);
 }
 
 // ===== ACCEPT / REJECT REQUEST =====
@@ -456,33 +450,44 @@ function openChat(name){
   window.scrollTo(0,0);
 }
 
+var _chatListener = null;
 function loadMsgs(){
-  var chats = getChats();
-  var msgs = chats[chatWith] || [];
   var box = document.getElementById('chatMsgs');
-  var html = "";
-  
-  if(msgs.length === 0){
-    html = '<div class="empty">👋 '+chatWith+' se chat shuru karo!<br>Neeche message likho ya 📎 se photo/video bhejo.</div>';
-  } else {
-    msgs.forEach(function(m){
-      var cls = m.me ? "me" : "them";
-      var content = "";
-      if(m.type === "image"){
-        content = '<img src="'+m.text+'">';
-      } else if(m.type === "video"){
-        content = '<video src="'+m.text+'" controls style="max-width:100%;border-radius:8px;"></video>';
-      } else if(m.type === "file"){
-        content = '📎 <a href="'+m.text+'" download="'+m.fname+'">'+m.fname+'</a>';
-      } else {
-        content = m.text.replace(/</g,"&lt;");
-      }
-      html += '<div class="msg '+cls+'">'+content+'<div class="tm">'+m.time+'</div></div>';
-    });
+  if(!box) return;
+  box.innerHTML = '<div class="empty">⏳ Messages load ho rahe hain...</div>';
+  var myUid = null;
+  try{ myUid = localStorage.getItem("auth_uid"); }catch(e){}
+  if(!myUid) return;
+  var friendUid = null;
+  try{
+    var users = window._fbUsers || [];
+    for(var i=0; i<users.length; i++){
+      var nm = users[i].profileName || users[i].name || "";
+      if(nm === chatWith){ friendUid = users[i]._key; break; }
+    }
+  }catch(e){}
+  if(!friendUid || !window._fbDb) return;
+  if(_chatListener){
+    try{ _chatListener.ref.off("value", _chatListener.listener); }catch(e){}
   }
-  
-  box.innerHTML = html;
-  box.scrollTop = box.scrollHeight;
+  var ref = window._fbDb.ref("user_chats/"+myUid+"/"+friendUid+"/messages");
+  var listener = ref.orderByChild("timestamp").on("value", function(snap){
+    var html = "";
+    var count = 0;
+    snap.forEach(function(ch){
+      var m = ch.val();
+      count++;
+      var cls = (m.sender === myUid) ? "me" : "them";
+      var content = String(m.text||"").replace(/</g,"&lt;");
+      html += '<div class="msg '+cls+'">'+content+'<div class="tm">'+(m.time||"")+'</div></div>';
+    });
+    if(count === 0){
+      html = '<div class="empty">👋 '+chatWith+' se chat shuru karo!</div>';
+    }
+    box.innerHTML = html;
+    box.scrollTop = box.scrollHeight;
+  });
+  _chatListener = {ref: ref, listener: listener};
 }
 
 function getTime(){
@@ -494,24 +499,17 @@ function sendMsg(){
   var inp = document.getElementById('chatText');
   var txt = inp.value.trim();
   if(!txt) return;
-  
-  var chats = getChats();
-  if(!chats[chatWith]) chats[chatWith] = [];
-  chats[chatWith].push({me:true, type:"text", text:txt, time:getTime()});
-  saveChats(chats);
-  
+  var friendUid = null;
+  try{
+    var users = window._fbUsers || [];
+    for(var i=0; i<users.length; i++){
+      var nm = users[i].profileName || users[i].name || "";
+      if(nm === chatWith){ friendUid = users[i]._key; break; }
+    }
+  }catch(e){}
+  if(!friendUid){ alert("Friend ka ID nahi mila!"); return; }
+  sendChatMessage(friendUid, txt);
   inp.value = "";
-  loadMsgs();
-  
-  // Demo auto-reply
-  setTimeout(function(){
-    var chats2 = getChats();
-    var replies = ["Haan ji! 😊", "Achha!", "OK 👍", "Bahut badhiya!", "Samajh gaya!"];
-    var r = replies[Math.floor(Math.random()*replies.length)];
-    chats2[chatWith].push({me:false, type:"text", text:r, time:getTime()});
-    saveChats(chats2);
-    if(chatWith) loadMsgs();
-  }, 1500);
 }
 
 function sendFile(input){
@@ -609,5 +607,5 @@ list.innerHTML=html;
 <script>PRIV_placeBtn("friendsPublic","hdr");PRIV_placeBtn("showInSearch","hdr");</script>
 <script src="block-check.js"></script>
 
-  
+ <script src="firebase-chat.js"></script> 
 </body></html>
