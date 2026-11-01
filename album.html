@@ -44,6 +44,37 @@ body{background:#fff8f0;color:#333}
 </style>
 </head>
 <body>
+
+
+<script>
+(function(){
+var urlUid = new URLSearchParams(location.search).get('uid');
+var myUid = null;
+try{ myUid = localStorage.getItem("auth_uid"); }catch(e){}
+var showUid = urlUid || myUid;
+if(showUid && window.firebase){
+  firebase.database().ref("customer_profiles/"+showUid).once("value", function(snap){
+    var d = snap.val();
+    if(!d) return;
+    if(d.profileName){
+      var el = document.getElementById('profileName');
+      if(el) el.textContent = d.profileName;
+    }
+    if(d.profilePhoto){
+      var ph = document.getElementById('profilePhoto');
+      if(ph) ph.src = d.profilePhoto;
+    }
+    if(d.customerStatus){
+      var st = document.getElementById('profileStatus');
+      if(st) st.textContent = d.customerStatus;
+    }
+  });
+}
+})();
+</script>
+
+
+  
 <div id="hdr">
 <button onclick="history.back()">←</button>
 <b>📸 Album</b><button onclick="location.href='customerlogin.html'" style="background:#7b1fa2;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;margin:10px;">🔐 Login</button>

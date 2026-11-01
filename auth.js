@@ -95,6 +95,7 @@ function fbErr(e){
   else if(e.code==="auth/invalid-email") m = "Sahi Gmail likho!";
   else if(e.code==="auth/operation-not-allowed") m = "Abhi thodi problem hai, baad me try karo 🙏";
   else if(e.code==="auth/network-request-failed") m = "Internet check karo, phir try karo 📶";
+    else if(e.code==="auth/too-many-requests") m = "Bahut baar try kiya! 5 minute ruk ke phir try karo ⏳";
   return m;
 }
 
@@ -108,9 +109,13 @@ function doLogin(){
   a.signInWithEmailAndPassword(em, pw).then(function(cred){
     var uid = cred.user.uid;
     try{
+      // Purana user ka data clear karo
+localStorage.removeItem("customer_profile");
+localStorage.removeItem("site_options");
       localStorage.setItem("auth_uid", uid);
       localStorage.setItem("auth_email", em);
       localStorage.setItem("customer_logged_in", "1");
+      
     }catch(e){}
     window.AUTH_UID = uid; window.AUTH_EMAIL = em;
     migrateToUid(uid);
@@ -184,6 +189,7 @@ window.authReset = function(){
   a.sendPasswordResetEmail(em).then(function(){
     authErr("");
     alert("✅ Reset link bhej diya! Apna Gmail kholo aur link par click karke naya password rakho.");
+        alert("✅ Reset link bhej diya!\n\nApna Gmail kholo aur link par click karke naya password rakho.\n\n🔒 Tumhara photo, message, sab data SAFE rahega — sirf password badlega!");
   }).catch(function(e){ authErr(fbErr(e)); });
 };
 
