@@ -582,10 +582,12 @@ function loadFbUsers(){
 function searchFbFriends(q){
   var box = document.getElementById('fbSearchResults');
   q = (q||"").toLowerCase().trim();
-  var myLogin = null;
-  try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
-  var myName = (myLogin && myLogin.name || "").toLowerCase();
-  var myPhone = (myLogin && myLogin.phone || "");
+  var myUid = "";
+try{ myUid = localStorage.getItem("auth_uid") || ""; }catch(e){}
+var _cp2 = {};
+try{ _cp2 = JSON.parse(localStorage.getItem("customer_profile")||"{}"); }catch(e){}
+var myName = (_cp2.profileName || _cp2.name || "").toLowerCase();
+var myPhone = (_cp2.profilePhone || _cp2.phone || "");
   var results = _fbUsers.filter(function(u){
     var nm = (u.profileName || u.name || "").toLowerCase();
     var ph = (u.profilePhone || u.phone || "");
