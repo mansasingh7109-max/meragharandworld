@@ -324,27 +324,34 @@ html += '<div class="mycard">'
 // ===== RENDER REQUESTS =====
 function renderRequests(){
   var list = document.getElementById('reqList');
-  var reqs = getRequests();
   var sec = document.getElementById('reqSec');
-  
-  if(reqs.length === 0){
-    sec.style.display = "none";
-    return;
-  }
-  sec.style.display = "block";
-  
-  var html = "";
-  reqs.forEach(function(r, i){
-    var f = FRIENDS.find(function(x){return x.name === r.name;});
-    var photo = f ? f.photo : "👤";
-    html += '<div class="reqcard">'
-      + '<div class="fp">'+photo+'</div>'
-      + '<div class="info"><div class="fn">'+r.name+'</div><div class="tm">📩 '+r.time+'</div></div>'
-      + '<div><button class="accbtn" onclick="acceptReq('+i+')">✅ Accept</button>'
-      + '<button class="rejbtn" onclick="rejectReq('+i+')">❌</button></div>'
-      + '</div>';
+  var myUid = "";
+  try{ myUid = localStorage.getItem("auth_uid") || ""; }catch(e){}
+  if(!myUid || !window._fbDb){ sec.style.display="none"; return; }
+  window._fbDb.ref("friend_requests/"+myUid).once("value", function(snap){
+    if(!snap.exists()){ sec.style.display="none"; return; }
+    sec.style.display="block";
+    var html = "";
+    snap.forEach(function(ch){
+      var fromUid = ch.key;
+      var r = ch.val() || {};
+      var nm = r.fromName || fromUid;
+      var tm = r.time || "";
+      html += '<div class="reqcard">'
+        + '<div class="fp">👤</div>'
+        + '<div class="info"><div class="fn">'+nm+'</div><div class="tm">📩 '+tm+'<br><span style="font-size:11px;">Ek friend request aayi hai — Accept ya Reject karo ya Block karo</span></div></div>'
+        + '<div><button class="accbtn" onclick="acceptFirebaseReq(\''+fromUid+'\',\''+nm.replace(/\'/g,"")+'\')">✅ Accept</button>'
+        + '<button class="rejbtn" onclick="rejectFirebaseReq(\''+fromUid+'\')">❌</button></div>'
+        + '</div>';
+    });
+    list.innerHTML = html;
   });
-  list.innerHTML = html;
+}
+function acceptFirebaseReq(fromUid, fromName){
+  if(window.acceptFriendRequest){ window.acceptFriendRequest(fromUid).then(function(){ alert("🎉 "+fromName+" ab dost hai!"); renderRequests(); }); }
+}
+function rejectFirebaseReq(fromUid){
+  if(window.rejectFriendRequest){ window.rejectFriendRequest(fromUid).then(function(){ renderRequests(); }); }
 }
 
 // ===== FILTER =====
