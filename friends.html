@@ -249,7 +249,16 @@ if(typeof renderRequests === "function"){
 loadRealFriends();
 setTimeout(loadRealFriends, 2000);
 setTimeout(loadRealFriends, 5000);
-
+window.FRIEND_STATUS = {};
+function loadStatuses(){
+  var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
+  if(!myUid || !window._fbDb) return;
+  var db = window._fbDb;
+  db.ref("friends/"+myUid).once("value",function(s){ s.forEach(function(c){ window.FRIEND_STATUS[c.key]="accepted"; }); });
+  db.ref("friend_requests_sent/"+myUid).once("value",function(s){ s.forEach(function(c){ if(window.FRIEND_STATUS[c.key]!="accepted") window.FRIEND_STATUS[c.key]="sent"; }); });
+  db.ref("friend_requests/"+myUid).once("value",function(s){ s.forEach(function(c){ if(!window.FRIEND_STATUS[c.key]) window.FRIEND_STATUS[c.key]="incoming"; }); renderFriends(document.getElementById('frSearch').value||""); });
+}
+setTimeout(loadStatuses,2500);
 
   
 // ===== LOCALSTORAGE KEYS =====
@@ -274,11 +283,13 @@ if(blocked.indexOf(f.name)!==-1) return;
 
   
     if(q && f.name.toLowerCase().indexOf(q) === -1) return;
-    var isFriend = myF.indexOf(f.name) !== -1;
-    var hasReq = reqs.some(function(r){return r.name === f.name;});
     var badge = "";
-    if(isFriend) badge = '<div style="font-size:11px;color:#4caf50;font-weight:bold;margin-top:4px;">✅ Dost</div>';
-    else if(hasReq) badge = '<div style="font-size:11px;color:#ff9800;font-weight:bold;margin-top:4px;">⏳ Request bheji</div>';
+var uid = f._uid || f.uid || "";
+var st = (window.FRIEND_STATUS && window.FRIEND_STATUS[uid]) || "none";
+if(st==="accepted") badge = '<div style="font-size:11px;color:#4caf50;font-weight:bold;margin-top:4px;">✅ Accepted</div>';
+else if(st==="sent") badge = '<div style="font-size:11px;color:#ff9800;font-weight:bold;margin-top:4px;">📤 Sent</div>';
+else if(st==="incoming") badge = '<div style="font-size:11px;color:#2196f3;font-weight:bold;margin-top:4px;">📩 Request aayi</div>';
+else if(st==="blocked") badge = '<div style="font-size:11px;color:#f44336;font-weight:bold;margin-top:4px;">🔴 Blocked</div>';
     
     html += '<div class="fcard" onclick="openDetail('+i+')">'
       + '<div class="fp">'+f.photo+'</div>'
