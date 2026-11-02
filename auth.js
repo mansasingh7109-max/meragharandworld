@@ -108,10 +108,8 @@ function doLogin(){
   authErr("Ruko... ⏳");
   a.signInWithEmailAndPassword(em, pw).then(function(cred){
     var uid = cred.user.uid;
-    try{
-      // Purana user ka data clear karo
-localStorage.removeItem("customer_profile");
-localStorage.removeItem("site_options");
+        try{
+      // Purana data MAT hatao - Firebase se load hoga
       localStorage.setItem("auth_uid", uid);
       localStorage.setItem("auth_email", em);
       localStorage.setItem("customer_logged_in", "1");

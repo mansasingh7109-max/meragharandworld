@@ -269,7 +269,7 @@ profileDetail: "Customer ka lamba detail yahan likho.", // OPTION: lamba detail
 profileThinking: "", // OPTION: customer kya soch raha hai - thinking box (unlimited words, khaali = nahi dikhega)
 customerStatus: "", // OPTION: customer ki status line (unlimited words, khaali = nahi dikhega)
 customerEditOn: "on", // OPTION: "on"=customer khud apna profile edit kar sake (photo, detail, status sab), "off"=sirf aap edit karo
- customerId: (window.AUTH_UID || "customer1"),// OPTION: customer ki unique ID (Firebase me save hogi, har customer ki alag rakho)
+customerId: (function(){ try{ return localStorage.getItem("auth_uid") || "customer1"; }catch(e){ return "customer1"; } })(), // OPTION: customer ki unique ID (Firebase me save hogi, har customer ki alag rakho)
 diaryOn: "on", // OPTION: "on"=📖 Diary/Timeline - date-wise photo/video/message entries, date search ke saath
 adminEditOn: "on", // OPTION: "on"=aap (admin) page se hi message edit/delete kar sakte ho, "off"=band
 profileMsgTimelineOn: "on", // OPTION: "on"=profile full page par 💬 Messages Timeline - past/present/future date wale save messages, edit/delete ke saath
@@ -415,17 +415,18 @@ function saveMyFriends(f){ localStorage.setItem("fr_myfriends", JSON.stringify(f
 // ===== REQUEST BHEJO =====
 function sendRequest(i){
   var f = FRIENDS[i];
-  var reqs = getRequests();
-  if(reqs.some(function(r){return r.name === f.name;})){
-    alert("Request pehle se bheji hui hai!");
+  if(!f) return;
+  var friendUid = f._uid || f.uid;
+  var friendName = f.name;
+  if(!friendUid){
+    alert("User ID nahi mila!");
     return;
   }
-  var now = new Date();
-  var time = now.getDate()+"/"+(now.getMonth()+1)+" "+now.getHours()+":"+String(now.getMinutes()).padStart(2,"0");
-  reqs.push({name: f.name, time: time});
-  saveRequests(reqs);
-  alert("✅ "+f.name+" ko friend request bhej di!");
-  renderRequests();
+  if(window.sendFriendRequest){
+    window.sendFriendRequest(friendUid, friendName);
+  } else {
+    alert("firebase-chat.js load nahi hua!");
+  }
 }
 
 // ===== REQUEST LIST DIKHAO =====
@@ -475,74 +476,55 @@ function rejectReq(i){
 
 
 
-// ===== CHAT STORAGE =====
-function getChats(){ try{return JSON.parse(localStorage.getItem("fr_chats")||"{}");}catch(e){return{};} }
-function saveChats(c){ localStorage.setItem("fr_chats", JSON.stringify(c)); }
-var chatWith = "";
 
-// ===== CHAT KHOLO =====
-function openChat(name){
+// ===== REAL CHAT (Firebase) =====
+var chatWith = "";
+var chatWithUid = null;
+function openChat(name, uid){
   chatWith = name;
+  chatWithUid = uid || null;
   document.getElementById('chatHead').innerHTML =
     '<div class="fp">👤</div><div class="nm">💬 '+name+'</div>';
   document.getElementById('chatPage').style.display = "block";
   loadMsgs();
   window.scrollTo(0,0);
 }
-
-// ===== MESSAGES LOAD KARO =====
 function loadMsgs(){
-  var chats = getChats();
-  var msgs = chats[chatWith] || [];
+  var friendUid = chatWithUid;
   var box = document.getElementById('chatMsgs');
-  var html = "";
-  if(msgs.length === 0){
-    html = '<div style="text-align:center;color:#999;padding:20px;">👋 '+chatWith+' se chat shuru karo!</div>';
-  } else {
-    msgs.forEach(function(m){
-      var cls = m.me ? "me" : "them";
-      var content = "";
-      if(m.type === "image"){
-        content = '<img src="'+m.text+'">';
-      } else if(m.type === "video"){
-        content = '<video src="'+m.text+'" controls style="max-width:100%;border-radius:8px;"></video>';
-      } else if(m.type === "file"){
-        content = '📎 <a href="'+m.text+'" download="'+m.fname+'">'+m.fname+'</a>';
-      } else {
-        content = m.text.replace(/</g,"&lt;");
-      }
-      html += '<div class="msg '+cls+'">'+content+'<div class="tm">'+m.time+'</div></div>';
-    });
+  if(!friendUid || !window._fbDb){
+    box.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">Firebase connect nahi hai</div>';
+    return;
   }
-  box.innerHTML = html;
-  box.scrollTop = box.scrollHeight;
+  var myUid = null;
+  try{ myUid = localStorage.getItem("auth_uid"); }catch(e){}
+  box.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">Messages load ho rahe hain...</div>';
+  window._fbDb.ref("user_chats/"+myUid+"/"+friendUid+"/messages").orderByChild("timestamp").on("value", function(snap){
+    var html = "";
+    var count = 0;
+    snap.forEach(function(ch){
+      count++;
+      var m = ch.val();
+      var cls = (m.sender === myUid) ? "me" : "them";
+      html += '<div class="msg '+cls+'">'+String(m.text||"").replace(/</g,"&lt;")+'<div class="tm">'+(m.time||"")+'</div></div>';
+    });
+    if(count === 0) html = '<div style="text-align:center;color:#999;padding:20px;">👋 '+chatWith+' se chat shuru karo!</div>';
+    box.innerHTML = html;
+    box.scrollTop = box.scrollHeight;
+  });
 }
-
-function getTime(){
-  var n = new Date();
-  return n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
-}
-
-// ===== TEXT MESSAGE BHEJO =====
 function sendMsg(){
   var inp = document.getElementById('chatText');
   var txt = inp.value.trim();
   if(!txt) return;
-  var chats = getChats();
-  if(!chats[chatWith]) chats[chatWith] = [];
-  chats[chatWith].push({me:true, type:"text", text:txt, time:getTime()});
-  saveChats(chats);
-  inp.value = "";
-  loadMsgs();
-  // Demo auto-reply
-  setTimeout(function(){
-    var chats2 = getChats();
-    var replies = ["Haan ji! 😊", "Achha!", "OK 👍", "Bahut badhiya!"];
-    var r = replies[Math.floor(Math.random()*replies.length)];
-    chats2[chatWith].push({me:false, type:"text", text:r, time:getTime()});
-    saveChats(chats2);
-    if(chatWith) loadMsgs();
-  }, 1500);
+  var friendUid = chatWithUid;
+  if(!friendUid){ alert("Pehle dost select karo!"); return; }
+  if(window.sendChatMessage){
+    window.sendChatMessage(friendUid, txt);
+    inp.value = "";
+  } else {
+    alert("firebase-chat.js load nahi hua!");
+  }
 }
 
 // ===== PHOTO/VIDEO/FILE BHEJO =====
@@ -1481,16 +1463,7 @@ function openDetailByName(name){
 
 
 
-// ===== DEMO FRIENDS (sirf tumko dikhenge) =====
-var DEMO_FRIENDS = [
-{photo:"👦", name:"Rahul", role:"Chef", detail:"Rahul hamara best chef hai. 5 saal se kaam kar raha hai."},
-{photo:"👧", name:"Priya", role:"Manager", detail:"Priya sab manage karti hai. Bahut smart hai."},
-{photo:"👨", name:"Amit", role:"Delivery Boy", detail:"Amit tez delivery karta hai. Sabka favourite."},
-{photo:"👩", name:"Sneha", role:"Waiter", detail:"Sneha customers ko bahut achhe se handle karti hai."},
-{photo:"🧑", name:"Vikash", role:"Cook", detail:"Vikash ke haath ka khana sabko pasand hai."},
-{photo:"👴", name:"Ramesh", role:"Helper", detail:"Ramesh ji sabki madad karte hain."}
-];
-var FRIENDS = DEMO_FRIENDS.slice();
+var FRIENDS = [];
 
 // ===== REAL FRIENDS FROM FIREBASE =====
 function loadRealFriends(){
@@ -1502,6 +1475,8 @@ function loadRealFriends(){
       var nm = u.profileName || u.name || "";
       if(!nm) return;
       realList.push({
+        _uid: ch.key,    // ← YE LINE ADD KARO!
+  uid: ch.key,     // ← YE BHI ADD KARO!
         photo: u.profilePhoto
           ? '<img src="'+u.profilePhoto+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
           : "👤",
@@ -1514,25 +1489,38 @@ function loadRealFriends(){
     var myLogin = null;
     try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
     var myName = (myLogin && myLogin.name || "").toLowerCase();
-    // Sirf tumko (Manisha) demo dikhega
-    var isOwner = myName === "manisha";
-    if(isOwner){
-      FRIENDS = DEMO_FRIENDS.concat(realList);
-    } else {
-      FRIENDS = realList;
-    }
+    // Sabko sirf real friends dikhenge
+FRIENDS = realList;
     // Apna naam list se hatao
     if(myName){
       FRIENDS = FRIENDS.filter(function(f){ return f.name.toLowerCase() !== myName; });
     }
-    renderFriends(document.getElementById('frSearch').value || "");
-    renderMyFriends();
-    renderRequests();
+        if(typeof renderFriends === "function"){
+      try{
+        var _s = document.getElementById('frSearch');
+        renderFriends(_s ? _s.value : "");
+      }catch(e){}
+    }
+    if(typeof renderMyFriends === "function"){
+      try{ renderMyFriends(); }catch(e){}
+    }
+    if(typeof renderRequests === "function"){
+      try{ renderRequests(); }catch(e){}
+    }
   });
 }
 setTimeout(loadRealFriends, 1500);
 
 
+
+
+// ===== FILTER FUNCTION (SEARCH KE LIYE) =====
+function filterFriends(q){
+  if(typeof renderFriends === "function"){
+    try{ renderFriends(q); }catch(e){}
+  }
+}
+  
 
 
 
@@ -1542,14 +1530,72 @@ function openDetail(i){
   currentFriend = i;
   var f = FRIENDS[i];
   if(!f) return;
-  var myF = getMyFriends();
-  var reqs = getRequests();
-  var isFriend = myF.indexOf(f.name) !== -1;
-  var hasReq = reqs.some(function(r){return r.name === f.name;});
 
+var currentFriend = -1;
+function openDetail(i){
+  currentFriend = i;
+  var f = FRIENDS[i];
+  if(!f) return;
+  var fUid = f._uid || f.uid || "";
+  var myUid = "";
+  try{ myUid = localStorage.getItem("auth_uid") || ""; }catch(e){}
+
+  var detailHtml = '<div class="bigphoto">'+f.photo+'</div>'
+    + '<h2>'+f.name+'</h2>'
+    + '<div class="role">'+f.role+'</div>'
+    + '<div class="desc">'+f.detail+'</div>'
+    + '<div id="stMsg" style="padding:20px;color:#999;">⏳ Status check ho raha hai...</div><div id="stBtn"></div>';
+
+  document.getElementById('detailCard').innerHTML = detailHtml;
+  document.getElementById('detailPage').style.display = "block";
+  window.scrollTo(0,0);
+
+  if(myUid && fUid && window._fbDb){
+    var db = window._fbDb;
+    db.ref("friends/"+myUid+"/"+fUid).once("value", function(s1){
+      var st = s1.exists() ? "accepted" : "none";
+      db.ref("friend_requests_sent/"+myUid+"/"+fUid).once("value", function(s2){
+        if(st==="none" && s2.exists()) st = "sent";
+        db.ref("friend_requests/"+myUid+"/"+fUid).once("value", function(s3){
+          if(st==="none" && s3.exists()) st = "incoming";
+          showDetailBtn(f, i, st);
+        });
+      });
+    });
+  } else {
+    showDetailBtn(f, i, "none");
+  }
+}
+
+function showDetailBtn(f, i, status){
+  var m = document.getElementById('stMsg');
+  var b = document.getElementById('stBtn');
+  if(m) m.style.display = "none";
+  if(!b) return;
+  var fUid = f._uid || f.uid || "";
+  if(status === "accepted"){
+    b.innerHTML = '<div style="background:#e8f5e9;color:#2e7d32;font-weight:bold;padding:12px;border-radius:12px;margin-top:10px;">✅ Accepted - Dost hain!</div><button class="sendbtn" style="background:#25D366;margin-top:10px;" onclick="openChat(\''+f.name.replace(/'/g,"")+'\',\''+fUid+'\')">💬 Chat Karo</button>';
+  } else if(status === "sent"){
+    b.innerHTML = '<div style="background:#fff3e0;color:#e65100;font-weight:bold;padding:12px;border-radius:12px;margin-top:10px;">📤 Sent Request</div>';
+  } else if(status === "incoming"){
+    b.innerHTML = '<div style="background:#e3f2fd;color:#1565c0;font-weight:bold;padding:12px;border-radius:12px;margin-top:10px;">📩 Request Aayi Hai!</div><button class="accbtn" style="padding:12px;margin-top:10px;" onclick="acceptFirebaseReq(\''+fUid+'\')">✅ Accept</button> <button class="rejbtn" style="padding:12px;margin-top:10px;" onclick="rejectFirebaseReq(\''+fUid+'\')">❌ Reject</button>';
+  } else {
+    b.innerHTML = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>';
+  }
+}
+function acceptFirebaseReq(fromUid){
+  if(window.acceptFriendRequest) window.acceptFriendRequest(fromUid).then(function(){ openDetail(currentFriend); });
+}
+function rejectFirebaseReq(fromUid){
+  if(window.rejectFriendRequest) window.rejectFriendRequest(fromUid).then(function(){ openDetail(currentFriend); });
+}
+
+
+
+  
   var btnHtml = "";
   if(isFriend){
-    btnHtml = '<button style="background:#25D366;color:#fff;border:none;padding:14px;font-size:16px;margin-top:10px;width:100%;border-radius:20px;font-weight:bold;cursor:pointer;" onclick="openChat(\''+f.name.replace(/'/g,"")+'\')">💬 Chat Karo</button>'
+    btnHtml = '<button style="background:#25D366;color:#fff;border:none;padding:14px;font-size:16px;margin-top:10px;width:100%;border-radius:20px;font-weight:bold;cursor:pointer;" onclick="openChat(\''+f.name.replace(/'/g,"")+'\',\''+(f._uid||f.uid||"")+'\')">💬 Chat Karo</button>'
       + '<div style="color:#4caf50;font-weight:bold;margin-top:10px;">✅ Ye aapka dost hai</div>';
   } else if(hasReq){
     btnHtml = '<div style="color:#ff9800;font-weight:bold;margin-top:10px;">⏳ Request bhej di hai!</div>';
