@@ -321,12 +321,13 @@ function renderMyFriends(){
     var f = FRIENDS.find(function(x){return x.name === name;});
     var photo = f ? f.photo : "👤";
     var role = f ? f.role : "";
+    var fUid = f && (f._uid || f.uid) ? (f._uid || f.uid) : "";
 html += '<div class="mycard">'
     + '<div style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;" onclick="openDetailByName(\''+name+'\')">'
     + '<div class="fp">'+photo+'</div>'
     + '<div class="info"><div class="fn">'+name+'</div><div class="st">✅ Dost • '+role+'</div></div>'
     + '</div>'
-    + '<button class="chatbtn" onclick="openChat(\''+name+'\')">💬 Chat</button>'
+  + '<button class="chatbtn" onclick="openChat(\''+name.replace(/\'/g,"")+'\',\''+fUid+'\')">💬 Chat</button>'
     + '</div>';
   });
   list.innerHTML = html;
