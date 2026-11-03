@@ -367,6 +367,8 @@ friend6Chat: "", // OPTION: dost 6 ka WhatsApp number (khali = chat button nahi)
 <a id="mH" href="#">Home</a><a id="mM" href="#items">Menu</a><a id="mO" href="#">Orders</a><a id="mC" href="#ftr">Contact</a>
 </nav></header>
   <button onclick="location.href='customerlogin.html'" style="background:#7b1f;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">🔐 Customer Login</button>
+<button id="googleLoginBtn" style="background:#fff;border:2px solid #4285F4;color:#4285F4;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;margin-top:10px;">🔵 Google se Login karo</button>
+  
 <div id="profileHead"></div>
 <section id="hero"><div id="heroIn">
 
@@ -621,11 +623,11 @@ var myPhone = (_cp2.profilePhone || _cp2.phone || "");
   box.innerHTML = h;
 }
 function sendFbRequest(userKey, btn){
-  var myLogin = null;
-  try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
-  if(!myLogin){ alert("Pehle login karo!"); return; }
-  var myName = myLogin.name || "Unknown";
-  var myPhone = myLogin.phone || "";
+  var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
+if(!myUid){ alert("Pehle login karo!"); return; }
+var _cp={}; try{_cp=JSON.parse(localStorage.getItem("customer_profile")||"{}");}catch(e){}
+var myName=_cp.profileName||_cp.name||"Unknown";
+var myPhone=_cp.profilePhone||_cp.phone||"";
   if(!window._fbDb){ alert("Firebase connect nahi hai!"); return; }
   var reqData = { fromName: myName, fromPhone: myPhone, toKey: userKey, time: Date.now(), status: "pending" };
   window._fbDb.ref("friend_requests/" + userKey).push(reqData, function(err){
@@ -1527,11 +1529,6 @@ function filterFriends(q){
 
 
   // ===== FRIEND DETAIL PAGE KHOLO =====
-var currentFriend = -1;
-function openDetail(i){
-  currentFriend = i;
-  var f = FRIENDS[i];
-  if(!f) return;
 
 var currentFriend = -1;
 function openDetail(i){
@@ -1648,6 +1645,7 @@ function openFbProfile(userKey){
     + (ph ? '<div style="color:#e65100;font-weight:bold;margin-bottom:10px;">📞 '+ph.replace(/</g,"&lt;")+'</div>' : '')
     + '<div style="font-size:14px;color:#666;margin:12px 0;">'+(u.profileDetail||"").replace(/</g,"&lt;")+'</div>'
     + '<button onclick="sendFbRequest(\''+userKey+'\',this)" style="background:#25D366;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;">➕ Friend Request Bhejo</button>';
+  + '<div style="margin-top:10px;"><button onclick="location.href=\'album.html?cid='+userKey+'\'" style="background:#9C27B0;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;width:100%;margin-bottom:8px;">📸 Album Dekho</button><button onclick="location.href=\'timedatalist.html?cid='+userKey+'\'" style="background:#2196F3;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;width:100%;">📅 Timeline Dekho</button></div>'
 
   document.getElementById('detailPage').style.display = "block";
   window.scrollTo(0,0);
@@ -1765,5 +1763,32 @@ el.style.color=tc;
 </script>
 
 <script src="firebase-chat.js"></script>
+
+
+<script>
+document.getElementById('googleLoginBtn').addEventListener('click', function(){
+  var provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).then(function(result){
+    var user = result.user;
+    try{
+      localStorage.setItem("auth_uid", user.uid);
+      localStorage.setItem("customer_logged_in", "1");
+      localStorage.setItem("customer_profile", JSON.stringify({
+        profileName: user.displayName || "User",
+        profilePhone: user.phoneNumber || "",
+        profilePhoto: user.photoURL || "👩",
+        email: user.email || ""
+      }));
+    }catch(e){}
+    if(window._fbDb){ try{ window._fbDb.ref("customer_profiles/"+user.uid).set({
+      profileName: user.displayName || "User",
+      profilePhoto: user.photoURL || "",
+      email: user.email || ""
+    }); }catch(e){} }
+    alert("Welcome, "+(user.displayName||"")+"! ✅");
+    location.reload();
+  }).catch(function(err){ alert("Error: "+err.message); });
+});
+</script>
   
 </body></html>
