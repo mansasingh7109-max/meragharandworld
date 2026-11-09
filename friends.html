@@ -1,59 +1,45 @@
 <!DOCTYPE html>
-<html lang="hi"><head><style>
-@font-face {
-  font-family: "Optimistic";
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Optimistic Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
-}
-:where(html) {
-  font-family: "Optimistic", system-ui, sans-serif;
-}
-:where(code, pre, kbd, samp) {
-  font-family: "Optimistic Mono", ui-monospace, monospace;
-}
-</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="hi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mere Dost - Friend List</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+var FIREBASE_CONFIG={apiKey:"AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",authDomain:"santramarketshoppingmall.firebaseapp.com",databaseURL:"https://santramarketshoppingmall-default-rtdb.firebaseio.com",projectId:"santramarketshoppingmall",storageBucket:"santramarketshoppingmall.firebasestorage.app",messagingSenderId:"398490252924",appId:"1:398490252924:web:4b6f73b48d28e1c23b7bf9"};
+var _fbDb=null; try{firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database();}catch(e){}
+function getMyUid(){ try{return localStorage.getItem("auth_uid")||localStorage.getItem("customer_phone")||"";}catch(e){return "";} }
+function getMyName(){ try{return localStorage.getItem("customer_name")||localStorage.getItem("customer_username")||"Me";}catch(e){return "Me";} }
+function getMYUID(){ var u=getMyUid(); if(u) MY_UID=u; return MY_UID; }
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#fff8f0;color:#333}
 #hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
-#brand{font-size:20px;font-weight:bold;color:#000;flex:1}
+#brand{font-size:20px;font-weight:bold;flex:1}
 .backbtn{background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;text-decoration:none;font-size:14px}
 #hero{background:linear-gradient(135deg,#ff7043,#e65100);color:#fff;padding:30px 20px;text-align:center}
 #hero h1{font-size:28px;margin-bottom:6px}
-#hero p{font-size:14px}
 #searchWrap{padding:16px 20px 0;max-width:560px;margin:0 auto}
 #frSearch{width:100%;padding:12px 16px;border:2px solid #e65100;border-radius:24px;font-size:15px;box-sizing:border-box;outline:none}
-#frSearch:focus{border-color:#ff7043;box-shadow:0 0 8px rgba(230,81,0,.2)}
 .hint{text-align:center;font-size:11px;color:#999;margin-top:6px}
 .sec{padding:10px 20px;max-width:560px;margin:0 auto}
 .sec h2{color:#e65100;text-align:center;margin:16px 0 12px;font-size:22px}
 .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .fcard{background:#fff;border-radius:14px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08);cursor:pointer}
 .fcard .fp{width:64px;height:64px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 8px;overflow:hidden}
-.fcard .fp img{width:100%;height:100%;object-fit:cover}
+.fcard .fp img{width:100%;height:100%;object-fit:cover;display:block}
 .fcard .fn{font-weight:bold;font-size:15px}
 .fcard .fr{color:#e65100;font-size:13px;font-weight:bold}
-.fcard .fd{font-size:11px;color:#777;margin-top:6px}
 .fcard .tap{font-size:11px;color:#999;margin-top:6px}
 .mycard{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px}
 .mycard .fp{width:52px;height:52px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden}
-.mycard .fp img{width:100%;height:100%;object-fit:cover}
+.mycard .fp img{width:100%;height:100%;object-fit:cover;display:block}
 .mycard .info{flex:1}
 .mycard .fn{font-weight:bold;font-size:15px}
 .mycard .st{font-size:12px;color:#4caf50}
 .chatbtn{background:#25D366;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px}
 .reqcard{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;border-left:4px solid #ff9800}
-.reqcard .fp{width:52px;height:52px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.reqcard .fp{width:52px;height:52px;border-radius:50%;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden}
+.reqcard .fp img{width:100%;height:100%;object-fit:cover;display:block}
 .reqcard .info{flex:1}
 .reqcard .fn{font-weight:bold;font-size:15px}
 .reqcard .tm{font-size:11px;color:#999}
@@ -62,629 +48,297 @@ body{background:#fff8f0;color:#333}
 .sendbtn{background:#e65100;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px;width:100%;margin-top:8px}
 .empty{text-align:center;color:#999;padding:20px;font-size:14px}
 #ftr{background:#4e342e;color:#fff;text-align:center;padding:24px 16px;margin-top:20px}
-#ftr a{color:#ffcc80}
-/* Friend Detail Page */
 #detailPage,#chatPage{padding:16px;max-width:600px;margin:0 auto;display:none}
 .detail-card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center}
 .detail-card .bigphoto{width:100px;height:100px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:56px;margin:0 auto 12px;overflow:hidden}
-.detail-card .bigphoto img{width:100%;height:100%;object-fit:cover}
+.detail-card .bigphoto img{width:100%;height:100%;object-fit:cover;display:block}
 .detail-card h2{font-size:22px;margin-bottom:4px}
 .detail-card .role{color:#e65100;font-weight:bold;margin-bottom:10px}
 .detail-card .desc{font-size:14px;color:#666;text-align:left;margin:12px 0;line-height:1.6}
-/* Chat */
 .chat-head{background:#e65100;color:#fff;padding:12px 16px;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:10px}
-.chat-head .fp{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px}
+.chat-head .fp{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;flex-shrink:0}
+.chat-head .fp img{width:100%;height:100%;object-fit:cover;display:block}
 .chat-head .nm{font-weight:bold;flex:1}
-#chatMsgs{background:#fff;height:300px;overflow-y:auto;padding:12px;border-left:1px solid #eee;border-right:1px solid #eee}
-.msg{max-width:75%;padding:8px 12px;border-radius:12px;margin-bottom:8px;font-size:14px;word-wrap:break-word}
+#chatMsgs{background:#fff;height:340px;overflow-y:auto;padding:12px;border:1px solid #eee}
+.msg{max-width:75%;padding:8px 12px;border-radius:12px;margin-bottom:8px;font-size:14px;word-wrap:break-word;position:relative}
 .msg.me{background:#dcf8c6;margin-left:auto;text-align:right}
 .msg.them{background:#f1f1f1;margin-right:auto}
-.msg img{max-width:100%;border-radius:8px;margin-top:4px}
+.msg img{max-width:100%;border-radius:8px;margin-top:4px;display:block}
 .msg .tm{font-size:10px;color:#999;margin-top:4px}
 .chat-input{display:flex;gap:8px;padding:10px;background:#fff;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none}
 .chat-input input{flex:1;padding:10px;border:1px solid #ddd;border-radius:20px;outline:none;font-size:14px}
-.attachbtn{background:#fff;border:1px solid #ddd;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;flex-shrink:0}
+.attachbtn{background:#fff;border:1px solid #ddd;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .sendchatbtn{background:#25D366;color:#fff;border:none;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;flex-shrink:0}
-.hidden{display:none!important}
-</style></head>
+.menubtn{background:rgba(255,255,255,.2);color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer}
+#chatMenu{display:none;background:#fff;color:#333;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.2);padding:8px;position:absolute;right:16px;top:60px;z-index:20;width:220px}
+#chatMenu button{display:block;width:100%;text-align:left;background:none;border:none;padding:10px;font-size:14px;cursor:pointer;border-bottom:1px solid #f0f0f0}
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script>
-// ===== FIREBASE CONFIG =====
-var FIREBASE_CONFIG = {
+
+
+
+.topmenu{position:sticky;top:52px;z-index:9;background:#fff;padding:8px 6px;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.1);scrollbar-width:none}.topmenu button{flex-shrink:0;border:none;padding:9px 14px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;color:#fff}.topmenu button.on{outline:3px solid #000}
   
-  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
-  authDomain: "santramarketshoppingmall.firebaseapp.com",
-  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
-  projectId: "santramarketshoppingmall",
-  storageBucket: "santramarketshoppingmall.firebasestorage.app",
-  messagingSenderId: "398490252924",
-  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
-  measurementId: "G-M3YK28NTT0"
-
-};
-var _fbDb = null;
-try {
-if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "") {
-firebase.initializeApp(FIREBASE_CONFIG);
-_fbDb = firebase.database();
-}
-} catch(e) {}
-</script>
-<body>
-
-<!-- ============ MAIN LIST VIEW ============ -->
+  
+</style></head><body>
 <div id="listView">
-<header id="hdr">
-<a class="backbtn" href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImhpIj48aGVhZD48bWV0YSBjaGFyc2V0PSJVVEYtOCI+PG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEiPgo8dGl0bGU+UmVzdHJvIEFwa2E8L3RpdGxlPgo8c3R5bGU+Cip7bWFyZ2luOjA7cGFkZGluZzowO2JveC1zaXppbmc6Ym9yZGVyLWJveDtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmfQpib2R5e2JhY2tncm91bmQ6I2ZmZjhmMDtjb2xvcjojMzMzfQojaGRye2JhY2tncm91bmQ6I2ZmZjtwYWRkaW5nOjEycHggMTZweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2JveC1zaGFkb3c6MCAycHggNnB4IHJnYmEoMCwwLDAsLjEpO3Bvc2l0aW9uOnN0aWNreTt0b3A6MDt6LWluZGV4OjEwfQojYnJhbmR7Zm9udC1zaXplOjIycHg7Zm9udC13ZWlnaHQ6Ym9sZDtjb2xvcjojMDAwO2ZsZXg6MX0KI25hdntkaXNwbGF5OmZsZXg7Z2FwOjE0cHh9CiNuYXYgYXt0ZXh0LWRlY29yYXRpb246bm9uZTtjb2xvcjojZTY1MTAwO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjE1cHg7cGFkZGluZzo2cHggOHB4fQojbmF2IGE6YWN0aXZle2JhY2tncm91bmQ6I2ZmZTBiMjtib3JkZXItcmFkaXVzOjZweH0KI2hlcm97YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNmZjcwNDMsI2U2NTEwMCk7Y29sb3I6I2ZmZjtwYWRkaW5nOjQwcHggMjBweDtib3JkZXItcmFkaXVzOjAgMCAyNHB4IDI0cHh9CiNoZXJvIGgxe2ZvbnQtc2l6ZTozMnB4O21hcmdpbi1ib3R0b206OHB4fQojaGVybyBwe2ZvbnQtc2l6ZToxNnB4O21hcmdpbi1ib3R0b206MTZweH0KLmJ0bjJ7ZGlzcGxheTppbmxpbmUtYmxvY2s7YmFja2dyb3VuZDojMjVEMzY2O2NvbG9yOiNmZmY7Zm9udC13ZWlnaHQ6Ym9sZDtwYWRkaW5nOjEycHggMjRweDtib3JkZXItcmFkaXVzOjMwcHg7dGV4dC1kZWNvcmF0aW9uOm5vbmU7Zm9udC1zaXplOjE2cHh9CiNpdGVtc3twYWRkaW5nOjIwcHg7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDoxNHB4fQouY2FyZHtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXJhZGl1czoxNHB4O292ZXJmbG93OmhpZGRlbjtib3gtc2hhZG93OjAgMnB4IDhweCByZ2JhKDAsMCwwLC4xKTt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nLWJvdHRvbToxMnB4fQouY2FyZCAucGh7aGVpZ2h0OjExMHB4O2JhY2tncm91bmQ6I2ZmZTBiMjtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQ0cHh9Ci5jYXJkIGgze2ZvbnQtc2l6ZToxNnB4O21hcmdpbjo4cHggNHB4IDJweH0KLmNhcmQgLnBye2NvbG9yOiNlNjUxMDA7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTZweH0KLmNhcmQgLmRze2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM4ODg7bWFyZ2luOjJweCA2cHggOHB4fQouY2FyZCAub2J7YmFja2dyb3VuZDojZTY1MTAwO2NvbG9yOiNmZmY7Ym9yZGVyOm5vbmU7cGFkZGluZzo4cHggMjBweDtib3JkZXItcmFkaXVzOjIwcHg7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTRweH0KI2Z0cntiYWNrZ3JvdW5kOiM0ZTM0MmU7Y29sb3I6I2ZmZjt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nOjI0cHggMTZweDttYXJnaW4tdG9wOjEwcHh9CiNmdHIgYXtjb2xvcjojZmZjYzgwfQo8L3N0eWxlPjwvaGVhZD48Ym9keT4KPHNjcmlwdD4KdmFyIE9QVCA9IHsKbmFtZUFsaWduOiAibGVmdCIsIC8vIE9QVElPTjogImxlZnQiPW5hYW0gbGVmdCBtZSwgImNlbnRlciI9bmFhbSBiZWVjaCBtZSwgInJpZ2h0Ij1uYWFtIHJpZ2h0IG1lCm1lbnVIb21lOiAib24iLCAvLyBPUFRJT046ICJvbiI9SG9tZSBkaWtoZWdhLCAib2ZmIj1Ib21lIGNoaHVwZWdhCm1lbnVNZW51OiAib24iLCAvLyBPUFRJT046ICJvbiI9TWVudSBkaWtoZWdhLCAib2ZmIj1NZW51IGNoaHVwZWdhCm1lbnVPcmRlcnM6ICJvbiIsIC8vIE9QVElPTjogIm9uIj1PcmRlcnMgZGlraGVnYSwgIm9mZiI9T3JkZXJzIGNoaHVwZWdhCm1lbnVDb250YWN0OiAib24iLCAvLyBPUFRJT046ICJvbiI9Q29udGFjdCBkaWtoZWdhLCAib2ZmIj1Db250YWN0IGNoaHVwZWdhCm9yZGVyQnRuOiAib24iLCAvLyBPUFRJT046ICJvbiI9T3JkZXIgYnV0dG9uIGRpa2hlZ2EsICJvZmYiPU9yZGVyIGJ1dHRvbiBjaGh1cGVnYQppdGVtc1NlYzogIm9uIiAvLyBPUFRJT046ICJvbiI9ZGlzaGVzIGRpa2hlbmdlLCAib2ZmIj1kaXNoZXMgY2hodXBlbmdlCn07Cjwvc2NyaXB0Pgo8aGVhZGVyIGlkPSJoZHIiPgo8ZGl2IGlkPSJicmFuZCI+UmVzdHJvIEFwa2E8L2Rpdj4KPG5hdiBpZD0ibmF2Ij4KPGEgaWQ9Im1IIiBocmVmPSIjIj5Ib21lPC9hPjxhIGlkPSJtTSIgaHJlZj0iI2l0ZW1zIj5NZW51PC9hPjxhIGlkPSJtTyIgaHJlZj0iIyI+T3JkZXJzPC9hPjxhIGlkPSJtQyIgaHJlZj0iI2Z0ciI+Q29udGFjdDwvYT4KPC9uYXY+PC9oZWFkZXI+CjxzZWN0aW9uIGlkPSJoZXJvIj48ZGl2IGlkPSJoZXJvSW4iPgo8aDE+QmFyZmkgU3BlY2lhbDwvaDE+CjxwPjMwLW1pbiBkZWxpdmVyeSBpbiBQaWxpYmFuZ2EgfCB0YWF6YSBiYXJmaSwgaGFyIHJvejwvcD4KPGEgaWQ9Im9yZEJ0biIgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5PcmRlciBvbiBXaGF0c0FwcDwvYT4KPC9kaXY+PC9zZWN0aW9uPgo8c2VjdGlvbiBpZD0iaXRlbXMiPjwvc2VjdGlvbj4KPGZvb3RlciBpZD0iZnRyIj4KPGI+UmVzdHJvIEFwa2E8L2I+IHwgUGlsaWJhbmdhPGJyPjxicj4KPGEgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5XaGF0c0FwcDogODc2OTE3MTA3ODwvYT48YnI+PGJyPgo8c3BhbiBzdHlsZT0iZm9udC1zaXplOjEycHgiPnJlc3Ryb2ZvcnlvdS53ZWIuYXBwPC9zcGFuPgo8L2Zvb3Rlcj4KPHNjcmlwdD4KLy8gRklYRUQ6IHBlaGxlIGNlbnRlciBvcHRpb24gbWlzc2luZyB0aGEsIGFiIHRlZW5vIGthYW0ga2FyZW5nZQp2YXIgYj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYnJhbmQnKTsKaWYoT1BULm5hbWVBbGlnbj09PSJjZW50ZXIiKXtiLnN0eWxlLnRleHRBbGlnbj0iY2VudGVyIjt9CmVsc2UgaWYoT1BULm5hbWVBbGlnbj09PSJyaWdodCIpe2Iuc3R5bGUudGV4dEFsaWduPSJyaWdodCI7fQplbHNle2Iuc3R5bGUudGV4dEFsaWduPSJsZWZ0Ijt9CmlmKE9QVC5tZW51SG9tZT09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtSCcpLnN0eWxlLmRpc3BsYXk9Im5vbmUiOwppZihPUFQubWVudU1lbnU9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU0nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVPcmRlcnM9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU8nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVDb250YWN0PT09Im9mZiIpZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21DJykuc3R5bGUuZGlzcGxheT0ibm9uZSI7CmlmKE9QVC5vcmRlckJ0bj09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdvcmRCdG4nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKdmFyIGl0ZW1zPVtbIvCfjbIiLCJWZWcgTW9tb3MgMTBwY3MiLCJScyAxNDkiLCJHYXIgbWEgZ2FyYW0gbW9tb3MiXSxbIvCfjZUiLCJWZWcgQ2hlZXNlIFBpenphIiwiUnMgMjk5IiwiQ2hlZXN5IHRhc3R5IHBpenphIl0sWyLwn42bIiwiQmlyeWFuaSIsIlJzIDE5OSIsIktodXNoYnVkYWFyIGJpcnlhbmkiXSxbIvCfpaoiLCJWZWcgU2FuZHdpY2giLCJScyA5OSIsIkZyZXNoIHZlZyBzYW5kd2ljaCJdXTsKaWYoT1BULml0ZW1zU2VjPT09Im9mZiIpe2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpdGVtcycpLnN0eWxlLmRpc3BsYXk9Im5vbmUiO30KZWxzZXt2YXIgaD0iIjtmb3IodmFyIGk9MDtpPGl0ZW1zLmxlbmd0aDtpKyspe2grPSc8ZGl2IGNsYXNzPSJjYXJkIj48ZGl2IGNsYXNzPSJwaCI+JytpdGVtc1tpXVswXSsnPC9kaXY+PGgzPicraXRlbXNbaV1bMV0rJzwvaDM+PGRpdiBjbGFzcz0icHIiPicraXRlbXNbaV1bMl0rJzwvZGl2PjxkaXYgY2xhc3M9ImRzIj4nK2l0ZW1zW2ldWzNdKyc8L2Rpdj48YnV0dG9uIGNsYXNzPSJvYiIgZGF0YS1ubT0iJytpdGVtc1tpXVsxXSsnIj5PcmRlcjwvYnV0dG9uPjwvZGl2Pic7fQpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaXRlbXMnKS5pbm5lckhUTUw9aDsKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2l0ZW1zJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLGZ1bmN0aW9uKGUpe3ZhciB0PWUudGFyZ2V0O2lmKHQuY2xhc3NOYW1lPT09J29iJyl7bG9jYXRpb24uaHJlZj0naHR0cHM6Ly93YS5tZS85MTg3NjkxNzEwNzg/dGV4dD0nK2VuY29kZVVSSUNvbXBvbmVudCgnT3JkZXI6ICcrdC5nZXRBdHRyaWJ1dGUoJ2RhdGEtbm0nKSk7fX0pO30KPC9zY3JpcHQ+CjwvYm9keT48L2h0bWw+">← Back</a>
-<div id="brand" style="text-align:center">👥 Mere Dost</div>
-<div style="width:70px"><a href="settings.html" style="font-size:24px;text-decoration:none;">⚙️</a></></div>
-</header>
+<header id="hdr"><a class="backbtn" href="index.html">← Back</a><div id="brand" style="text-align:center">👥 Mere Dost</div><div style="width:70px"></div></header>
 
-<div id="hero">
-<h1>👥 Doston ki Duniya</h1>
-<p>Dost dhoondo, request bhejo, chat karo!</p>
-</div>
 
-<div id="searchWrap">
-<input id="frSearch" type="search" placeholder="🔍 Dost ka naam likho..." oninput="filterFriends(this.value)">
-<div class="hint">Naam likho - dost dhoondo, request bhejo!</div>
-</div>
 
-<!-- Mere Dost (Accepted) -->
-<div class="sec" id="myFriendsSec">
-<h2>💚 Mere Dost</h2>
-<div id="myFriendsList"></div>
+<div class="topmenu"><button style="background:#4caf50" onclick="goSec('myFriendsSec',this)">💚 Accepted</button><button style="background:#ff9800" onclick="goSec('reqSec',this)">📩 Request Aayi</button><button style="background:#2196F3" onclick="goSec('sentSec',this)">📤 Sent</button><button style="background:#f44336" onclick="goSec('blockSec',this)">🔴 Block</button><button style="background:#7b1fa2" onclick="goSec('friendsGrid',this)">🌍 World</button><button style="background:#000" onclick="location.href='settings.html'">⚙️ Settings</button><button style="background:#e65100" onclick="location.href='index.html'">🏠 Home</button></div>  
+<div id="hero"><h1>👥 Doston ki Duniya</h1><p id="heroSub">Dost dhoondo, request bhejo, chat karo!</p></div>
+<div id="searchWrap"><input id="frSearch" type="search" placeholder="🔍 Dost ka naam likho..." oninput="filterFriends(this.value)"><div class="hint">Naam likho - dost dhoondo, request bhejo!</div></div>
+<div class="sec" id="myFriendsSec"><h2>💚 Mere Dost (Accepted)</h2><div id="myFriendsList"></div></div>
+<div class="sec" id="reqSec"><h2>📩 Friend Request Aayi Hai (Incoming)</h2><div id="reqList"></div></div>
+<div class="sec" id="sentSec"><h2>📤 Request Bheji Hai (Sent)</h2><div id="sentList"></div></div>
+<div class="sec" id="blockSec"><h2>🔴 Block List</h2><div id="blockList"></div></div>
+<div class="sec"><h2>🌍 World - Hamare Dost (Naye Log)</h2><div class="fgrid" id="friendsGrid"></div><div id="worldCount" style="text-align:center;color:#999;font-size:12px;margin-top:8px"></div></div><div style="text-align:center;margin:16px 0"><button onclick="location.href='settings.html'" style="width:90%;padding:14px;background:#000;color:#fff;border:none;border-radius:20px;font-weight:bold;font-size:16px;cursor:pointer">⚙️ Friend Settings - Block / Recycle Dekho</button></div>
+<footer id="ftr"><b>Mere Dost</b><br><br><a href="index.html" style="color:#ffcc80">← Home wapas jao</a></footer>
 </div>
-
-<div class="sec" id="blockSec" style="display:none;">
-<h2 style="color:#000;">🔴 Block List</h2>
-<div id="blockList"></div>
-</div>
-  
-<!-- Meri Requests -->
-<div class="sec" id="reqSec">
-<h2>📩 Meri Friend Requests</h2>
-<div id="reqList"></div>
-</div>
-
-<!-- Hamare Dost (All) -->
-<div class="sec">
-<h2>👥 Hamare Dost</h2>
-<div class="fgrid" id="friendsGrid"></div>
-</div>
-
-<footer id="ftr">
-<b>Mere Dost</b><br><br>
-<a href="data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImhpIj48aGVhZD48bWV0YSBjaGFyc2V0PSJVVEYtOCI+PG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEiPgo8dGl0bGU+UmVzdHJvIEFwa2E8L3RpdGxlPgo8c3R5bGU+Cip7bWFyZ2luOjA7cGFkZGluZzowO2JveC1zaXppbmc6Ym9yZGVyLWJveDtmb250LWZhbWlseTpBcmlhbCxzYW5zLXNlcmlmfQpib2R5e2JhY2tncm91bmQ6I2ZmZjhmMDtjb2xvcjojMzMzfQojaGRye2JhY2tncm91bmQ6I2ZmZjtwYWRkaW5nOjEycHggMTZweDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2JveC1zaGFkb3c6MCAycHggNnB4IHJnYmEoMCwwLDAsLjEpO3Bvc2l0aW9uOnN0aWNreTt0b3A6MDt6LWluZGV4OjEwfQojYnJhbmR7Zm9udC1zaXplOjIycHg7Zm9udC13ZWlnaHQ6Ym9sZDtjb2xvcjojMDAwO2ZsZXg6MX0KI25hdntkaXNwbGF5OmZsZXg7Z2FwOjE0cHh9CiNuYXYgYXt0ZXh0LWRlY29yYXRpb246bm9uZTtjb2xvcjojZTY1MTAwO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjE1cHg7cGFkZGluZzo2cHggOHB4fQojbmF2IGE6YWN0aXZle2JhY2tncm91bmQ6I2ZmZTBiMjtib3JkZXItcmFkaXVzOjZweH0KI2hlcm97YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNmZjcwNDMsI2U2NTEwMCk7Y29sb3I6I2ZmZjtwYWRkaW5nOjQwcHggMjBweDtib3JkZXItcmFkaXVzOjAgMCAyNHB4IDI0cHh9CiNoZXJvIGgxe2ZvbnQtc2l6ZTozMnB4O21hcmdpbi1ib3R0b206OHB4fQojaGVybyBwe2ZvbnQtc2l6ZToxNnB4O21hcmdpbi1ib3R0b206MTZweH0KLmJ0bjJ7ZGlzcGxheTppbmxpbmUtYmxvY2s7YmFja2dyb3VuZDojMjVEMzY2O2NvbG9yOiNmZmY7Zm9udC13ZWlnaHQ6Ym9sZDtwYWRkaW5nOjEycHggMjRweDtib3JkZXItcmFkaXVzOjMwcHg7dGV4dC1kZWNvcmF0aW9uOm5vbmU7Zm9udC1zaXplOjE2cHh9CiNpdGVtc3twYWRkaW5nOjIwcHg7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDoxNHB4fQouY2FyZHtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXJhZGl1czoxNHB4O292ZXJmbG93OmhpZGRlbjtib3gtc2hhZG93OjAgMnB4IDhweCByZ2JhKDAsMCwwLC4xKTt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nLWJvdHRvbToxMnB4fQouY2FyZCAucGh7aGVpZ2h0OjExMHB4O2JhY2tncm91bmQ6I2ZmZTBiMjtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7Zm9udC1zaXplOjQ0cHh9Ci5jYXJkIGgze2ZvbnQtc2l6ZToxNnB4O21hcmdpbjo4cHggNHB4IDJweH0KLmNhcmQgLnBye2NvbG9yOiNlNjUxMDA7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTZweH0KLmNhcmQgLmRze2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM4ODg7bWFyZ2luOjJweCA2cHggOHB4fQouY2FyZCAub2J7YmFja2dyb3VuZDojZTY1MTAwO2NvbG9yOiNmZmY7Ym9yZGVyOm5vbmU7cGFkZGluZzo4cHggMjBweDtib3JkZXItcmFkaXVzOjIwcHg7Zm9udC13ZWlnaHQ6Ym9sZDtmb250LXNpemU6MTRweH0KI2Z0cntiYWNrZ3JvdW5kOiM0ZTM0MmU7Y29sb3I6I2ZmZjt0ZXh0LWFsaWduOmNlbnRlcjtwYWRkaW5nOjI0cHggMTZweDttYXJnaW4tdG9wOjEwcHh9CiNmdHIgYXtjb2xvcjojZmZjYzgwfQo8L3N0eWxlPjwvaGVhZD48Ym9keT4KPHNjcmlwdD4KdmFyIE9QVCA9IHsKbmFtZUFsaWduOiAibGVmdCIsIC8vIE9QVElPTjogImxlZnQiPW5hYW0gbGVmdCBtZSwgImNlbnRlciI9bmFhbSBiZWVjaCBtZSwgInJpZ2h0Ij1uYWFtIHJpZ2h0IG1lCm1lbnVIb21lOiAib24iLCAvLyBPUFRJT046ICJvbiI9SG9tZSBkaWtoZWdhLCAib2ZmIj1Ib21lIGNoaHVwZWdhCm1lbnVNZW51OiAib24iLCAvLyBPUFRJT046ICJvbiI9TWVudSBkaWtoZWdhLCAib2ZmIj1NZW51IGNoaHVwZWdhCm1lbnVPcmRlcnM6ICJvbiIsIC8vIE9QVElPTjogIm9uIj1PcmRlcnMgZGlraGVnYSwgIm9mZiI9T3JkZXJzIGNoaHVwZWdhCm1lbnVDb250YWN0OiAib24iLCAvLyBPUFRJT046ICJvbiI9Q29udGFjdCBkaWtoZWdhLCAib2ZmIj1Db250YWN0IGNoaHVwZWdhCm9yZGVyQnRuOiAib24iLCAvLyBPUFRJT046ICJvbiI9T3JkZXIgYnV0dG9uIGRpa2hlZ2EsICJvZmYiPU9yZGVyIGJ1dHRvbiBjaGh1cGVnYQppdGVtc1NlYzogIm9uIiAvLyBPUFRJT046ICJvbiI9ZGlzaGVzIGRpa2hlbmdlLCAib2ZmIj1kaXNoZXMgY2hodXBlbmdlCn07Cjwvc2NyaXB0Pgo8aGVhZGVyIGlkPSJoZHIiPgo8ZGl2IGlkPSJicmFuZCI+UmVzdHJvIEFwa2E8L2Rpdj4KPG5hdiBpZD0ibmF2Ij4KPGEgaWQ9Im1IIiBocmVmPSIjIj5Ib21lPC9hPjxhIGlkPSJtTSIgaHJlZj0iI2l0ZW1zIj5NZW51PC9hPjxhIGlkPSJtTyIgaHJlZj0iIyI+T3JkZXJzPC9hPjxhIGlkPSJtQyIgaHJlZj0iI2Z0ciI+Q29udGFjdDwvYT4KPC9uYXY+PC9oZWFkZXI+CjxzZWN0aW9uIGlkPSJoZXJvIj48ZGl2IGlkPSJoZXJvSW4iPgo8aDE+QmFyZmkgU3BlY2lhbDwvaDE+CjxwPjMwLW1pbiBkZWxpdmVyeSBpbiBQaWxpYmFuZ2EgfCB0YWF6YSBiYXJmaSwgaGFyIHJvejwvcD4KPGEgaWQ9Im9yZEJ0biIgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5PcmRlciBvbiBXaGF0c0FwcDwvYT4KPC9kaXY+PC9zZWN0aW9uPgo8c2VjdGlvbiBpZD0iaXRlbXMiPjwvc2VjdGlvbj4KPGZvb3RlciBpZD0iZnRyIj4KPGI+UmVzdHJvIEFwa2E8L2I+IHwgUGlsaWJhbmdhPGJyPjxicj4KPGEgY2xhc3M9ImJ0bjIiIGhyZWY9Imh0dHBzOi8vd2EubWUvOTE4NzY5MTcxMDc4Ij5XaGF0c0FwcDogODc2OTE3MTA3ODwvYT48YnI+PGJyPgo8c3BhbiBzdHlsZT0iZm9udC1zaXplOjEycHgiPnJlc3Ryb2ZvcnlvdS53ZWIuYXBwPC9zcGFuPgo8L2Zvb3Rlcj4KPHNjcmlwdD4KLy8gRklYRUQ6IHBlaGxlIGNlbnRlciBvcHRpb24gbWlzc2luZyB0aGEsIGFiIHRlZW5vIGthYW0ga2FyZW5nZQp2YXIgYj1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYnJhbmQnKTsKaWYoT1BULm5hbWVBbGlnbj09PSJjZW50ZXIiKXtiLnN0eWxlLnRleHRBbGlnbj0iY2VudGVyIjt9CmVsc2UgaWYoT1BULm5hbWVBbGlnbj09PSJyaWdodCIpe2Iuc3R5bGUudGV4dEFsaWduPSJyaWdodCI7fQplbHNle2Iuc3R5bGUudGV4dEFsaWduPSJsZWZ0Ijt9CmlmKE9QVC5tZW51SG9tZT09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtSCcpLnN0eWxlLmRpc3BsYXk9Im5vbmUiOwppZihPUFQubWVudU1lbnU9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU0nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVPcmRlcnM9PT0ib2ZmIilkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbU8nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKaWYoT1BULm1lbnVDb250YWN0PT09Im9mZiIpZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21DJykuc3R5bGUuZGlzcGxheT0ibm9uZSI7CmlmKE9QVC5vcmRlckJ0bj09PSJvZmYiKWRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdvcmRCdG4nKS5zdHlsZS5kaXNwbGF5PSJub25lIjsKdmFyIGl0ZW1zPVtbIvCfjbIiLCJWZWcgTW9tb3MgMTBwY3MiLCJScyAxNDkiLCJHYXIgbWEgZ2FyYW0gbW9tb3MiXSxbIvCfjZUiLCJWZWcgQ2hlZXNlIFBpenphIiwiUnMgMjk5IiwiQ2hlZXN5IHRhc3R5IHBpenphIl0sWyLwn42bIiwiQmlyeWFuaSIsIlJzIDE5OSIsIktodXNoYnVkYWFyIGJpcnlhbmkiXSxbIvCfpaoiLCJWZWcgU2FuZHdpY2giLCJScyA5OSIsIkZyZXNoIHZlZyBzYW5kd2ljaCJdXTsKaWYoT1BULml0ZW1zU2VjPT09Im9mZiIpe2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpdGVtcycpLnN0eWxlLmRpc3BsYXk9Im5vbmUiO30KZWxzZXt2YXIgaD0iIjtmb3IodmFyIGk9MDtpPGl0ZW1zLmxlbmd0aDtpKyspe2grPSc8ZGl2IGNsYXNzPSJjYXJkIj48ZGl2IGNsYXNzPSJwaCI+JytpdGVtc1tpXVswXSsnPC9kaXY+PGgzPicraXRlbXNbaV1bMV0rJzwvaDM+PGRpdiBjbGFzcz0icHIiPicraXRlbXNbaV1bMl0rJzwvZGl2PjxkaXYgY2xhc3M9ImRzIj4nK2l0ZW1zW2ldWzNdKyc8L2Rpdj48YnV0dG9uIGNsYXNzPSJvYiIgZGF0YS1ubT0iJytpdGVtc1tpXVsxXSsnIj5PcmRlcjwvYnV0dG9uPjwvZGl2Pic7fQpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaXRlbXMnKS5pbm5lckhUTUw9aDsKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2l0ZW1zJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLGZ1bmN0aW9uKGUpe3ZhciB0PWUudGFyZ2V0O2lmKHQuY2xhc3NOYW1lPT09J29iJyl7bG9jYXRpb24uaHJlZj0naHR0cHM6Ly93YS5tZS85MTg3NjkxNzEwNzg/dGV4dD0nK2VuY29kZVVSSUNvbXBvbmVudCgnT3JkZXI6ICcrdC5nZXRBdHRyaWJ1dGUoJ2RhdGEtbm0nKSk7fX0pO30KPC9zY3JpcHQ+CjwvYm9keT48L2h0bWw+" style="color:#ffcc80">← Home wapas jao</a>
-</footer>
-</div>
-
-<!-- ============ FRIEND DETAIL VIEW ============ -->
-<div id="detailPage">
-<button class="backbtn" onclick="showList()">← Wapas</button>
-<div class="detail-card" id="detailCard"></div>
-</div>
-
-<!-- ============ CHAT VIEW ============ -->
-<div id="chatPage">
-<button class="backbtn" onclick="showList()" style="margin-bottom:12px">← Wapas</button>
-<div class="chat-head" id="chatHead"></div>
-<div id="chatMsgs"></div>
-<div class="chat-input">
-<label class="attachbtn" style="display:flex;align-items:center;justify-content:center;cursor:pointer">📎<input type="file" id="chatFile" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none" onchange="sendFile(this)"></label>
-<input id="chatText" placeholder="Message likho..." onkeypress="if(event.key==='Enter')sendMsg()">
-<button class="sendchatbtn" onclick="sendMsg()">➤</button>
-  <button onclick="blockUser(chatWith)" style="background:#000;color:#fff;border:none;padding:8px 12px;border-radius:16px;font-size:12px;">🔴 Block</button> 
-</div>
-</div>
-
+<div id="detailPage"><button class="backbtn" onclick="showList()">← Wapas</button><div class="detail-card" id="detailCard"></div></div>
+<div id="chatPage" style="position:relative"><button class="backbtn" onclick="showList()" style="margin-bottom:12px">← Wapas</button><div class="chat-head" id="chatHead"></div><div id="chatMenu"></div><button onclick="checkChatKahanHai()" style="width:100%;padding:10px;background:#2196F3;color:#fff;border:none;border-radius:10px;font-weight:bold;margin-bottom:8px">🔍 Chat Kahan Hai? Check Karo</button>
+<button onclick="uploadLocalChatToFirebase()" style="width:100%;padding:10px;background:#4caf50;color:#fff;border:none;border-radius:10px;font-weight:bold;margin-bottom:8px">☁️ Local Chat ko Firebase me Save Karo</button><div id="chatMsgs"></div><div style="padding:8px;background:#fff;border:1px solid #eee;border-top:none;display:flex;gap:6px"><label style="font-size:13px"><input type="checkbox" id="selAll" onchange="toggleSelAll(this.checked)"> Sab Select</label><span id="selCount" style="font-size:12px;color:#999"></span></div><div class="chat-input"><label class="attachbtn">📎<input type="file" id="chatFile" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none" onchange="sendFile(this)"></label><input id="chatText" placeholder="Message likho..." onkeypress="if(event.key==='Enter')sendMsg()"><button class="sendchatbtn" onclick="sendMsg()">➤</button></div></div>
 <script>
-// ===== DOSTON KA DATA (yahan apne dost add karo) =====
-
-var FRIENDS = [];
-
-
-
-
-// ===== REAL FRIENDS FROM FIREBASE =====
+var DEMO=[
+{photo:"👦",name:"Rahul",role:"Chef",detail:"Rahul hamara best chef hai."},
+{photo:"👧",name:"Priya",role:"Manager",detail:"Priya sab manage karti hai."},
+{photo:"👨",name:"Amit",role:"Delivery Boy",detail:"Amit tez delivery karta hai."},
+{photo:"👩",name:"Sneha",role:"Waiter",detail:"Sneha customers ko achhe se handle karti hai."},
+{photo:"🧑",name:"Vikash",role:"Cook",detail:"Vikash ke haath ka khana sabko pasand hai."},
+{photo:"👴",name:"Ramesh",role:"Helper",detail:"Ramesh ji sabki madad karte hain."}
+];
+var FRIENDS=[];
+var FRIEND_STATUS={};
+var BLOCKED_UIDS={};
+var MY_UID=getMyUid();
+function getRequests(){try{return JSON.parse(localStorage.getItem("fr_requests")||"[]");}catch(e){return[];}}
+function saveRequests(r){localStorage.setItem("fr_requests",JSON.stringify(r));}
+function getMyFriends(){try{return JSON.parse(localStorage.getItem("fr_myfriends")||"[]");}catch(e){return[];}}
+function saveMyFriends(f){localStorage.setItem("fr_myfriends",JSON.stringify(f));}
+function getChats(){try{return JSON.parse(localStorage.getItem("fr_chats")||"{}");}catch(e){return{};}}
+function saveChats(c){localStorage.setItem("fr_chats",JSON.stringify(c));}
+function getDeleted(){try{return JSON.parse(localStorage.getItem("fr_deleted")||"[]");}catch(e){return[];}}
+function saveDeleted(d){localStorage.setItem("fr_deleted",JSON.stringify(d));}
+function getBlockedLocal(){try{return JSON.parse(localStorage.getItem("fr_blocked")||"[]");}catch(e){return[];}}
+function photoHtml(photo){ if(!photo) return "👤"; if(String(photo).indexOf("<img")!==-1) return photo; if(String(photo).indexOf("http")===0||String(photo).indexOf("data:image")===0) return '<img src="'+photo+'">'; return photo; }
+function loadStatus(cb){
+  MY_UID=getMYUID();
+  if(!_fbDb||!MY_UID){ if(cb)cb(); return; }
+  var done=0; function one(){ done++; if(done>=4 && cb)cb(); }
+  _fbDb.ref("friends/"+MY_UID).once("value").then(function(s){ Object.keys(s.val()||{}).forEach(function(k){FRIEND_STATUS[k]="accepted";}); one(); }).catch(one);
+  _fbDb.ref("friend_requests_sent/"+MY_UID).once("value").then(function(s){ Object.keys(s.val()||{}).forEach(function(k){ if(!FRIEND_STATUS[k]) FRIEND_STATUS[k]="sent"; }); one(); }).catch(one);
+  _fbDb.ref("friend_requests/"+MY_UID).once("value").then(function(s){ Object.keys(s.val()||{}).forEach(function(k){ if(!FRIEND_STATUS[k]) FRIEND_STATUS[k]="incoming"; }); one(); }).catch(one);
+  _fbDb.ref("blocked/"+MY_UID).once("value").then(function(s){ Object.keys(s.val()||{}).forEach(function(k){FRIEND_STATUS[k]="blocked"; BLOCKED_UIDS[k]=true;}); one(); }).catch(one);
+}
 function loadRealFriends(){
-  console.log("Loading friends from Firebase...");
-  
-  if(!window._fbDb){
-    console.log("ERROR: Firebase not connected! Config check karo!");
-    document.getElementById('friendsGrid').innerHTML = '<div class="empty">⚠️ Firebase connect nahi hai! Config check karo.</div>';
-    return;
-  }
-  
-  window._fbDb.ref("customer_profiles").once("value", function(snap){
-    console.log("Total users found:", snap.numChildren());
-    var realList = [];
-    var myUid = "";
-    try{ myUid = localStorage.getItem("auth_uid") || ""; }catch(e){}
-    
-    snap.forEach(function(ch){
-      var u = ch.val();
-      var uid = ch.key;
-      // Khud ko list se hatao
-      if(uid === myUid) return;
-      
-      var nm = u.profileName || u.name || "";
-      if(!nm) return;
-      
-      realList.push({
-        _uid: uid,
-        uid: uid,
-        photo: u.profilePhoto
-          ? '<img src="'+u.profilePhoto+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
-          : "👤",
-        name: nm,
-        role: u.profilePhone || u.phone || "",
-        detail: (u.profileDetail || "") + "<br>📞 " + (u.profilePhone || u.phone || "")
-      });
+  FRIENDS=DEMO.map(function(f,i){ return {photo:f.photo,name:f.name,role:f.role,detail:f.detail,_uid:"local_"+f.name.toLowerCase(),_phone:"",_isDemo:true}; });
+  renderAll();
+  if(!_fbDb){ document.getElementById('heroSub').textContent="Demo dost dikh rahe hain"; return; }
+  _fbDb.ref("customer_profiles").once("value").then(function(snap){
+    var val=snap.val()||{};
+    var seen={};
+    FRIENDS.forEach(function(f){ if(f._phone) seen[f._phone]=true; seen[f.name.toLowerCase()]=true; });
+    Object.keys(val).forEach(function(uid){
+      if(uid===MY_UID) return;
+      var P=val[uid]||{};
+      var name=(P.profileName||P.name||P.customer_name||"").toString().trim();
+      var phone=(P.profilePhone||P.phone||P.mobile||"").toString().trim();
+      if(!name){ if(phone) name="User "+phone.slice(-4); else if(P.email) name=P.email.split("@")[0]; else name="Friend "+uid.slice(0,4); }
+      if(phone && seen[phone]) return;
+      if(seen["n_"+name.toLowerCase()+"_"+phone]) return;
+      seen[phone]=true; seen["n_"+name.toLowerCase()+"_"+phone]=true;
+      var photo=P.profilePhoto||P.photo||P.profileImage||"👤";
+      FRIENDS.push({photo:photo,name:name,role:P.role||P.profileDetail||"Friend",detail:P.profileDetail||P.status||P.detail||"Hi, main "+name+" hu!",_uid:uid,_phone:phone,_isDemo:false,_profile:P});
     });
-    
-    console.log("Real friends loaded:", realList.length);
-    FRIENDS = realList;
-    if(typeof renderFriends === "function"){
-  try{ renderFriends(document.getElementById('frSearch').value || ""); }catch(e){}
+    document.getElementById('heroSub').textContent="Total Friends: "+FRIENDS.length;
+    renderAll();
+  }).catch(function(){ renderAll(); });
 }
-if(typeof renderMyFriends === "function"){
-  try{ renderMyFriends(); }catch(e){}
+function isBlocked(f){ if(BLOCKED_UIDS[f._uid]) return true; if(getBlockedLocal().indexOf(f.name)!==-1) return true; return FRIEND_STATUS[f._uid]==="blocked"; }
+function isAccepted(f){ if(FRIEND_STATUS[f._uid]==="accepted") return true; if(getMyFriends().indexOf(f.name)!==-1) return true; return false; }
+function isSent(f){ if(FRIEND_STATUS[f._uid]==="sent") return true; return false; }
+function isIncoming(f){ if(FRIEND_STATUS[f._uid]==="incoming") return true; if(getRequests().some(function(r){return r.name===f.name;})) return true; return false; }
+function renderAll(){
+  var q=(document.getElementById('frSearch').value||"").toLowerCase();
+  renderWorld(q); renderMyFriends(q); renderRequests(q); renderSent(q); renderBlocked(q);
 }
-if(typeof renderRequests === "function"){
-  try{ renderRequests(); }catch(e){}
-}
-    
-    if(realList.length === 0){
-      document.getElementById('friendsGrid').innerHTML = '<div class="empty">📭 Firebase me koi user nahi mila!<br>Pehle signup karo.</div>';
-    }
-  }, function(err){
-    console.log("Firebase error:", err);
-    document.getElementById('friendsGrid').innerHTML = '<div class="empty">❌ Firebase error: ' + err.message + '</div>';
+function renderWorld(q){
+  var grid=document.getElementById('friendsGrid'); var html=""; var count=0;
+  FRIENDS.forEach(function(f,i){
+    if(q && f.name.toLowerCase().indexOf(q)===-1) return;
+    if(isBlocked(f)) return;
+    if(isAccepted(f)) return;
+    if(isSent(f)) return;
+    if(isIncoming(f)) return;
+    count++;
+    html+='<div class="fcard" onclick="openDetailByUid(\''+f._uid+'\')"><div class="fp">'+photoHtml(f.photo)+'</div><div class="fn">'+f.name+'</div><div class="fr">'+(f.role||"")+'</div><div class="tap">Tap karo 👆</div></div>';
   });
+  grid.innerHTML=html||'<div class="empty">World me koi naya dost nahi hai.<br>Sab dost neeche wale section me hain.</div>';
+  document.getElementById('worldCount').textContent=count+" naye dost";
 }
-// Page load par chalao + 2 sec baad phir se (Firebase ready hone tak)
-loadRealFriends();
-setTimeout(loadRealFriends, 2000);
-setTimeout(loadRealFriends, 5000);
-window.FRIEND_STATUS = {};
-function loadStatuses(){
-  var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
-  if(!myUid || !window._fbDb) return;
-  var db = window._fbDb;
-  db.ref("friends/"+myUid).once("value",function(s){ s.forEach(function(c){ window.FRIEND_STATUS[c.key]="accepted"; }); });
-  db.ref("friend_requests_sent/"+myUid).once("value",function(s){ s.forEach(function(c){ if(window.FRIEND_STATUS[c.key]!="accepted") window.FRIEND_STATUS[c.key]="sent"; }); });
-  db.ref("friend_requests/"+myUid).once("value",function(s){ s.forEach(function(c){ if(!window.FRIEND_STATUS[c.key]) window.FRIEND_STATUS[c.key]="incoming"; }); renderFriends(document.getElementById('frSearch').value||""); });
+function renderMyFriends(q){
+  var list=document.getElementById('myFriendsList'); var sec=document.getElementById('myFriendsSec');
+  var arr=FRIENDS.filter(function(f){ if(q && f.name.toLowerCase().indexOf(q)===-1) return false; return isAccepted(f) && !isBlocked(f); });
+  getMyFriends().forEach(function(nm){ if(!arr.some(function(x){return x.name===nm;})){ var d=DEMO.find(function(x){return x.name===nm;}); arr.push({photo:d?d.photo:"👤",name:nm,role:d?d.role:"Friend",detail:"",_uid:"local_"+nm.toLowerCase(),_phone:""}); } });
+  if(arr.length===0){ sec.style.display="block"; document.getElementById('myFriendsList').innerHTML='<div class="empty">💚 Abhi koi Accepted dost nahi hai 👍</div>'; return; }sec.style.display="block";
+  var html=""; arr.forEach(function(f){ html+='<div class="mycard"><div class="fp">'+photoHtml(f.photo)+'</div><div class="info"><div class="fn">'+f.name+'</div><div class="st">✅ Dost • '+(f.role||"")+'</div></div><button class="chatbtn" onclick="openChat(\''+f.name+'\',\''+f._uid+'\')">💬 Chat</button><button class="chatbtn" style="background:#e65100" onclick="openDetailByUid(\''+f._uid+'\')">👤 Profile</button></div>'; });
+  list.innerHTML=html;
 }
-setTimeout(loadStatuses,2500);
-
-  
-// ===== LOCALSTORAGE KEYS =====
-function getRequests(){ try{return JSON.parse(localStorage.getItem("fr_requests")||"[]");}catch(e){return[];} }
-function saveRequests(r){ localStorage.setItem("fr_requests", JSON.stringify(r)); }
-function getMyFriends(){ try{return JSON.parse(localStorage.getItem("fr_myfriends")||"[]");}catch(e){return[];} }
-function saveMyFriends(f){ localStorage.setItem("fr_myfriends", JSON.stringify(f)); }
-function getChats(){ try{return JSON.parse(localStorage.getItem("fr_chats")||"{}");}catch(e){return{};} }
-function saveChats(c){ localStorage.setItem("fr_chats", JSON.stringify(c)); }
-
-// ===== RENDER ALL FRIENDS =====
-function renderFriends(filter){
-  var grid = document.getElementById('friendsGrid');
-  var html = "";
-  var q = (filter||"").toLowerCase();
-  var myF = getMyFriends();
-  var reqs = getRequests();
-  var blocked=getBlocked();
-  
-FRIENDS.forEach(function(f, i){
-if(blocked.indexOf(f.name)!==-1) return;
-
-  
-    if(q && f.name.toLowerCase().indexOf(q) === -1) return;
-    var badge = "";
-var uid = f._uid || f.uid || "";
-var st = (window.FRIEND_STATUS && window.FRIEND_STATUS[uid]) || "none";
-if(st==="accepted") badge = '<div style="font-size:11px;color:#4caf50;font-weight:bold;margin-top:4px;">✅ Accepted</div>';
-else if(st==="sent") badge = '<div style="font-size:11px;color:#ff9800;font-weight:bold;margin-top:4px;">📤 Sent</div>';
-else if(st==="incoming") badge = '<div style="font-size:11px;color:#2196f3;font-weight:bold;margin-top:4px;">📩 Request aayi</div>';
-else if(st==="blocked") badge = '<div style="font-size:11px;color:#f44336;font-weight:bold;margin-top:4px;">🔴 Blocked</div>';
-    
-    html += '<div class="fcard" onclick="openDetail('+i+')">'
-      + '<div class="fp">'+f.photo+'</div>'
-      + '<div class="fn">'+f.name+'</div>'
-      + '<div class="fr">'+f.role+'</div>'
-      + badge
-      + '<div class="tap">Tap karo 👆</div></div>';
-  });
-  
-  grid.innerHTML = html || '<div class="empty">Koi dost nahi mila. Dusra naam try karo!</div>';
+function renderRequests(q){
+  var list=document.getElementById('reqList'); var sec=document.getElementById('reqSec');
+  var arr=FRIENDS.filter(function(f){ return isIncoming(f) && !isBlocked(f) && (!q || f.name.toLowerCase().indexOf(q)!==-1); });
+  getRequests().forEach(function(r){ if(!arr.some(function(x){return x.name===r.name;})){ arr.push({photo:"👤",name:r.name,role:"",detail:"",_uid:"local_"+r.name.toLowerCase(),_phone:""}); } });
+  if(arr.length===0){ sec.style.display="block"; document.getElementById('reqList').innerHTML='<div class="empty">📩 Koi Request nahi aayi hai 👍</div>'; return; } sec.style.display="block";
+  var html=""; arr.forEach(function(f){ html+='<div class="reqcard"><div class="fp">'+photoHtml(f.photo)+'</div><div class="info"><div class="fn">'+f.name+'</div><div class="tm">📩 Request aayi hai</div></div><div><button class="accbtn" onclick="acceptByUid(\''+f._uid+'\',\''+f.name+'\')">✅ Accept</button><button class="rejbtn" onclick="rejectByUid(\''+f._uid+'\',\''+f.name+'\')">❌</button></div></div>'; });
+  list.innerHTML=html;
 }
+function renderSent(q){
+  var list=document.getElementById('sentList'); var sec=document.getElementById('sentSec');
+  var arr=FRIENDS.filter(function(f){ return isSent(f) && (!q || f.name.toLowerCase().indexOf(q)!==-1); });
+   if(arr.length===0){ sec.style.display="block"; document.getElementById('sentList').innerHTML='<div class="empty">📤 Koi Sent Request nahi hai 👍</div>'; return; }sec.style.display="block";
+  var html=""; arr.forEach(function(f){ html+='<div class="mycard" style="border-left:4px solid #2196F3"><div class="fp">'+photoHtml(f.photo)+'</div><div class="info"><div class="fn">'+f.name+'</div><div class="st" style="color:#2196F3">📤 Request bheji hai - Wait karo</div></div><button class="rejbtn" onclick="cancelSent(\''+f._uid+'\',\''+f.name+'\')">Cancel</button></div>'; });
+  list.innerHTML=html;
+}
+function renderBlocked(q){
+  var list=document.getElementById('blockList'); var sec=document.getElementById('blockSec');
+  var arr=FRIENDS.filter(function(f){ return isBlocked(f) && (!q || f.name.toLowerCase().indexOf(q)!==-1); });
+  if(arr.length===0){ sec.style.display="block"; document.getElementById('blockList').innerHTML='<div class="empty">🔴 Koi Block friend nahi hai 👍</div>'; return; } sec.style.display="block";
+  var html=""; arr.forEach(function(f){ html+='<div class="mycard" style="border-left:4px solid #f44336"><div class="fp">'+photoHtml(f.photo)+'</div><div class="info"><div class="fn">'+f.name+'</div><div class="st" style="color:#f44336">🔴 Blocked</div></div><button class="accbtn" onclick="unblockByUid(\''+f._uid+'\',\''+f.name+'\')">✅ Unblock</button></div>'; });
+  list.innerHTML=html;
+}
+function filterFriends(q){ renderAll(); }
+function findByUid(uid){ return FRIENDS.find(function(f){return f._uid===uid;}) || FRIENDS.find(function(f){return "local_"+f.name.toLowerCase()===uid;}); }
+var currentFriendUid="";
+function openDetailByUid(uid){
+  var f=findByUid(uid); if(!f) return; currentFriendUid=uid;
+  var isF=isAccepted(f); var hasReq=isSent(f);
+  var btnHtml="";
+  if(isF){ btnHtml='<button class="chatbtn" style="width:100%;padding:14px;font-size:16px;margin-top:10px;" onclick="openChat(\''+f.name+'\',\''+f._uid+'\')">💬 Chat Karo - '+f.name+' se</button><div style="color:#4caf50;font-weight:bold;margin-top:10px;">✅ Already Friends - Mere Dost me hai</div>'; }
+  else if(hasReq){ btnHtml='<div style="color:#ff9800;font-weight:bold;margin-top:10px;">📤 Request Bheji Hai - Wait Karo</div>'; }
+  else{ btnHtml='<button class="sendbtn" onclick="sendRequestByUid(\''+f._uid+'\')">📩 Friend Request Bhejo - '+f.name+' ko</button>'; }
+  btnHtml+='<div style="margin-top:12px;display:grid;gap:8px;"><button class="sendbtn" style="background:#7b1fa2" onclick="location.href=\'profile.html?uid='+f._uid+'\'">👤 Friend Profile - '+f.name+' ka Profile Dekho</button><button class="sendbtn" style="background:#2196F3" onclick="location.href=\'album.html?uid='+f._uid+'\'">📸 Friend Album - '+f.name+' ka Album Dekho</button><button class="sendbtn" style="background:#ff7043" onclick="location.href=\'timedatalist.html?uid='+f._uid+'\'">📅 Friend Timeline - '+f.name+' ki Timeline Dekho</button><button class="sendbtn" style="background:#4caf50" onclick="location.href=\'index.html?uid='+f._uid+'\'">🏠 Friend Home - '+f.name+' ke Posts Dekho</button></div>';
+  document.getElementById('detailCard').innerHTML='<div class="bigphoto">'+photoHtml(f.photo)+'</div><h2>'+f.name+'</h2><div class="role">'+(f.role||"")+'</div><div class="desc">'+(f.detail||"")+'</div>'+btnHtml;
+  document.getElementById('listView').style.display="none"; document.getElementById('detailPage').style.display="block"; document.getElementById('chatPage').style.display="none"; window.scrollTo(0,0);
+}
+function sendRequestByUid(uid){ var f=findByUid(uid); if(!f) return; MY_UID=getMYUID(); if(!MY_UID){alert("Pehle login karo!"); location.href="customerlogin.html"; return;} if(_fbDb){ _fbDb.ref("friend_requests/"+uid).push({fromUid:MY_UID,fromName:getMyName(),time:Date.now(),status:"pending"}); _fbDb.ref("friend_requests_sent/"+MY_UID+"/"+uid).set({time:Date.now(),name:f.name}); } FRIEND_STATUS[uid]="sent"; alert("✅ "+f.name+" ko request bhej di!"); renderAll(); openDetailByUid(uid); }
+function acceptByUid(uid,name){ MY_UID=getMYUID(); if(_fbDb && MY_UID){ _fbDb.ref("friends/"+MY_UID+"/"+uid).set({name:name,time:Date.now()}); _fbDb.ref("friends/"+uid+"/"+MY_UID).set({name:getMyName(),time:Date.now()}); _fbDb.ref("friend_requests/"+MY_UID).once("value").then(function(s){ Object.keys(s.val()||{}).forEach(function(k){ if(s.val()[k].fromUid===uid) _fbDb.ref("friend_requests/"+MY_UID+"/"+k).remove(); }); }); } var myF=getMyFriends(); if(myF.indexOf(name)===-1){myF.push(name); saveMyFriends(myF);} var reqs=getRequests().filter(function(r){return r.name!==name;}); saveRequests(reqs); FRIEND_STATUS[uid]="accepted"; alert("🎉 "+name+" ab dost hai!"); renderAll(); }
+function rejectByUid(uid,name){ MY_UID=getMYUID(); if(_fbDb && MY_UID){ _fbDb.ref("friend_requests/"+MY_UID).once("value").then(function(s){ Object.keys(s.val()||{}).forEach(function(k){ if(s.val()[k].fromUid===uid) _fbDb.ref("friend_requests/"+MY_UID+"/"+k).remove(); }); }); } var reqs=getRequests().filter(function(r){return r.name!==name;}); saveRequests(reqs); FRIEND_STATUS[uid]="rejected"; alert(name+" ki request hata di."); renderAll(); }
+function cancelSent(uid,name){ MY_UID=getMYUID(); if(_fbDb && MY_UID){ _fbDb.ref("friend_requests_sent/"+MY_UID+"/"+uid).remove(); } delete FRIEND_STATUS[uid]; alert("Cancel ho gaya"); renderAll(); }
+function unblockByUid(uid,name){ MY_UID=getMYUID(); if(_fbDb && MY_UID){ _fbDb.ref("blocked/"+MY_UID+"/"+uid).remove(); } delete FRIEND_STATUS[uid]; delete BLOCKED_UIDS[uid]; var b=getBlockedLocal().filter(function(x){return x!==name;}); localStorage.setItem("fr_blocked",JSON.stringify(b)); alert("✅ Unblock ho gaya"); renderAll(); }
 
-// ===== RENDER MY FRIENDS (ACCEPTED) =====
-function renderMyFriends(){
-  var list = document.getElementById('myFriendsList');
-  var myF = getMyFriends();
-  var sec = document.getElementById('myFriendsSec');
-  
-  if(myF.length === 0){
-    sec.style.display = "none";
-    return;
+function goSec(id,btn){var e=document.getElementById(id);if(!e)return;if(e.style.display==='none'){var nm=id==='myFriendsSec'?'💚 Accepted me koi dost nahi hai':id==='reqSec'?'📩 Koi Request nahi aayi hai':id==='sentSec'?'📤 Koi Sent Request nahi hai':id==='blockSec'?'🔴 Koi Block friend nahi hai':'🌍 World me koi naya dost nahi hai';alert(nm);return;}e.scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.topmenu button').forEach(function(b){b.classList.remove('on');});if(btn)btn.classList.add('on');}
+function showList(){ document.getElementById('listView').style.display="block"; document.getElementById('detailPage').style.display="none"; document.getElementById('chatPage').style.display="none"; renderAll(); window.scrollTo(0,0); }
+var chatWith=""; var chatMsgsCache=[]; var chatFriendUid="";
+function chatPath(a,b){ return "chats/"+a+"/"+b; }
+  function renderChatMenu(){
+  var m=document.getElementById('chatMenu'); if(!m) return;
+  var isBlocked=false;
+  try{
+    var bl=JSON.parse(localStorage.getItem("fr_blocked")||"[]");
+    if(bl.indexOf(chatWith)!==-1) isBlocked=true;
+    if(typeof FRIEND_STATUS!=="undefined" && FRIEND_STATUS[chatFriendUid]==="blocked") isBlocked=true;
+  }catch(e){}
+  var h='';
+  if(isBlocked){
+    h+='<button onclick="doUnblock()">✅ Unblock Karo</button>';
+  }else{
+    h+='<button onclick="doBlock()">🚫 Block Karo</button>';
   }
-  sec.style.display = "block";
+  h+='<button onclick="deleteSelectedChat()">🗑️ Delete Selected</button>';
+  h+='<button onclick="deleteAllChat()">🗑️ All Delete</button>';
+  h+='<button onclick="showRecycle()">♻️ Recycle Bin Dekho</button>';
+  h+='<button onclick="sendToGmail()">📧 Gmail Par Bhejo</button>';
+  h+='<button onclick="document.getElementById(\'chatMenu\').style.display=\'none\'">✕ Band Karo</button>';
+  m.innerHTML=h;
+}
   
-  var html = "";
-  var blocked=getBlocked();
-  myF.forEach(function(name){
-  if(blocked.indexOf(name)!==-1) return;  
-    var f = FRIENDS.find(function(x){return x.name === name;});
-    var photo = f ? f.photo : "👤";
-    var role = f ? f.role : "";
-    var fUid = f && (f._uid || f.uid) ? (f._uid || f.uid) : "";
-html += '<div class="mycard">'
-    + '<div style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;" onclick="openDetailByName(\''+name+'\')">'
-    + '<div class="fp">'+photo+'</div>'
-    + '<div class="info"><div class="fn">'+name+'</div><div class="st">✅ Dost • '+role+'</div></div>'
-    + '</div>'
-  + '<button class="chatbtn" onclick="openChat(\''+name.replace(/\'/g,"")+'\',\''+fUid+'\')">💬 Chat</button>'
-    + '</div>';
-  });
-  list.innerHTML = html;
-}
-
-// ===== RENDER REQUESTS =====
-function renderRequests(){
-  var list = document.getElementById('reqList');
-  var sec = document.getElementById('reqSec');
-  var myUid = "";
-  try{ myUid = localStorage.getItem("auth_uid") || ""; }catch(e){}
-  if(!myUid || !window._fbDb){ sec.style.display="none"; return; }
-  window._fbDb.ref("friend_requests/"+myUid).once("value", function(snap){
-    if(!snap.exists()){ sec.style.display="none"; return; }
-    sec.style.display="block";
-    var html = "";
-    snap.forEach(function(ch){
-      var fromUid = ch.key;
-      var r = ch.val() || {};
-      var nm = r.fromName || fromUid;
-      var tm = r.time || "";
-      html += '<div class="reqcard">'
-        + '<div class="fp">👤</div>'
-        + '<div class="info"><div class="fn">'+nm+'</div><div class="tm">📩 '+tm+'<br><span style="font-size:11px;">Ek friend request aayi hai — Accept ya Reject karo ya Block karo</span></div></div>'
-        + '<div><button class="accbtn" onclick="acceptFirebaseReq(\''+fromUid+'\',\''+nm.replace(/\'/g,"")+'\')">✅ Accept</button>'
-        + '<button class="rejbtn" onclick="rejectFirebaseReq(\''+fromUid+'\')">❌</button></div>'
-        + '</div>';
-    });
-    list.innerHTML = html;
-  });
-}
-function acceptFirebaseReq(fromUid, fromName){
-  if(window.acceptFriendRequest){ window.acceptFriendRequest(fromUid).then(function(){ alert("🎉 "+fromName+" ab dost hai!"); renderRequests(); }); }
-}
-function rejectFirebaseReq(fromUid){
-  if(window.rejectFriendRequest){ window.rejectFriendRequest(fromUid).then(function(){ renderRequests(); }); }
-}
-
-// ===== FILTER =====
-function filterFriends(q){
-  renderFriends(q);
-}
-
-var currentFriend = -1;
-function openDetail(i){
-  currentFriend = i;
-  var f = FRIENDS[i];
-  var fUid = f._uid || f.uid || "";
-  var myUid = "";
-  try{ myUid = localStorage.getItem("auth_uid") || ""; }catch(e){}
-  
-  var btnHtml = "";
-  // Simple: agar UID hai to Firebase check karo, nahi to direct button dikhao
-  if(myUid && fUid && window._fbDb){
-    btnHtml = '<div style="padding:20px;color:#999;" id="stMsg">⏳ Status check ho raha hai...</div><div id="stBtn"></div>';
-  } else {
-    btnHtml = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>';
-  }
-  
-  document.getElementById('detailCard').innerHTML =
-    '<div class="bigphoto">'+f.photo+'</div>'
-    + '<h2>'+f.name+'</h2>'
-    + '<div class="role">'+f.role+'</div>'
-    + '<div class="desc">'+f.detail+'</div>'
-    + btnHtml;
-  
-  document.getElementById('listView').style.display = "none";
-  document.getElementById('detailPage').style.display = "block";
-  document.getElementById('chatPage').style.display = "none";
-  window.scrollTo(0,0);
-  
-  // Firebase status check (agar available hai)
-  if(myUid && fUid && window._fbDb){
-    var db = window._fbDb;
-    db.ref("friends/"+myUid+"/"+fUid).once("value").then(function(s1){
-      var st = "none";
-      if(s1.exists()) st = "accepted";
-      return db.ref("friend_requests_sent/"+myUid+"/"+fUid).once("value").then(function(s2){
-        if(st==="none" && s2.exists()) st = "sent";
-        return st;
-      });
-    }).then(function(st){
-      var b = document.getElementById('stBtn');
-      var m = document.getElementById('stMsg');
-      if(!b) return;
-      if(m) m.style.display = "none";
-      if(st === "accepted"){
-        b.innerHTML = '<div style="background:#e8f5e9;color:#2e7d32;font-weight:bold;padding:12px;border-radius:12px;margin-top:10px;">✅ Accepted - Dost hain!</div><button class="chatbtn" style="width:100%;padding:14px;margin-top:10px;" onclick="openChat(\''+f.name.replace(/\'/g,"")+'\',\''+fUid+'\')">💬 Chat Karo</button>';
-      } else if(st === "sent"){
-        b.innerHTML = '<div style="background:#fff3e0;color:#e65100;font-weight:bold;padding:12px;border-radius:12px;margin-top:10px;">📤 Sent Request</div>';
-      } else {
-        b.innerHTML = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>';
-      }
-    }).catch(function(e){
-      // Firebase fail ho to bhi button dikhao
-      var b = document.getElementById('stBtn');
-      var m = document.getElementById('stMsg');
-      if(m) m.style.display = "none";
-      if(b) b.innerHTML = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>';
-    });
-    // 5 second me force button dikhao (agar atak jaye)
-    setTimeout(function(){
-      var b = document.getElementById('stBtn');
-      var m = document.getElementById('stMsg');
-      if(b && b.innerHTML === ""){
-        if(m) m.style.display = "none";
-        b.innerHTML = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>';
-      }
-    }, 5000);
-  }
-}
-function showDetailBtn(f, i, status){
-  var btnHtml = "";
-  if(status === "accepted"){
-    btnHtml = '<div style="background:#e8f5e9;color:#2e7d32;font-weight:bold;padding:12px;border-radius:12px;margin-top:10px;font-size:16px;">✅ Accepted - Dost hain!</div><button class="chatbtn" style="width:100%;padding:14px;font-size:16px;margin-top:10px;" onclick="openChat(\''+f.name.replace(/\'/g,"")+'\',\''+(f._uid||f.uid||'')+'\')">💬 Chat Karo</button>';
-  } else if(status === "sent"){
-    btnHtml = '<div style="background:#fff3e0;color:#e65100;font-weight:bold;padding:12px;border-radius:12px;margin-top:10px;font-size:16px;">📤 Sent Request</div><div style="font-size:12px;color:#999;margin-top:8px;">Jab tak accept nahi karte, "Sent Request" hi dikhega.<br>Dobara bhejne ki zaroorat nahi!</div>';
-  } else if(status === "incoming"){
-    btnHtml = '<div style="background:#e3f2fd;color:#1565c0;font-weight:bold;padding:12px;border-radius:12px;margin-top:10px;font-size:16px;">📩 Friend Request Aayi Hai!</div><button class="accbtn" style="width:48%;padding:12px;margin-top:10px;font-size:15px;" onclick="acceptFirebaseReq(\''+(f._uid||f.uid||'')+'\',\''+f.name.replace(/\'/g,"")+'\')">✅ Accept</button> <button class="rejbtn" style="width:48%;padding:12px;margin-top:10px;font-size:15px;" onclick="rejectFirebaseReq(\''+(f._uid||f.uid||'')+'\')">❌ Reject</button>';
-  } else {
-    btnHtml = '<button class="sendbtn" id="sendReqBtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button><div style="font-size:12px;color:#999;margin-top:8px;">Example: "Hi '+f.name+'! Mujhe dost banao 🙏"</div>';
-  }
-  document.getElementById('detailCard').innerHTML = '<div class="bigphoto">'+f.photo+'</div><h2>'+f.name+'</h2><div class="role">'+f.role+'</div><div class="desc">'+f.detail+'</div>'+btnHtml;
-}
-function acceptFirebaseReq(fromUid, fromName){
-  if(window.acceptFriendRequest){ window.acceptFriendRequest(fromUid).then(function(){ alert("🎉 "+fromName+" ab aapka dost hai!"); openDetail(currentFriend); }); }
-}
-function rejectFirebaseReq(fromUid){
-  if(window.rejectFriendRequest){ window.rejectFriendRequest(fromUid).then(function(){ alert("Request reject kar di."); openDetail(currentFriend); }); }
-}
-
-// ===== SEND FRIEND REQUEST =====
-function sendRequest(i){
-  var f = FRIENDS[i];
-  var friendUid = f._uid || f.uid;
-  if(!friendUid){
-    alert("Friend ka UID nahi mila! Pehle Firebase se friends load karo.");
-    return;
-  }
-  if(window.sendFriendRequest){
-    window.sendFriendRequest(friendUid, f.name).then(function(){
-      openDetail(i);
-    });
-  }
-}
-
-// ===== ACCEPT / REJECT REQUEST =====
-function acceptReq(i){
-  var reqs = getRequests();
-  var r = reqs[i];
-  if(!r) return;
-  
-  var myF = getMyFriends();
-  if(myF.indexOf(r.name) === -1){
-    myF.push(r.name);
-    saveMyFriends(myF);
-  }
-  reqs.splice(i, 1);
-  saveRequests(reqs);
-  
-  alert("🎉 "+r.name+" ab aapka dost hai!\n\n'Mere Dost' list me dikhega. Chat karo!");
-  renderRequests();
-  renderMyFriends();
-  renderFriends(document.getElementById('frSearch').value);
-}
-
-function rejectReq(i){
-  var reqs = getRequests();
-  var r = reqs[i];
-  reqs.splice(i, 1);
-  saveRequests(reqs);
-  var rej=[];try{rej=JSON.parse(localStorage.getItem("fr_rejected")||"[]");}catch(e){}
-if(rej.indexOf(r.name)===-1){rej.push(r.name);localStorage.setItem("fr_rejected",JSON.stringify(rej));}
-  alert(r.name+" ki request hata di.");
-  renderRequests();
-  renderFriends(document.getElementById('frSearch').value);
-}
-
-function openMyRequests(){
-  showList();
-  document.getElementById('reqSec').scrollIntoView({behavior:'smooth'});
-}
-
-// ===== SHOW LIST VIEW =====
-function showList(){
-  document.getElementById('listView').style.display = "block";
-  document.getElementById('detailPage').style.display = "none";
-  document.getElementById('chatPage').style.display = "none";
-  renderMyFriends();
-  renderRequests();
-  renderBlockList();
-  renderFriends(document.getElementById('frSearch').value);
-  window.scrollTo(0,0);
-}
-
-// ===== CHAT =====
-var chatWith = "";
-var chatWithUid = null;
-function openChat(name, uid){
-  chatWith = name;
-  chatWithUid = uid || null;
-  var f = FRIENDS.find(function(x){return x.name === name;});
-  var photo = f ? f.photo : "👤";
-  
-  document.getElementById('chatHead').innerHTML =
-    '<div class="fp">'+photo+'</div><div class="nm">💬 '+name+'</div>';
-  
-  document.getElementById('listView').style.display = "none";
-  document.getElementById('detailPage').style.display = "none";
-  document.getElementById('chatPage').style.display = "block";
-  
-  loadMsgs();
-  window.scrollTo(0,0);
-}
-
-var _chatListener = null;
+function openChat(name,uid){ chatWith=name; var f=findByUid(uid); if(f && f._uid && f._uid.indexOf("local_")!==0) chatFriendUid=f._uid; else if(uid && uid.indexOf("local_")!==0) chatFriendUid=uid; else if(f) chatFriendUid=f._uid; else chatFriendUid=uid||"local_"+name.toLowerCase(); var photo=f?f.photo:"👤"; document.getElementById('chatHead').innerHTML='<div class="fp">'+photoHtml(photo)+'</div><div class="nm">💬 '+name+'</div><button class="menubtn" onclick="renderChatMenu();var m=document.getElementById(\'chatMenu\');m.style.display=m.style.display===\'block\'?\'none\':\'block\'">⋮</button>'; document.getElementById('listView').style.display="none"; document.getElementById('detailPage').style.display="none"; document.getElementById('chatPage').style.display="block"; document.getElementById('chatMenu').style.display='none'; loadMsgs(); window.scrollTo(0,0); }
 function loadMsgs(){
-  var box = document.getElementById('chatMsgs');
-  if(!box) return;
-  box.innerHTML = '<div class="empty">⏳ Messages load ho rahe hain...</div>';
-  var myUid = null;
-  try{ myUid = localStorage.getItem("auth_uid"); }catch(e){}
-  if(!myUid) return;
-  var friendUid = chatWithUid;
-if(!friendUid || !window._fbDb) return;
-  if(_chatListener){
-    try{ _chatListener.ref.off("value", _chatListener.listener); }catch(e){}
-  }
-  var ref = window._fbDb.ref("user_chats/"+myUid+"/"+friendUid+"/messages");
-  var listener = ref.orderByChild("timestamp").on("value", function(snap){
-    var html = "";
-    var count = 0;
-    snap.forEach(function(ch){
-      var m = ch.val();
-      count++;
-      var cls = (m.sender === myUid) ? "me" : "them";
-      var content = String(m.text||"").replace(/</g,"&lt;");
-      html += '<div class="msg '+cls+'">'+content+'<div class="tm">'+(m.time||"")+'</div></div>';
+  MY_UID=getMYUID();
+  var box=document.getElementById('chatMsgs');
+  box.innerHTML='<div class="empty">⏳ Old chat load ho raha hai...</div>';
+  var chats=getChats();
+  var localMsgs=chats[chatWith]||[];
+  var del=getDeleted(); var delIds={}; del.forEach(function(d){delIds[d.id]=true;});
+  var merged=[]; localMsgs.forEach(function(m){ if(!delIds[m.id]) merged.push(m); });
+  renderChatList(merged);
+  if(!_fbDb||!MY_UID){ box.innerHTML='<div class="empty">🔐 Pehle login karo<br>UID khali hai isliye Firebase chat nahi dikh raha</div>'; return; }
+  var p1=_fbDb.ref(chatPath(MY_UID,chatFriendUid)).once("value").then(function(s){return s.val()||{};}).catch(function(){return {};});
+  var p2=_fbDb.ref(chatPath(chatFriendUid,MY_UID)).once("value").then(function(s){return s.val()||{};}).catch(function(){return {};});
+  var p3=_fbDb.ref("chats/"+MY_UID).once("value").then(function(s){return s.val()||{};}).catch(function(){return {};});
+  Promise.all([p1,p2,p3]).then(function(res){
+    var map={}; merged.forEach(function(m){ if(m.id) map[m.id]=m; });
+    [res[0],res[1]].forEach(function(obj){
+      Object.keys(obj||{}).forEach(function(k){ var m=obj[k]; if(!m) return; var id=m.id||k; if(delIds[id]) return; var isMe=(m.fromUid===MY_UID)||(m.me===true && !m.fromUid); map[id]={id:id,me:isMe,type:m.type||"text",text:m.text||"",fname:m.fname||"",time:m.time||"",ts:m.ts||0,fromUid:m.fromUid||""}; });
     });
-    if(count === 0){
-      html = '<div class="empty">👋 '+chatWith+' se chat shuru karo!</div>';
-    }
-    box.innerHTML = html;
-    box.scrollTop = box.scrollHeight;
+    Object.keys(res[2]||{}).forEach(function(fk){
+      var msgs=res[2][fk]||{};
+      Object.keys(msgs).forEach(function(k){
+        var m=msgs[k]; if(!m) return;
+        var id=m.id||(fk+"_"+k); if(delIds[id]) return;
+        if(m.toName!==chatWith && m.fromName!==chatWith && m.toUid!==chatFriendUid && m.fromUid!==chatFriendUid && fk!==chatFriendUid) return;
+        var isMe=(m.fromUid===MY_UID)||(m.me===true && !m.fromUid);
+        map[id]={id:id,me:isMe,type:m.type||"text",text:m.text||"",fname:m.fname||"",time:m.time||"",ts:m.ts||0,fromUid:m.fromUid||""};
+      });
+    });
+    var arr=Object.keys(map).map(function(k){return map[k];});
+    arr.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+    chatMsgsCache=arr; var c=getChats(); c[chatWith]=arr; saveChats(c);
+    renderChatList(arr);
   });
-  _chatListener = {ref: ref, listener: listener};
 }
+function renderChatList(msgs){ var box=document.getElementById('chatMsgs'); if(!msgs||msgs.length===0){ box.innerHTML='<div class="empty">👋 '+chatWith+' se chat shuru karo!</div>'; return; } var html=""; msgs.forEach(function(m,i){ var cls=m.me?"me":"them"; var content=""; if(m.type==="image") content='<img src="'+m.text+'">'; else if(m.type==="video") content='<video src="'+m.text+'" controls style="max-width:100%;border-radius:8px;"></video>'; else if(m.type==="file") content='📎 <a href="'+m.text+'" download="'+(m.fname||"file")+'">'+(m.fname||"file")+'</a>'; else content=String(m.text||"").replace(/</g,"&lt;"); html+='<div class="msg '+cls+'"><label style="position:absolute;left:4px;top:4px"><input type="checkbox" class="msgSel" data-idx="'+i+'"></label><div style="padding-left:18px">'+content+'</div><div class="tm">'+(m.time||"")+'</div></div>'; }); box.innerHTML=html; box.scrollTop=box.scrollHeight; updateSelCount(); }
+function updateSelCount(){ var n=document.querySelectorAll('.msgSel:checked').length; document.getElementById('selCount').textContent=n? n+" selected":""; }
+document.addEventListener('change',function(e){ if(e.target.classList && e.target.classList.contains('msgSel')) updateSelCount(); });
+function toggleSelAll(on){ document.querySelectorAll('.msgSel').forEach(function(c){c.checked=on;}); updateSelCount(); }
+function getTime(){ var n=new Date(); return n.getHours()+":"+String(n.getMinutes()).padStart(2,"0"); }
+function sendMsg(){ MY_UID=getMYUID(); var inp=document.getElementById('chatText'); var txt=inp.value.trim(); if(!txt) return; if(!MY_UID){ alert("Pehle login karo!"); location.href="customerlogin.html"; return; } var id="m_"+Date.now()+"_"+Math.floor(Math.random()*1000); var msg={id:id,me:true,type:"text",text:txt,time:getTime(),ts:Date.now(),fromUid:MY_UID,fromName:getMyName(),toUid:chatFriendUid,toName:chatWith}; var c=getChats(); if(!c[chatWith]) c[chatWith]=[]; c[chatWith].push(msg); saveChats(c); chatMsgsCache.push(msg); renderChatList(chatMsgsCache); inp.value=""; if(_fbDb){ _fbDb.ref(chatPath(MY_UID,chatFriendUid)+"/"+id).set(msg); _fbDb.ref(chatPath(chatFriendUid,MY_UID)+"/"+id).set(msg); } }
+function sendFile(input){ MY_UID=getMYUID(); var file=input.files[0]; if(!file) return; if(file.size>5*1024*1024){ alert("File 5MB se chhoti honi chahiye!"); input.value=""; return; } var reader=new FileReader(); reader.onload=function(e){ var id="m_"+Date.now()+"_"+Math.floor(Math.random()*1000); var type="file"; if(file.type.indexOf("image")===0) type="image"; else if(file.type.indexOf("video")===0) type="video"; var msg={id:id,me:true,type:type,text:e.target.result,fname:file.name,time:getTime(),ts:Date.now(),fromUid:MY_UID,fromName:getMyName(),toUid:chatFriendUid,toName:chatWith}; var c=getChats(); if(!c[chatWith]) c[chatWith]=[]; c[chatWith].push(msg); saveChats(c); chatMsgsCache.push(msg); renderChatList(chatMsgsCache); if(_fbDb){ _fbDb.ref(chatPath(MY_UID,chatFriendUid)+"/"+id).set(msg); _fbDb.ref(chatPath(chatFriendUid,MY_UID)+"/"+id).set(msg); } input.value=""; }; reader.readAsDataURL(file); }
+function getSelectedIdx(){ var arr=[]; document.querySelectorAll('.msgSel:checked').forEach(function(c){arr.push(parseInt(c.getAttribute('data-idx')));}); return arr; }
 
-function getTime(){
-  var n = new Date();
-  return n.getHours()+":"+String(n.getMinutes()).padStart(2,"0");
+
+function deleteSelectedChat(){ MY_UID=getMYUID(); var idxs=getSelectedIdx(); if(idxs.length===0){ alert("Pehle koi message select karo"); return; } if(!confirm(idxs.length+" message delete karein? Sirf TUMHARE paas se delete hoga, dost ke paas rahega. Recycle me jayega.")) return; var del=getDeleted(); var toDel=idxs.map(function(i){return chatMsgsCache[i];}).filter(Boolean); toDel.forEach(function(m){ m.withName=chatWith; m.withUid=chatFriendUid; m.deletedTime=Date.now(); del.push(m); if(_fbDb && m.id){ _fbDb.ref("recycle_bin/"+MY_UID+"/"+m.id).set(m); } }); saveDeleted(del); var delSet={}; toDel.forEach(function(m){delSet[m.id]=true;}); chatMsgsCache=chatMsgsCache.filter(function(m){return !delSet[m.id];}); var c=getChats(); c[chatWith]=chatMsgsCache; saveChats(c); renderChatList(chatMsgsCache); alert("✅ Delete ho gaya - Recycle me hai, dost ke paas abhi bhi hai"); }
+function deleteAllChat(){ MY_UID=getMYUID(); if(!confirm("Saara chat delete karein? Sirf TUMHARE paas se delete hoga.")) return; var del=getDeleted(); chatMsgsCache.forEach(function(m){ m.withName=chatWith; m.withUid=chatFriendUid; m.deletedTime=Date.now(); del.push(m); if(_fbDb && m.id){ _fbDb.ref("recycle_bin/"+MY_UID+"/"+m.id).set(m); } }); saveDeleted(del); chatMsgsCache=[]; var c=getChats(); c[chatWith]=[]; saveChats(c); renderChatList([]); alert("✅ Saara chat delete ho gaya - Recycle me hai"); }
+
+
+
+
+function showRecycle(){ MY_UID=getMYUID(); var del=getDeleted(); if(del.length===0){ alert("Recycle khali hai"); return; } if(confirm("♻️ Recycle me "+del.length+" messages hain. Wapas laayein?")){ var c=getChats(); if(!c[chatWith]) c[chatWith]=[]; del.forEach(function(m){ c[chatWith].push(m); if(_fbDb && m.id){ _fbDb.ref(chatPath(MY_UID,chatFriendUid)+"/"+m.id).set(m); } }); saveChats(c); saveDeleted([]); chatMsgsCache=c[chatWith]; renderChatList(chatMsgsCache); alert("✅ Wapas aa gaya!"); } }
+function doBlock(){ MY_UID=getMYUID(); if(!confirm(chatWith+" ko Block karein?")) return; var bl=getBlockedLocal(); if(bl.indexOf(chatWith)===-1){bl.push(chatWith); localStorage.setItem("fr_blocked",JSON.stringify(bl));} if(_fbDb){ _fbDb.ref("blocked/"+MY_UID+"/"+chatFriendUid).set({name:chatWith,time:Date.now()}); } FRIEND_STATUS[chatFriendUid]="blocked"; BLOCKED_UIDS[chatFriendUid]=true; alert("🚫 Block ho gaya"); renderAll(); }
+  function doUnblock(){ MY_UID=getMYUID(); var bl2=getBlockedLocal().filter(function(x){return x!==chatWith;}); localStorage.setItem("fr_blocked",JSON.stringify(bl2)); if(_fbDb){ _fbDb.ref("blocked/"+MY_UID+"/"+chatFriendUid).remove(); } delete FRIEND_STATUS[chatFriendUid]; delete BLOCKED_UIDS[chatFriendUid]; alert("✅ Unblock ho gaya"); renderAll(); }
+function sendToGmail(){ var txt=chatMsgsCache.map(function(m){return (m.me?"Me":chatWith)+": "+m.text;}).join("\n"); window.open("mailto:?subject="+encodeURIComponent("Chat with "+chatWith)+"&body="+encodeURIComponent(txt||"Chat khali hai")); if(_fbDb){ _fbDb.ref("chat_exports/"+MY_UID).push({with:chatWith,text:txt,time:Date.now()}); } alert("📧 Gmail khul gaya"); }
+function checkChatKahanHai(){
+  alert("Button kaam kar raha hai!");
+  MY_UID=getMYUID();
+  var out="MY UID: "+MY_UID+"\nDOST: "+chatWith+" / "+chatFriendUid+"\n\n";
+  var c=getChats(); var local=c[chatWith]||[];
+  out+="LOCAL me: "+local.length+" msg\n";
+  if(local.length>0) out+="Last: "+(local[local.length-1].text||"").substring(0,30)+"\n\n";
+  if(!_fbDb){ alert(out+"Firebase nahi"); return; }
+  if(!MY_UID){ alert(out+"Login khali hai - pehle login karo, tabhi Firebase chat dikhega"); return; }
+  _fbDb.ref("chats/"+MY_UID).once("value").then(function(s){
+    var v=s.val()||{};
+    out+="FIREBASE me folders: "+Object.keys(v).join(", ")+"\n";
+    Object.keys(v).forEach(function(fk){ out+=" - "+fk+" : "+Object.keys(v[fk]||{}).length+" msg\n"; });
+    alert(out);
+  }).catch(function(e){ alert(out+"Error: "+e.message); });
 }
-
-function sendMsg(){
-  var inp = document.getElementById('chatText');
-  var txt = inp.value.trim();
-  if(!txt) return;
-  var friendUid = chatWithUid;
-if(!friendUid){ alert("Friend ka ID nahi mila!"); return; }
-  sendChatMessage(friendUid, txt);
-  inp.value = "";
+function uploadLocalChatToFirebase(){
+  MY_UID=getMYUID();
+  var c=getChats(); var arr=c[chatWith]||[];
+  if(arr.length===0){ alert("Local me bhi chat nahi hai"); return; }
+  if(!_fbDb||!MY_UID){ alert("Login karo - UID khali hai"); return; }
+  arr.forEach(function(m){
+    var id=m.id||("m_"+Date.now()+"_"+Math.floor(Math.random()*1000));
+    _fbDb.ref("chats/"+MY_UID+"/"+chatFriendUid+"/"+id).set(m);
+    _fbDb.ref("chats/"+chatFriendUid+"/"+MY_UID+"/"+id).set(m);
+  });
+  alert("✅ "+arr.length+" purane msg Firebase me save ho gaye!");
 }
+loadStatus(function(){ loadRealFriends(); });
 
-function sendFile(input){
-  var file = input.files[0];
-  if(!file) return;
-  
-  if(file.size > 5*1024*1024){
-    alert("File 5MB se chhoti honi chahiye!");
-    input.value = "";
-    return;
-  }
-  
-  var reader = new FileReader();
-  reader.onload = function(e){
-    var chats = getChats();
-    if(!chats[chatWith]) chats[chatWith] = [];
-    var type = "file";
-    if(file.type.indexOf("image") === 0) type = "image";
-    else if(file.type.indexOf("video") === 0) type = "video";
-    
-    chats[chatWith].push({me:true, type:type, text:e.target.result, fname:file.name, time:getTime()});
-    saveChats(chats);
-    loadMsgs();
-    input.value = "";
-  };
-  reader.readAsDataURL(file);
-}
 
-// ===== INIT =====
-renderFriends("");
-renderMyFriends();
-renderRequests();
-renderBlockList();  
+
+
 </script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();
-
-
-
-
-// ===== NAAM SE DETAIL KHOLO =====
-function openDetailByName(name){
-  var i = FRIENDS.findIndex(function(x){return x.name === name;});
-  if(i !== -1) openDetail(i);
-}
-
-function blockUser(name){
-if(!confirm("🔴 "+name+" ko block kar dein?")) return;
-var blocked=[];
-try{blocked=JSON.parse(localStorage.getItem("fr_blocked")||"[]");}catch(e){}
-if(blocked.indexOf(name)===-1){
-blocked.push(name);
-try{localStorage.setItem("fr_blocked",JSON.stringify(blocked));}catch(e){}
-}
-alert("🔴 "+name+" block ho gaya!");
-showList();
-renderBlockList();
-}
-
-function unblockUser(name){
-if(!confirm("🟢 "+name+" ko unblock kar dein?")) return;
-var blocked=[];
-try{blocked=JSON.parse(localStorage.getItem("fr_blocked")||"[]");}catch(e){}
-blocked=blocked.filter(function(n){return n!==name;});
-try{localStorage.setItem("fr_blocked",JSON.stringify(blocked));}catch(e){}
-alert("🟢 "+name+" unblock ho gaya!");
-renderBlockList();
-renderMyFriends();
-renderFriends(document.getElementById('frSearch').value||"");
-}
-function getBlocked(){
-try{return JSON.parse(localStorage.getItem("fr_blocked")||"[]");}catch(e){return[];}
-}
-function renderBlockList(){
-var list=document.getElementById('blockList');
-if(!list) return;
-var sec=document.getElementById('blockSec');
-var blocked=getBlocked();
-if(blocked.length===0){sec.style.display="none";return;}
-sec.style.display="block";
-var html="";
-blocked.forEach(function(name){
-var f=FRIENDS.find(function(x){return x.name===name;});
-var photo=f?f.photo:"👤";
-html+='<div class="mycard" style="border-left:4px solid #000;">'
-+'<div class="fp">'+photo+'</div>'
-+'<div class="info"><div class="fn">'+name+'</div><div class="st" style="color:#f44336;">🔴 Blocked</div></div>'
-+'<button onclick="unblockUser(\''+name.replace(/'/g,"")+'\')" style="background:#4caf50;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;font-size:14px;">🟢 Unblock</button>'
-+'</div>';
-});
-list.innerHTML=html;
-}
-  
-</script>
-<script src="privacy.js"></script>
-<script>PRIV_placeBtn("friendsPublic","hdr");PRIV_placeBtn("showInSearch","hdr");</script>
-<script src="block-check.js"></script>
-
- <script src="firebase-chat.js"></script> 
 </body></html>

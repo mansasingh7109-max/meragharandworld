@@ -391,11 +391,73 @@ friend6Chat: "", // OPTION: dost 6 ka WhatsApp number (khali = chat button nahi)
 <div id="profile"></div>
 </footer>
 
+<!-- ===== NAYA - HAMARE DOST KE NEECHE - OLD KE SAATH ===== -->
+<div style="padding:12px;width:100%;box-sizing:border-box">
+<!-- 1. SEARCH BOX - World ke upar -->
+<input id="frSearchNew" placeholder="🔍 Naam likho..." oninput="loadNewFriends(this.value)" style="width:100%;padding:13px;border:2px solid #e65100;border-radius:24px;outline:none">
 
+<!-- 2. WORLD FRIENDS - Sirf naye -->
+<h2 style="margin:14px 0 8px">🌍 World Friends</h2>
+<div id="worldGridNew" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+
+<!-- 3. ACCEPTED - Neeche -->
+<h2 style="background:#4caf50;color:#fff;padding:10px;border-radius:12px 12px 0 0;margin-top:18px">✅ Accepted Dost</h2>
+<div id="acceptedListNew" style="background:#fff;padding:10px;border-radius:0 0 12px 12px"></div>
+
+<!-- 4. REQUEST - Sabse neeche -->
+<h2 style="background:#ff9800;color:#fff;padding:10px;border-radius:12px 12px 0 0;margin-top:14px">🔔 Friend Request Aayi Hai</h2>
+<div id="incomingListNew" style="background:#fff;padding:10px;border-radius:0 0 12px 12px"></div>
+
+<h2 style="background:#2196F3;color:#fff;padding:10px;border-radius:12px 12px 0 0;margin-top:14px">📤 Sent Request</h2>
+<div id="sentListNew" style="background:#fff;padding:10px;border-radius:0 0 12px 12px"></div>
+</>
+
+<script>
+function loadNewFriends(q){
+q=(q||"").toLowerCase();
+var uid=localStorage.getItem("auth_uid")||localStorage.getItem("customer_phone")||"";
+if(!window._fbDb) return;
+Promise.all([_fbDb.ref("friends/"+uid).once("value"),_fbDb.ref("friend_requests/"+uid).once("value"),_fbDb.ref("friend_requests_sent/"+uid).once("value"),_fbDb.ref("blocked/"+uid).once("value"),_fbDb.ref("customer_profiles").once("value")]).then(function(r){
+var S={}; Object.keys(r[0].val()||{}).forEach(function(k){S[k]="accepted"});
+Object.keys(r[1].val()||{}).forEach(function(k){if(!S[k]) S[k]="incoming"});
+Object.keys(r[2].val()||{}).forEach(function(k){if(!S[k]) S[k]="sent"});
+Object.keys(r[3].val()||{}).forEach(function(k){S[k]="blocked"});
+var val=r[4].val()||{}; var w="",a="",inc="",sent="";
+Object.keys(val).forEach(function(id){
+
+var P=val[id]||{}; var name=(P.profileName||P.name||"Friend"); var phone=(P.profilePhone||P.phone||""); if(id===uid) return; if(name==="Manisha") return; if(phone===localStorage.getItem("customer_phone")) return;
+if(q && name.toLowerCase().indexOf(q)===-1) return;
+var photo=P.profilePhoto||"👤";
+var ph='<div style="width:44px;height:44px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden">'+(photo!=="👤"?'<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover">':"👤")+'</div>';
+if(S[id]==="blocked") return;
+
+
+
+if(!S[id]) w+='<div onclick="location.href=\'profile.html?uid='+id+'\'" style="background:#fff;border-radius:12px;padding:10px;text-align:center"><div style="width:52px;height:52px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto;overflow:hidden">'+(photo!=="👤"?'<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover">':"👤")+'</div><b>'+name+'</b><div style="color:#e65100;font-size:12px">'+(P.role||"Friend")+'</div><div style="font-size:11px;color:#999">Tap karo</div></div>';
+
+
+ 
+  
+ if(S[id]==="accepted") a+='<div style="display:flex;gap:10px;align-items:center;padding:8px;border-bottom:1px solid #eee"><div onclick="location.href=\'profile.html?uid='+id+'\'" style="cursor:pointer">'+ph+'</div><div style="flex:1" onclick="location.href=\'profile.html?uid='+id+'\'" style="cursor:pointer"><b>'+name+'</b><div style="font-size:12px;color:#666">'+phone+'</div></div><button onclick="location.href=\'friends.html\'" style="background:#25D366;color:#fff;border:none;padding:8px 14px;border-radius:20px;font-weight:bold">💬 Chat</button></div>'; 
+  
+  
+if(S[id]==="incoming") inc+='<div style="display:flex;gap:10px;align-items:center;padding:8px;border-bottom:1px solid #eee">'+ph+'<div style="flex:1"><b>'+name+'</b><div style="font-size:12px;color:#666">Sent you a request</div></div><button onclick="location.href=\'friends.html\'" style="background:#4caf50;color:#fff;border:none;padding:7px 12px;border-radius:8px;font-weight:bold">Accept</button></div>';
+if(S[id]==="sent") sent+='<div style="display:flex;gap:10px;align-items:center;padding:8px;border-bottom:1px solid #eee">'+ph+'<div style="flex:1"><b>'+name+'</b><div style="font-size:12px;color:#666">Requested</div></div><span style="background:#2196F3;color:#fff;padding:7px 12px;border-radius:20px;font-size:13px;font-weight:bold">Wait Karo</span></div>';
+});
+document.getElementById('worldGridNew').innerHTML=w||'<div style="text-align:center;color:#999">World me koi naya dost nahi hai</div>';
+document.getElementById('acceptedListNew').innerHTML=a||'<div style="text-align:center;color:#999;padding:10px">💚 Abhi koi Accepted dost nahi hai</div>';
+document.getElementById('incomingListNew').innerHTML=inc||'<div style="text-align:center;color:#999;padding:10px">📩 Koi Request nahi aayi hai</div>';
+document.getElementById('sentListNew').innerHTML=sent||'<div style="text-align:center;color:#999;padding:10px">📤 Koi Sent Request nahi hai</div>';
+});
+}
+loadNewFriends("");
+</script>
+<!-- ===== NAYA END ===== -->
 
 
 <!-- ===== FIREBASE FRIENDS SEARCH (website accounts) ===== -->
-<div id="fbSearchWrap" style="padding:0 16px;margin-top:12px;">
+
+<div id="fbSearchWrap" style="display:none;">  
 <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);">
 <b style="color:#e65100;font-size:16px;">🌍 Friends Search</b>
 <div style="font-size:12px;color:#888;margin:4px 0 10px;">searching</div>
@@ -415,6 +477,41 @@ function getMyFriends(){ try{return JSON.parse(localStorage.getItem("fr_myfriend
 function saveMyFriends(f){ localStorage.setItem("fr_myfriends", JSON.stringify(f)); }
 
 // ===== REQUEST BHEJO =====
+
+function sendFbRequest(userKey, btn){
+  var myLogin = null;
+  try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
+  var myUid = ""; try{ myUid = localStorage.getItem("auth_uid")||""; }catch(e){}
+  if(!myLogin && !myUid){
+    alert("Pehle login karo!"); location.href="customerlogin.html"; return;
+  }
+  var myName = myLogin ? myLogin.name : (localStorage.getItem("customer_name")||myUid||"User");
+  // ... baki same
+}
+
+
+
+
+
+
+
+
+function sendFbRequest(userKey, btn){
+  var myLogin = null;
+  try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
+  var myUid = ""; try{ myUid = localStorage.getItem("auth_uid")||""; }catch(e){}
+  if(!myLogin && !myUid){
+    alert("Pehle login karo!"); location.href="customerlogin.html"; return;
+  }
+  var myName = myLogin ? myLogin.name : (localStorage.getItem("customer_name")||myUid||"User");
+  // ... baki same
+}
+
+
+
+
+  
+  
 function sendRequest(i){
   var f = FRIENDS[i];
   if(!f) return;
@@ -491,30 +588,44 @@ function openChat(name, uid){
   loadMsgs();
   window.scrollTo(0,0);
 }
+
 function loadMsgs(){
-  var friendUid = chatWithUid;
-  var box = document.getElementById('chatMsgs');
-  if(!friendUid || !window._fbDb){
-    box.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">Firebase connect nahi hai</div>';
-    return;
-  }
-  var myUid = null;
-  try{ myUid = localStorage.getItem("auth_uid"); }catch(e){}
-  box.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">Messages load ho rahe hain...</div>';
-  window._fbDb.ref("user_chats/"+myUid+"/"+friendUid+"/messages").orderByChild("timestamp").on("value", function(snap){
-    var html = "";
-    var count = 0;
-    snap.forEach(function(ch){
-      count++;
-      var m = ch.val();
-      var cls = (m.sender === myUid) ? "me" : "them";
-      html += '<div class="msg '+cls+'">'+String(m.text||"").replace(/</g,"&lt;")+'<div class="tm">'+(m.time||"")+'</div></div>';
+  var box=document.getElementById('chatMsgs');
+  box.innerHTML='<div class="empty">⏳ Old chat load ho raha hai...</div>';
+  var chats=getChats();
+  var localMsgs=chats[chatWith]||[];
+  var del=getDeleted(); var delIds={}; del.forEach(function(d){delIds[d.id]=true;});
+  var merged=[]; localMsgs.forEach(function(m){ if(!delIds[m.id]) merged.push(m); });
+  renderChatList(merged);
+  if(!_fbDb||!MY_UID) return;
+  var p1=_fbDb.ref(chatPath(MY_UID,chatFriendUid)).once("value").then(function(s){return s.val()||{};}).catch(function(){return {};});
+  var p2=_fbDb.ref(chatPath(chatFriendUid,MY_UID)).once("value").then(function(s){return s.val()||{};}).catch(function(){return {};});
+  var p3=_fbDb.ref("chats/"+MY_UID).once("value").then(function(s){return s.val()||{};}).catch(function(){return {};});
+  Promise.all([p1,p2,p3]).then(function(res){
+    var map={}; merged.forEach(function(m){ if(m.id) map[m.id]=m; });
+    [res[0],res[1]].forEach(function(obj){
+      Object.keys(obj||{}).forEach(function(k){ var m=obj[k]; if(!m) return; var id=m.id||k; if(delIds[id]) return; var isMe=(m.fromUid===MY_UID)||(m.me===true && !m.fromUid); map[id]={id:id,me:isMe,type:m.type||"text",text:m.text||"",fname:m.fname||"",time:m.time||"",ts:m.ts||0,fromUid:m.fromUid||""}; });
     });
-    if(count === 0) html = '<div style="text-align:center;color:#999;padding:20px;">👋 '+chatWith+' se chat shuru karo!</div>';
-    box.innerHTML = html;
-    box.scrollTop = box.scrollHeight;
+    // pura folder scan - agar chat dusre UID me hai to bhi milega
+    Object.keys(res[2]||{}).forEach(function(fk){
+      var msgs=res[2][fk]||{};
+      Object.keys(msgs).forEach(function(k){
+        var m=msgs[k]; if(!m) return;
+        var id=m.id||(fk+"_"+k); if(delIds[id]) return;
+        if(m.toName!==chatWith && m.fromName!==chatWith && m.toUid!==chatFriendUid && m.fromUid!==chatFriendUid && fk!==chatFriendUid) return;
+        var isMe=(m.fromUid===MY_UID)||(m.me===true && !m.fromUid);
+        map[id]={id:id,me:isMe,type:m.type||"text",text:m.text||"",fname:m.fname||"",time:m.time||"",ts:m.ts||0,fromUid:m.fromUid||""};
+      });
+    });
+    var arr=Object.keys(map).map(function(k){return map[k];});
+    arr.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+    chatMsgsCache=arr; var c=getChats(); c[chatWith]=arr; saveChats(c);
+    renderChatList(arr);
   });
 }
+
+
+  
 function sendMsg(){
   var inp = document.getElementById('chatText');
   var txt = inp.value.trim();
@@ -1332,8 +1443,7 @@ var _fc=parseInt(OPT.friendCount)||3;if(_fc<1)_fc=1;
 var _fcol=parseInt(OPT.friendCols)||3;if(_fcol<1)_fcol=1;
 var _fg="";for(var _fk=0;_fk<_fcol;_fk++){_fg+="1fr ";}
 var _chatOn=OPT.friendChatOn==="on";
-var fh='<h2 style="color:#e65100;margin:14px 0 12px;text-align:center">'+(OPT.friendsTitle||"Hamare Dost")+'</h2>';
-fh+='<div style="display:grid;grid-template-columns:'+_fg.trim()+';gap:14px;">';
+var fh='<h2 style="color:#e65100;margin:14px 0 12px;text-align:center">'+(OPT.friendsTitle||"Hamare Dost")+'</h2>';fh+='<button onclick="location.href=\'friends.html\'" style="width:100%;padding:14px;background:#e65100;color:#fff;border:none;border-radius:20px;font-weight:bold;font-size:16px;margin-top:12px;cursor:pointer">👥 Mere Dost - Friend List Dekho</button>';fh+='<div style="display:grid;grid-template-columns:'+_fg.trim()+';gap:14px;">';
 var fi=1;window._FR={};
 while(1){if(fi>_fc)break;var fn=OPT['friend'+fi+'Name'];if(fn===undefined)break;
 var fp=OPT['friend'+fi+'Photo']||"\uD83D\uDC64";var fr=OPT['friend'+fi+'Role']||"";var fd=OPT['friend'+fi+'Detail']||"";
@@ -1541,6 +1651,11 @@ function openDetail(i){
 
   var detailHtml = '<div class="bigphoto">'+f.photo+'</div>'
     + '<h2>'+f.name+'</h2>'
+    + '<div style="margin-top:14px;display:grid;gap:8px;">'
++ '<button onclick="location.href=\'profile.html?uid=\'+(f._uid||f.uid||\'\')" style="background:#e65100;color:#fff;border:none;padding:12px;border-radius:20px;font-weight:bold;">👤 Uska Profile</button>'
++ '<button onclick="location.href=\'album.html?uid=\'+(f._uid||f.uid||\'\')" style="background:#9C27B0;color:#fff;border:none;padding:12px;border-radius:20px;font-weight:bold;">📸 Uska Album</button>'
++ '<button onclick="location.href=\'timedatalist.html?uid=\'+(f._uid||f.uid||\'\')" style="background:#2196F3;color:#fff;border:none;padding:12px;border-radius:20px;font-weight:bold;">📅 Uski Timeline</button>'
++ '</div>'
     + '<div class="role">'+f.role+'</div>'
     + '<div class="desc">'+f.detail+'</div>'
     + '<div id="stMsg" style="padding:20px;color:#999;">⏳ Status check ho raha hai...</div><div id="stBtn"></div>';
@@ -1599,7 +1714,7 @@ function rejectFirebaseReq(fromUid){
   } else if(hasReq){
     btnHtml = '<div style="color:#ff9800;font-weight:bold;margin-top:10px;">⏳ Request bhej di hai!</div>';
   } else {
-    btnHtml = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>';
+    btnHtml = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>''<button onclick="sendFbRequest(\''+userKey+'\',this)" style="background:#25D366;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-weight:bold;">➕ Request</button>';
   }
 
   var photoHtml = f.photo;
@@ -1664,7 +1779,9 @@ function renderMyFriends(){
   if(sec) sec.style.display = "block";
   var html = "";
   myF.forEach(function(name){
-    html += '<div style="background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;">'
+    html += var uid2 = f._uid || f.uid || "";
+html += '<div class="fcard"><div onclick="openDetail('+i+')"><div class="fp">'+f.photo+'</div><div class="fn">'+f.name+'</div><div class="tap">Tap karo 👆</div></div><button onclick="event.stopPropagation(); sendFbRequest(\''+uid2+'\',this)" style="background:#25D366;color:#fff;border:none;padding:6px 12px;border-radius:16px;font-weight:bold;font-size:12px;margin-top:6px;width:100%;">➕ Request</button></div>'
+      '<div style="background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;">'
       + '<div style="width:52px;height:52px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;cursor:pointer;" onclick="openDetailByName(\''+name.replace(/'/g,"")+'\')">👤</div>'
       + '<div style="flex:1;cursor:pointer;" onclick="openDetailByName(\''+name.replace(/'/g,"")+'\')"><div style="font-weight:bold;font-size:15px;">'+name+'</div><div style="font-size:12px;color:#4caf50;">✅ Dost</div></div>'
       + '<button onclick="openChat(\''+name.replace(/'/g,"")+'\')" style="background:#25D366;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px;">💬 Chat</button>'
@@ -1679,6 +1796,24 @@ function renderMyFriends(){
  setTimeout(function(){ renderRequests(); renderMyFriends(); }, 1500); 
 
 
+
+
+
+// STATUS nikalo har friend ka
+var status = FRIEND_STATUS[phone] || "none"; 
+// status = accepted, sent, incoming, blocked, rejected, none
+
+if(status === "accepted") -> sirf Mere Dost grid me dalo
+else if(status === "incoming") -> Request Aayi grid me
+else if(status === "sent") -> Sent grid me
+else if(status === "blocked") -> Block grid me
+else if(status === "rejected") -> Reject grid me
+else -> World / Hamare Dost grid me
+
+
+
+  
+
 function logoutNow(){
 if(!confirm("Logout karein?"))return;
 try{localStorage.removeItem("customer_logged_in");}catch(e){}
@@ -1688,9 +1823,21 @@ location.reload();
   
   
 </script>
+  
 
-<button onclick="var _c=(typeof OPT!=='undefined'&&OPT.customerId)||'customer1';location.href='album.html?cid='+_c" style="background:#9C27B0;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">📸 Album Dekho</button>  
+
+
+<div onclick="location.href='album.html'" style="margin:12px 16px;background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px"><b>📸 Mera Album</b><span style="color:#7b1fa2;font-size:13px">Poora Dekho ›</span></div><div id="homeAlbumPreview" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0px;padding:0px;min-height:520px"></div><div style="text-align:center;padding:6px;font-size:12px;color:#999">Tap karo - Poora Album Dekho</div></div><script>try{function addPhotosFromProfile(Q,arr){if(!Q)return;if(Q.profilePhoto)arr.push(Q.profilePhoto);if(Q.photo)arr.push(Q.photo);for(var q=2;q<=15;q++){var k='profilePhoto'+q;if(Q[k])arr.push(Q[k]);}(Q.extraPhotos||[]).forEach(function(p){if(p)arr.push(p);});(Q.timelinePhotos||[]).forEach(function(p){if(p)arr.push(p);});var det=Q.details||Q.customer_details||[];if(!Array.isArray(det)&&typeof det==='object')det=Object.values(det);det.forEach(function(e){if(e&&e.photo)arr.push(e.photo);});var th=Q.thinkings||Q.customer_thinkings||[];if(!Array.isArray(th)&&typeof th==='object')th=Object.values(th);th.forEach(function(e){if(e&&e.photo)arr.push(e.photo);});}function showHomeAlbum(list){var seen={};var u2=[];list.forEach(function(x){if(x&&!seen[x]){seen[x]=1;u2.push(x);}});var h="";if(!u2.length){h='<div style="grid-column:1/-1;height:85px;background:#f3e5f5;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;border-radius:10px">Abhi koi photo nahi hai</div>';}else{for(var i=0;i<Math.min(u2.length,18);i++){h+='<div style="height:200px;border-radius:12px;overflow:hidden;background:#fff"><img src="'+u2[i]+'" style="width:100%;height:200px;object-fit:cover;object-position:top center"></div>';}}document.getElementById("homeAlbumPreview").innerHTML=h;}var P={};try{P=JSON.parse(localStorage.getItem("my_profile")||"{}");}catch(e){}var photos=[];addPhotosFromProfile(P,photos);try{var det2=JSON.parse(localStorage.getItem("customer_details")||"[]");det2.forEach(function(e){if(e&&e.photo)photos.push(e.photo);});}catch(e){}showHomeAlbum(photos);if(window.firebase){try{firebase.database().ref("customer_profiles").once("value").then(function(s){var all=[];s.forEach(function(ch){var Q=ch.val()||{};var nm=(Q.profileName||Q.name||"");var ph=(Q.profilePhone||Q.phone||"");if(nm==="Manisha"||ph==="9660834888"||ph==="8769171078"){addPhotosFromProfile(Q,all);}});if(all.length)showHomeAlbum(all);firebase.database().ref("customer_albums").once("value").then(function(s2){var alb=[];s2.forEach(function(uidNode){uidNode.forEach(function(gc){var v=gc.val();if(v&&v.url)alb.push(v.url);else if(typeof v==="string")alb.push(v);else if(v&&v.photo)alb.push(v.photo);});});if(alb.length)showHomeAlbum(all.concat(alb));});});}catch(e){}}}catch(e){}</script>
+
+
+  
+  
+  
 <button onclick="location.href='timedatalist.html'" style="background:#2196F3;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">📅 Timeline Dekho</button>
+
+
+
+
 
 
 
@@ -1708,8 +1855,8 @@ location.reload();
 </div>
 
 
- <script src="usage-monitor.js"></script>
-<script src="loading-guard.js"></script>
+ <script src="usage-monitor.js"></scrip>
+<script src="loading-guard.js"></scrip>
 <script src="fastorderprocess.js"></script>   
 
 <script src="privacy.js"></script>
@@ -1789,6 +1936,13 @@ document.getElementById('googleLoginBtn').addEventListener('click', function(){
     location.reload();
   }).catch(function(err){ alert("Error: "+err.message); });
 });
+
+
+
+
+
+
+  
 </script>
   
 </body></html>

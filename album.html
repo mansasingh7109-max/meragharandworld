@@ -1,39 +1,18 @@
 <!DOCTYPE html>
-<html lang="hi">
-<head><style>
-@font-face {
-  font-family: "Optimistic";
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Optimistic Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
-}
-:where(html) {
-  font-family: "Optimistic", system-ui, sans-serif;
-}
-:where(code, pre, kbd, samp) {
-  font-family: "Optimistic Mono", ui-monospace, monospace;
-}
-</style>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="hi"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Album - mera ghar and world</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#fff8f0;color:#333}
 #hdr{background:#e65100;color:#fff;padding:14px 16px;display:flex;align-items:center;position:sticky;top:0;z-index:10}
-#hdr button{background:#fff;color:#e65100;border:none;min-width:36px;height:36px;border-radius:50%;font-size:18px;font-weight:bold;margin-right:12px}
-#hdr b{font-size:18px}
+#hdr button{background:#fff;color:#e65100;border:none;min-width:36px;height:36px;border-radius:50%;font-size:18px;font-weight:bold;margin-right:12px;cursor:pointer}
+#hdr b{font-size:18px;flex:1}
 #grid{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:600px;margin:0 auto}
 .ph{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-.ph img{width:100%;height:180px;object-fit:cover;display:block}
+.ph img{width:100%;height:180px;object-fit:cover;display:block;cursor:pointer}
 .ph.main{grid-column:1/-1}
 .ph.main img{height:280px}
 .empty{text-align:center;color:#aaa;padding:40px 20px;font-size:15px;grid-column:1/-1}
@@ -41,108 +20,70 @@ body{background:#fff8f0;color:#333}
 #lb img{max-width:95%;max-height:90%;border-radius:10px}
 #lb button{position:absolute;top:16px;right:16px;background:#fff;border:none;width:40px;height:40px;border-radius:50%;font-size:20px;font-weight:bold}
 .ttl{text-align:center;padding:16px 16px 0;font-size:16px;font-weight:bold;color:#e65100}
+.pbtn{display:block;width:calc(100% - 32px);margin:12px 16px;padding:12px;border:none;border-radius:24px;font-weight:bold;font-size:14px;color:#fff;cursor:pointer;text-decoration:none;text-align:center;box-sizing:border-box}
 </style>
-</head>
-<body>
-
-
 <script>
-(function(){
-var urlUid = new URLSearchParams(location.search).get('uid');
-var myUid = null;
-try{ myUid = localStorage.getItem("auth_uid"); }catch(e){}
-var showUid = urlUid || myUid;
-if(showUid && window.firebase){
-  firebase.database().ref("customer_profiles/"+showUid).once("value", function(snap){
-    var d = snap.val();
-    if(!d) return;
-    if(d.profileName){
-      var el = document.getElementById('profileName');
-      if(el) el.textContent = d.profileName;
-    }
-    if(d.profilePhoto){
-      var ph = document.getElementById('profilePhoto');
-      if(ph) ph.src = d.profilePhoto;
-    }
-    if(d.customerStatus){
-      var st = document.getElementById('profileStatus');
-      if(st) st.textContent = d.customerStatus;
-    }
+var FIREBASE_CONFIG={apiKey:"AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",authDomain:"santramarketshoppingmall.firebaseapp.com",databaseURL:"https://santramarketshoppingmall-default-rtdb.firebaseio.com",projectId:"santramarketshoppingmall",storageBucket:"santramarketshoppingmall.firebasestorage.app",messagingSenderId:"398490252924",appId:"1:398490252924:web:4b6f73b48d28e1c23b7bf9"};
+var _fbDb=null; try{firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database();}catch(e){}
+function getUid(){ var m=location.search.match(/[?&]uid=([^&]+)/); if(m) return decodeURIComponent(m[1]); m=location.search.match(/[?&]cid=([^&]+)/); return m?decodeURIComponent(m[1]):""; }
+</script>
+</head><body>
+<div id="hdr"><button onclick="history.back()">←</button><b id="ttl">📸 Album</b></div>
+<div class="ttl" id="cnt"></div>
+<button class="pbtn" id="reqBtn" style="display:none;background:#25D366;" onclick="sendReq()">📩 Friend Request Bhejo</button>
+<div id="grid"></div>
+<div id="lb" onclick="this.style.display='none'"><button onclick="document.getElementById('lb').style.display='none'">✕</button><img id="lbImg" src=""></div>
+<script>
+function renderOwn(){
+  var P={}; try{P=JSON.parse(localStorage.getItem("my_profile")||"{}");}catch(e){}
+  try{ var p2=JSON.parse(localStorage.getItem("customer_profile")||"{}"); P=Object.assign(p2,P); }catch(e){}
+  var photos=[];
+  if(P.profilePhoto) photos.push({src:P.profilePhoto,main:true});
+  if(P.photo && P.photo!==P.profilePhoto) photos.push({src:P.photo,main:false});
+  for(var q=2;q<=15;q++){ var k='profilePhoto'+q; if(P[k]&&P[k]!=="") photos.push({src:P[k],main:false}); }
+  (P.extraPhotos||[]).forEach(function(p){ if(p) photos.push({src:p,main:false}); });
+  document.getElementById('ttl').textContent='📸 Mera Album';
+  document.getElementById('cnt').textContent='📸 Total Photos: '+photos.length;
+  var grid=document.getElementById('grid');
+  if(photos.length===0){ grid.innerHTML='<div class="empty">Koi photo nahi<br>Edit me jakar photo add karo</div>'; }
+  else{ var h=''; for(var i=0;i<photos.length;i++){ h+='<div class="ph'+(photos[i].main?' main':'')+'"><img src="'+photos[i].src+'" onclick="openLb(this.src)"></div>'; } grid.innerHTML=h; }
+}
+function renderFriend(uid){
+  // UID kabhi screen par nahi dikhayenge
+  document.getElementById('ttl').textContent='📸 Friend ka Album';
+  document.getElementById('cnt').textContent='⏳ Friend ka album load ho raha hai...';
+  document.getElementById('reqBtn').style.display='block';
+  if(!_fbDb){ document.getElementById('grid').innerHTML='<div class="empty">❌ Load nahi hua, dobara try karo</div>'; return; }
+  _fbDb.ref("customer_profiles/"+uid).once("value").then(function(snap){
+    var P=snap.val();
+    if(!P){ document.getElementById('grid').innerHTML='<div class="empty">❌ User nahi mila</div>'; return; }
+    var name=P.profileName||P.name||"Friend";
+    var isPublic=true; try{ if(P.privacy && P.privacy.albumPublic===false) isPublic=false; }catch(e){}
+    if(!isPublic){ document.getElementById('ttl').textContent='📸 '+name+' ka Album'; document.getElementById('cnt').textContent='🔒 Album Private Hai'; document.getElementById('grid').innerHTML='<div class="empty">🔒 '+name+' ne apna album private kiya hai<br>Friend banne ke baad dikhega</div>'; return; }
+    document.getElementById('ttl').textContent='📸 '+name+' ka Album (Friend ka)';
+    var photos=[];
+    if(P.profilePhoto) photos.push({src:P.profilePhoto,main:true});
+    if(P.photo && P.photo!==P.profilePhoto) photos.push({src:P.photo,main:false});
+    for(var q=2;q<=15;q++){ var k='profilePhoto'+q; if(P[k]&&P[k]!=="") photos.push({src:P[k],main:false}); }
+    (P.extraPhotos||[]).forEach(function(p){ if(p) photos.push({src:p,main:false}); });
+    _fbDb.ref("customer_albums/"+uid).once("value").then(function(s2){s2.forEach(function(ch){var v=ch.val();var u="";if(v&&v.url)u=v.url;else if(typeof v==="string")u=v;else if(v&&v.photo)u=v.photo;if(u)photos.push({src:u,main:false});});document.getElementById('cnt').textContent='📸 Total Photos: '+photos.length+' ('+name+' ka)';var grid2=document.getElementById('grid');var h2='';for(var j=0;j<photos.length;j++){h2+='<div class="ph'+(photos[j].main?' main':'')+'"><img src="'+photos[j].src+'" onclick="openLb(this.src)"></div>';}grid2.innerHTML=h2;}).catch(function(){});
+    document.getElementById('cnt').textContent='📸 Total Photos: '+photos.length+' ('+name+' ka)';
+    var grid=document.getElementById('grid');
+    if(photos.length===0){ grid.innerHTML='<div class="empty">📸 Koi public photo nahi hai<br>'+name+' ne abhi photo add nahi ki</div>'; }
+    else{ var h=''; for(var i=0;i<photos.length;i++){ h+='<div class="ph'+(photos[i].main?' main':'')+'"><img src="'+photos[i].src+'" onclick="openLb(this.src)"></div>'; } grid.innerHTML=h; }
+  }).catch(function(){
+    // permission_denied ya koi bhi error -> private dikhao, UID/error mat dikhao
+    document.getElementById('cnt').textContent='🔒 Album Private Hai';
+    document.getElementById('grid').innerHTML='<div class="empty">🔒 Album private hai ya load nahi hua<br>Friend banne ke baad dikhega</div>';
   });
 }
-})();
-</script>
-
-
-  
-<div id="hdr">
-<button onclick="history.back()">←</button>
-<b>📸 Album</b><button onclick="location.href='customerlogin.html'" style="background:#7b1fa2;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:bold;margin:10px;">🔐 Login</button>
-</div>
-<div class="ttl" id="cnt"></div>
-<div id="grid"></div>
-<div id="lb" onclick="this.style.display='none'">
-<button onclick="document.getElementById('lb').style.display='none'">✕</button>
-<img id="lbImg" src="">
-</div>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script>
-// ===== FIREBASE CONFIG - API keys yahan bharo =====
-var FIREBASE_CONFIG = {
-  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
-  authDomain: "santramarketshoppingmall.firebaseapp.com",
-  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
-  projectId: "santramarketshoppingmall",
-  storageBucket: "santramarketshoppingmall.firebasestorage.app",
-  messagingSenderId: "398490252924",
-  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
-  measurementId: "G-M3YK28NTT0"
-};
-var _fbDb = null;
-try {
-  if (FIREBASE_CONFIG.apiKey !== "TUMHARI_API_KEY") {
-    firebase.initializeApp(FIREBASE_CONFIG);
-    _fbDb = firebase.database();
-  }
-} catch(e) {}
-// ===== FIREBASE END =====
-var _p=new URLSearchParams(location.search);
-var cid=_p.get('cid')||'customer1';
-function _load(){try{var v=localStorage.getItem("customer_profile");return v?JSON.parse(v):{};}catch(e){return{};}}
-var d=_load();
-function buildPhotos(){
-var photos=[];
-if(d.profilePhoto)photos.push({src:d.profilePhoto,main:true});
-for(var q=2;q<=15;q++){var k='profilePhoto'+q;if(d[k]&&d[k]!=="")photos.push({src:d[k],main:false});}
-var grid=document.getElementById('grid');
-document.getElementById('cnt').textContent='📸 Total Photos: '+photos.length;
-if(photos.length===0){
-grid.innerHTML='<div class="empty">Koi photo nahi<br>Edit me jakar photo add karo</div>';
-}else{
-var h='';
-for(var i=0;i<photos.length;i++){
-h+='<div class="ph'+(photos[i].main?' main':'')+'"><img src="'+photos[i].src+'" onclick="openLb(this.src)"></div>';
+function sendReq(){
+  var uid=getUid(); var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
+  if(!myUid){alert("Pehle login karo!"); location.href="customerlogin.html"; return;}
+  _fbDb.ref("friend_requests/"+uid).push({fromUid:myUid,time:Date.now(),status:"pending"},function(){ alert("✅ Request bhej di!"); });
 }
-grid.innerHTML=h;
-}
-}
-// Firebase se photos load karo (friends ke liye)
-try{
-if(_fbDb){
-_fbDb.ref('customer_profiles/'+cid).on('value',function(snap){
-var fb=snap.val();
-if(fb){d=fb;buildPhotos();}
-});
-}
-}catch(e){}
-buildPhotos();
 function openLb(src){document.getElementById('lbImg').src=src;document.getElementById('lb').style.display='flex';}
+var fid=getUid();
+if(fid){ renderFriend(fid); } else { renderOwn(); }
 </script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script>
-
-<script src="privacy.js"></script>
-<script>PRIV_placeBtn("albumPublic","hdr");</script>
-
-</body>
-</html>
+</body></html>
