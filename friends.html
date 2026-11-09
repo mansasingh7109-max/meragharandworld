@@ -77,7 +77,15 @@ body{background:#fff8f0;color:#333}
 
 
 .topmenu{position:sticky;top:52px;z-index:9;background:#fff;padding:8px 6px;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.1);scrollbar-width:none}.topmenu button{flex-shrink:0;border:none;padding:9px 14px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;color:#fff}.topmenu button.on{outline:3px solid #000}
-  
+
+
+/* friends.html ke <style> me paste karo */
+.inboxBox{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.inboxRow{display:flex;gap:8px;margin-bottom:8px}
+.inboxBtn{flex:1;border:none;padding:10px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer}
+.inboxList{max-height:180px;overflow-y:auto;border:1px solid #eee;border-radius:10px;padding:8px;margin-bottom:8px}
+.inboxItem{display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #f5f5f5;cursor:pointer}
+.inboxItem img{width:36px;height:36px;border-radius:50%;object-fit:cover}  
   
 </style></head><body>
 <div id="listView">
@@ -88,6 +96,11 @@ body{background:#fff8f0;color:#333}
 <div class="topmenu"><button style="background:#4caf50" onclick="goSec('myFriendsSec',this)">💚 Accepted</button><button style="background:#ff9800" onclick="goSec('reqSec',this)">📩 Request Aayi</button><button style="background:#2196F3" onclick="goSec('sentSec',this)">📤 Sent</button><button style="background:#f44336" onclick="goSec('blockSec',this)">🔴 Block</button><button style="background:#7b1fa2" onclick="goSec('friendsGrid',this)">🌍 World</button><button style="background:#000" onclick="location.href='settings.html'">⚙️ Settings</button><button style="background:#e65100" onclick="location.href='index.html'">🏠 Home</button></div>  
 <div id="hero"><h1>👥 Doston ki Duniya</h1><p id="heroSub">Dost dhoondo, request bhejo, chat karo!</p></div>
 <div id="searchWrap"><input id="frSearch" type="search" placeholder="🔍 Dost ka naam likho..." oninput="filterFriends(this.value)"><div class="hint">Naam likho - dost dhoondo, request bhejo!</div></div>
+
+<!-- friends.html me: Search wale box ke neeche, Accepted se pehle paste karo -->
+<div class="sec"><div class="inboxBox"><b style="color:#e65100;font-size:15px;">💬 Message Bhejo - Inbox Chat</b><div style="font-size:12px;color:#888;margin:4px 0 8px;">Dost select karo, ek ko ya sabko ek saath bhejo</div><div class="inboxRow"><button type="button" id="selAllFr" style="background:#e65100;color:#fff;" class="inboxBtn">✅ All Friends</button><button type="button" id="clearAllFr" style="background:#eee;" class="inboxBtn">❌ Clear</button></div><div id="inboxFriendList" class="inboxList"><div style="color:#999;font-size:13px;text-align:center;">⏳ Dost load ho rahe hain...</div></div><textarea id="pfMsgText" placeholder="Message likho... (ek saath sabko jayega)" rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:14px;"></textarea><button id="pfMsgSend" style="background:#25D366;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;margin-top:8px;width:100%;">📩 Inbox Me Bhejo</button><div id="inboxSentMsg" style="font-size:12px;color:#2e7d32;text-align:center;margin-top:6px;"></div></div></div>
+
+  
 <div class="sec" id="myFriendsSec"><h2>💚 Mere Dost (Accepted)</h2><div id="myFriendsList"></div></div>
 <div class="sec" id="reqSec"><h2>📩 Friend Request Aayi Hai (Incoming)</h2><div id="reqList"></div></div>
 <div class="sec" id="sentSec"><h2>📤 Request Bheji Hai (Sent)</h2><div id="sentList"></div></div>
@@ -160,7 +173,7 @@ function isSent(f){ if(FRIEND_STATUS[f._uid]==="sent") return true; return false
 function isIncoming(f){ if(FRIEND_STATUS[f._uid]==="incoming") return true; if(getRequests().some(function(r){return r.name===f.name;})) return true; return false; }
 function renderAll(){
   var q=(document.getElementById('frSearch').value||"").toLowerCase();
-  renderWorld(q); renderMyFriends(q); renderRequests(q); renderSent(q); renderBlocked(q);
+renderWorld(q); renderMyFriends(q); renderRequests(q); renderSent(q); renderBlocked(q);renderInboxFriends(q)
 }
 function renderWorld(q){
   var grid=document.getElementById('friendsGrid'); var html=""; var count=0;
@@ -339,6 +352,53 @@ loadStatus(function(){ loadRealFriends(); });
 
 
 
+function renderInboxFriends(filter){
+  var box=document.getElementById('inboxFriendList'); if(!box) return;
+  var q=(filter||"").toLowerCase();
+  var h="";
+  FRIENDS.forEach(function(f){
+    var fid=f._uid||f.uid||"";
+    if(!fid) return;
+    if(FRIEND_STATUS[fid]!=="accepted") return;
+   if(q && (f.name||"").toLowerCase().indexOf(q)===-1) return;
+    var ph=f.photoUrl||f.photo||"";
+    var pic=(String(ph).indexOf("http")===0||String(ph).indexOf("data:")===0) ? '<img src="'+ph.replace(/"/g,'&quot;')+'">' : '<span style="font-size:22px;">'+(ph||"👤")+'</span>';
+    h+='<label class="inboxItem"><input type="checkbox" class="inboxFrChk" value="'+fid+'" style="width:18px;height:18px;">'+pic+'<b style="flex:1;font-size:14px;">'+(f.name||"")+'</b></label>';
+  });
+  box.innerHTML=h||'<div style="color:#999;font-size:13px;text-align:center;">Abhi koi Accepted dost nahi hai<br>Neeche se Accept karo</div>';
+}
+window.sendChatMessage=function(fid,txt){
+  var time=new Date().getHours()+":"+String(new Date().getMinutes()).padStart(2,"0");
+  var ts=Date.now();
+  if(window._fbDb && MY_UID && fid){
+    try{
+      _fbDb.ref("chats/"+MY_UID+"/"+fid).push({from:MY_UID,to:fid,msg:txt,text:txt,time:time,timestamp:ts});
+      _fbDb.ref("chats/"+fid+"/"+MY_UID).push({from:MY_UID,to:fid,msg:txt,text:txt,time:time,timestamp:ts});
+    }catch(e){}
+  }
+  var chats=getChats();
+  if(!chats[fid]) chats[fid]=[];
+  chats[fid].push({me:true,text:txt,time:time,ts:ts});
+  saveChats(chats);
+};
+function initInbox(){
+  var sel=document.getElementById('selAllFr'); if(sel) sel.onclick=function(){document.querySelectorAll('.inboxFrChk').forEach(function(c){c.checked=true;});};
+  var clr=document.getElementById('clearAllFr'); if(clr) clr.onclick=function(){document.querySelectorAll('.inboxFrChk').forEach(function(c){c.checked=false;});};
+  var sb=document.getElementById('pfMsgSend'); if(!sb) return;
+  sb.addEventListener('click',function(){
+    var tx=document.getElementById('pfMsgText').value||"";
+    if(tx.trim()===""){alert("Pehle message likho!");return;}
+    var selArr=[]; document.querySelectorAll('.inboxFrChk:checked').forEach(function(c){selArr.push(c.value);});
+    if(!selArr.length){alert("Pehle 1 dost select karo, ya All Friends dabao!");return;}
+    selArr.forEach(function(fid){ window.sendChatMessage(fid, tx); });
+    document.getElementById('inboxSentMsg').textContent="✅ "+selArr.length+" dost ko bhej diya!";
+    document.getElementById('pfMsgText').value="";
+  });
+  setTimeout(function(){ renderInboxFriends(""); },2000);
+  setTimeout(function(){ renderInboxFriends(""); },4000);
+}
+document.addEventListener('DOMContentLoaded', initInbox);
 
+  
 </script>
 </body></html>

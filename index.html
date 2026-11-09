@@ -856,7 +856,7 @@ var _psz=parseInt(OPT.profilePhotoSize)||80;if(_psz<1)_psz=80;
 var _bsz=parseInt(OPT.profileSize)||320;if(_bsz<1)_bsz=320;
 // ===== LOGIN CHECK (e-commerce jaisa) =====
 var _loggedIn=false;
-try{_loggedIn=localStorage.getItem("customer_logged_in")==="1";}catch(e){}
+try{_loggedIn=localStorage.getItem("customer_logged_in")==="1" || !!localStorage.getItem("auth_uid");}catch(e){}
 if(!_loggedIn){
 // Login form dikhao
 var _loginHtml='<div style="background:#fff;padding:24px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center;width:'+_bsz+'px;max-width:95%;">'
@@ -927,7 +927,11 @@ if(OPT.profileThinking&&OPT.profileThinking!=="")_sb+='<span style="background:#
 if(OPT.profileMsgTimelineOn==="on")_sb+='<span style="background:#f3e5f5;color:#7b1fa2;font-size:12px;font-weight:bold;padding:6px 12px;border-radius:16px;">💬 Messages</span>';
 _sb+='</div>';return _sb;})()
 // MESSAGE BOX (unlimited words)
-if(OPT.profileMsgOn==="on"){cardHtml+='<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee;text-align:left;"><b style="color:#e65100;font-size:15px;">'+(OPT.profileMsgTitle||"Message Bhejo")+'</b>'+(OPT.profileMsgDetail?'<div style="font-size:13px;color:#666;margin:6px 0;">'+OPT.profileMsgDetail+'</div>':'')+'<input id="pfMsgName" placeholder="Aapka naam" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin:6px 0;font-size:14px;"><textarea id="pfMsgText" placeholder="Apna message likho (unlimited words)..." rows="4" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea><button id="pfMsgSend" style="background:#25D366;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;margin-top:8px;width:100%;">📩 Message Bhejo</button></div>';}
+
+if(OPT.profileMsgOn==="on"){cardHtml+='<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee;text-align:left;"><b style="color:#e65100;font-size:15px;">💬 Message Bhejo - Inbox Chat</b><div style="font-size:12px;color:#888;margin:4px 0 8px;">Dost select karo, ek ko ya sabko ek saath bhejo</div><div style="display:flex;gap:8px;margin-bottom:8px;"><button type="button" id="selAllFr" style="flex:1;background:#e65100;color:#fff;border:none;padding:10px;border-radius:20px;font-weight:bold;font-size:13px;">✅ All Friends</button><button type="button" id="clearAllFr" style="flex:1;background:#eee;border:none;padding:10px;border-radius:20px;font-weight:bold;font-size:13px;">❌ Clear</button></div><div id="inboxFriendList" style="max-height:180px;overflow-y:auto;border:1px solid #eee;border-radius:10px;padding:8px;margin-bottom:8px;"><div style="color:#999;font-size:13px;text-align:center;">⏳ Dost load ho rahe hain...</div></div><textarea id="pfMsgText" placeholder="Message likho... (ek saath sabko jayega)" rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:14px;"></textarea><button id="pfMsgSend" style="background:#25D366;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;margin-top:8px;width:100%;">📩 Inbox Me Bhejo</button><div id="inboxSentMsg" style="font-size:12px;color:#2e7d32;text-align:center;margin-top:6px;"></div></div>';}   
+            
+
+            
 // CHAT BUTTON (unlimited chatting via WhatsApp)
 if(OPT.profileChatOn==="on"){var _cn=OPT.profileChatNumber||"918769171078";cardHtml+='<div style="margin-top:12px;"><a href="https://wa.me/'+_cn+'?text='+encodeURIComponent("Hi "+(OPT.profileName||"")+"!")+'" style="display:inline-block;background:#25D366;color:#fff;font-weight:bold;padding:12px 32px;border-radius:30px;text-decoration:none;font-size:16px;">💬 '+(OPT.profileChatText||"Chat Karo")+'</a><div style="font-size:11px;color:#999;margin-top:4px;">Unlimited chatting - WhatsApp par</div></div>';}
 // EDIT MY PROFILE BUTTON (customer khud edit kare)
@@ -953,7 +957,33 @@ if(pos==="footer"){document.getElementById('profile').innerHTML='<div style="dis
 else if(pos==="header"||pos==="top"){document.getElementById('profileHead').innerHTML=wrapHtml;}
 else{document.getElementById('profileTop').innerHTML=wrapHtml;}
 // Message send button kaam
-setTimeout(function(){var _sb=document.getElementById('pfMsgSend');if(_sb){_sb.addEventListener('click',function(){var _nm=document.getElementById('pfMsgName').value||"Customer";var _tx=document.getElementById('pfMsgText').value||"";if(_tx.trim()===""){alert("Pehle message likho!");return;}var _cnum=OPT.profileChatNumber||"918769171078";window.open("https://wa.me/"+_cnum+"?text="+encodeURIComponent("Naam: "+_nm+"\nMessage: "+_tx),'_blank');});}},500);
+
+// ===== INBOX FRIEND LIST LOAD =====
+setTimeout(function(){
+var box=document.getElementById('inboxFriendList'); if(!box) return;
+var myUid = localStorage.getItem("auth_uid")||"";
+if(!myUid || !window._fbDb){ box.innerHTML='<div style="color:#999;font-size:13px;">Login ke baad dost dikhenge</div>'; return; }
+window._fbDb.ref("friends/"+myUid).once("value").then(function(snap){
+var ids = Object.keys(snap.val()||{});
+if(!ids.length){ box.innerHTML='<div style="color:#999;font-size:13px;text-align:center;">Abhi koi Accepted dost nahi hai<br>friends.html se Accept karo</div>'; return; }
+window._fbDb.ref("customer_profiles").once("value").then(function(s2){
+var all = s2.val()||{}; var h="";
+ids.forEach(function(id){
+var P = all[id]||{}; var nm = P.profileName||P.name||"Friend";
+var ph = P.profilePhoto||"";
+var pic = (ph.indexOf("http")===0||ph.indexOf("data:")===0) ? '<img src="'+ph+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">' : '<span style="font-size:22px;">👤</span>';
+h+='<label style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #f5f5f5;cursor:pointer;"><input type="checkbox" class="inboxFrChk" value="'+id+'" style="width:18px;height:18px;">'+pic+'<b style="flex:1;font-size:14px;">'+nm+'</b></label>';
+});
+box.innerHTML=h;
+});
+});
+var sel=document.getElementById('selAllFr'); if(sel) sel.onclick=function(){document.querySelectorAll('.inboxFrChk').forEach(function(c){c.checked=true;});};
+var clr=document.getElementById('clearAllFr'); if(clr) clr.onclick=function(){document.querySelectorAll('.inboxFrChk').forEach(function(c){c.checked=false;});};
+},800);      
+            
+setTimeout(function(){var _sb=document.getElementById('pfMsgSend');if(_sb){_sb.addEventListener('click',function(){var _tx=document.getElementById('pfMsgText').value||"";if(_tx.trim()===""){alert("Pehle message likho!");return;}var _sel=[]; document.querySelectorAll('.inboxFrChk:checked').forEach(function(c){_sel.push(c.value);});if(!_sel.length){alert("Pehle 1 dost select karo, ya All Friends dabao!");return;}if(window.sendChatMessage){ _sel.forEach(function(fid){ window.sendChatMessage(fid, _tx); }); }else if(window._fbDb){ var myUid2=localStorage.getItem("auth_uid")||""; _sel.forEach(function(fid){ window._fbDb.ref("chats/"+myUid2+"_"+fid).push({fromUid:myUid2,toUid:fid,text:_tx,time:Date.now(),ts:Date.now()}); window._fbDb.ref("chats/"+fid+"_"+myUid2).push({fromUid:myUid2,toUid:fid,text:_tx,time:Date.now(),ts:Date.now()}); }); }document.getElementById('inboxSentMsg').textContent="✅ "+_sel.length+" dost ko bhej diya!";document.getElementById('pfMsgText').value="";
+});
+}},500);            
 })();
 // PROFILE FULL PAGE (card par tap → poora alag page)
 (function(){
