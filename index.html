@@ -127,10 +127,13 @@ body{background:#fff8f0;color:#333}
 </style></head>
   
  
-   
- 
+<div style="background:#e65100;padding:10px;text-align:center;position:sticky;top:0;z-index:99;">
+<a href="#" onclick="return checkLogin('friends.html')" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">👥 Friends</a>
+<a href="#" onclick="return checkLogin('profile.html')" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">👤 Profile</a>
+<a href="#" onclick="return checkLogin('editprofile.html')" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">✏️ Edit</a>
+<a href="#" onclick="return checkLogin('album.html')" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">📸 Album</a>
+<a href="#" onclick="return checkLogin('timedatalist.html')" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">📅 Timeline</a>
 
-<div style="background:#e65100;padding:10px;text-align:center;position:sticky;top:0;z-index:99;"><a href="friends.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">👥 Friends</a><a href="profile.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">👤 Profile</a><a href="editprofile.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">✏️ Edit</a><a href="album.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">📸 Album</a><a href="timedatalist.html" style="color:#fff;text-decoration:none;font-weight:bold;margin:0 10px;">📅 Timeline</a></div>
     
   
 <div class="sec" id="reqSec">
@@ -367,7 +370,28 @@ friend6Chat: "", // OPTION: dost 6 ka WhatsApp number (khali = chat button nahi)
 <a id="mH" href="#">Home</a><a id="mM" href="#items">Menu</a><a id="mO" href="#">Orders</a><a id="mC" href="#ftr">Contact</a>
 </nav></header>
   <button onclick="location.href='customerlogin.html'" style="background:#7b1f;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">🔐 Customer Login</button>
-<button id="googleLoginBtn" style="background:#fff;border:2px solid #4285F4;color:#4285F4;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;margin-top:10px;">🔵 Google se Login karo</button>
+  
+
+  
+  <div id="loginCover" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:9999;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+<div style="background:#fff;padding:24px;border-radius:16px;text-align:center;width:100%;max-width:360px;">
+<div style="font-size:44px;">🔐</div>
+<b style="font-size:20px;">Login Karo</b>
+<div style="font-size:13px;color:#888;margin:8px 0 14px;">Login ke bina Friends / Album nahi dikhega</div>
+<button onclick="location.href='customerlogin.html'" style="background:#25D366;color:#fff;border:none;padding:14px;width:100%;border-radius:30px;font-weight:bold;font-size:16px;">🔐 Login Page Kholo</button>
+</div>
+</div>
+<script>
+function checkLogin(page){
+if(localStorage.getItem("auth_uid") || localStorage.getItem("customer_logged_in")==="1"){ location.href=page; return false; }
+alert("Pehle Login karo!");
+document.getElementById("loginCover").style.display="flex";
+return false;
+}
+if(!localStorage.getItem("auth_uid") && localStorage.getItem("customer_logged_in")!=="1"){
+document.getElementById("loginCover").style.display="flex";
+}
+</script>
   
 <div id="profileHead"></div>
 <section id="hero"><div id="heroIn">
@@ -1001,7 +1025,7 @@ pp.innerHTML=h;
 pp.style.display="block";document.body.style.overflow="hidden";
 var _pfb=document.getElementById('pfFullBack');if(_pfb)_pfb.addEventListener('click',function(){pp.style.display="none";document.body.style.overflow="";});
 var _plo=document.getElementById('pfFullLogout');
-if(_plo)_plo.addEventListener('click',function(){if(!confirm("Logout karein? Sab data clear ho jayega!"))return;try{localStorage.removeItem('customer_profile');localStorage.removeItem('customer_details');localStorage.removeItem('customer_thinkings');localStorage.removeItem('pfmsgs_customer1');localStorage.removeItem('diary_customer1');localStorage.removeItem('customer_logged_in');}catch(e){}try{if(window._fbDb){var _lc=(OPT&&OPT.customerId)||'customer1';_fbDb.ref('customer_profiles/'+_lc).remove();_fbDb.ref('customer_details/'+_lc).remove();_fbDb.ref('customer_thinkings/'+_lc).remove();}}catch(e){}alert('Logout ho gaya!');location.reload();});
+if(_plo)_plo.addEventListener('click',function(){if(!confirm("Logout karein?"))return;try{localStorage.removeItem('customer_logged_in');localStorage.removeItem('auth_uid');}catch(e){}alert('Logout ho gaya!');location.reload();});
 var _fm=document.getElementById('pfFullMsg');
 if(_fm)_fm.addEventListener('click',function(){pp.style.display="none";document.body.style.overflow="";var _m=document.getElementById('pfMsgText');if(_m)_m.focus();window.scrollTo(0,document.body.scrollHeight);});
 var _fe=document.getElementById('pfFullEdit');
@@ -1826,8 +1850,25 @@ location.reload();
   
 
 
+<div onclick="location.href='album.html'" style="margin:12px 16px;background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px"><b>📸 Mera Album</b><span style="color:#7b1fa2;font-size:13px">Poora Dekho ›</span></div><div id="homeAlbumPreview" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0px;padding:0px;min-height:320px"></div><div style="text-align:center;padding:6px;font-size:12px;color:#999">Tap karo - Poora Album Dekho</div></div>
+<script>
+try{
+var _isLogin = localStorage.getItem("auth_uid") || localStorage.getItem("customer_logged_in")==="1";
+if(!_isLogin){
+document.getElementById("homeAlbumPreview").innerHTML='<div style="grid-column:1/-1;height:85px;display:flex;align-items:center;justify-content:center;color:#999">🔐 Login karo - Album dekhne ke liye</div>';
+}else{
+function addPhotosFromProfile(Q,arr){if(!Q)return;if(Q.profilePhoto)arr.push(Q.profilePhoto);if(Q.photo)arr.push(Q.photo);for(var q=2;q<=15;q++){var k='profilePhoto'+q;if(Q[k])arr.push(Q[k]);}(Q.extraPhotos||[]).forEach(function(p){if(p)arr.push(p);});}
+function showHomeAlbum(list){var seen={};var u2=[];list.forEach(function(x){if(x&&!seen[x]){seen[x]=1;u2.push(x);}});var h="";if(!u2.length){h='<div style="grid-column:1/-1;height:85px;display:flex;align-items:center;justify-content:center;color:#999">Abhi koi photo nahi hai</div>';}else{for(var i=0;i<Math.min(u2.length,12);i++){h+='<div style="height:130px;overflow:hidden;background:#fff"><img src="'+u2[i]+'" style="width:100%;height:130px;object-fit:cover;object-position:top center"></div>';}}document.getElementById("homeAlbumPreview").innerHTML=h;}
+var photos=[];
+try{var P1=JSON.parse(localStorage.getItem("my_profile")||"{}");addPhotosFromProfile(P1,photos);}catch(e){}
+try{var P2=JSON.parse(localStorage.getItem("customer_profile")||"{}");addPhotosFromProfile(P2,photos);}catch(e){}
+try{var det2=JSON.parse(localStorage.getItem("customer_details")||"[]");det2.forEach(function(e){if(e&&e.photo)photos.push(e.photo);});}catch(e){}
+showHomeAlbum(photos);
+if(window.firebase){try{firebase.database().ref("customer_profiles").once("value").then(function(s){var all=[];s.forEach(function(ch){var Q=ch.val()||{};var nm=(Q.profileName||Q.name||"");var ph=(Q.profilePhone||Q.phone||"");if(nm==="Manisha"||ph==="9660834888"||ph==="8769171078"){addPhotosFromProfile(Q,all);}});if(all.length)showHomeAlbum(all);firebase.database().ref("customer_albums").once("value").then(function(s2){var alb=[];s2.forEach(function(uidNode){uidNode.forEach(function(gc){var v=gc.val();if(v&&v.url)alb.push(v.url);else if(typeof v==="string")alb.push(v);else if(v&&v.photo)alb.push(v.photo);});});if(alb.length)showHomeAlbum(all.concat(alb));});});}catch(e){}}
+}
+}catch(e){}
+</script>
 
-<div onclick="location.href='album.html'" style="margin:12px 16px;background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px"><b>📸 Mera Album</b><span style="color:#7b1fa2;font-size:13px">Poora Dekho ›</span></div><div id="homeAlbumPreview" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0px;padding:0px;min-height:520px"></div><div style="text-align:center;padding:6px;font-size:12px;color:#999">Tap karo - Poora Album Dekho</div></div><script>try{function addPhotosFromProfile(Q,arr){if(!Q)return;if(Q.profilePhoto)arr.push(Q.profilePhoto);if(Q.photo)arr.push(Q.photo);for(var q=2;q<=15;q++){var k='profilePhoto'+q;if(Q[k])arr.push(Q[k]);}(Q.extraPhotos||[]).forEach(function(p){if(p)arr.push(p);});(Q.timelinePhotos||[]).forEach(function(p){if(p)arr.push(p);});var det=Q.details||Q.customer_details||[];if(!Array.isArray(det)&&typeof det==='object')det=Object.values(det);det.forEach(function(e){if(e&&e.photo)arr.push(e.photo);});var th=Q.thinkings||Q.customer_thinkings||[];if(!Array.isArray(th)&&typeof th==='object')th=Object.values(th);th.forEach(function(e){if(e&&e.photo)arr.push(e.photo);});}function showHomeAlbum(list){var seen={};var u2=[];list.forEach(function(x){if(x&&!seen[x]){seen[x]=1;u2.push(x);}});var h="";if(!u2.length){h='<div style="grid-column:1/-1;height:85px;background:#f3e5f5;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px;border-radius:10px">Abhi koi photo nahi hai</div>';}else{for(var i=0;i<Math.min(u2.length,18);i++){h+='<div style="height:200px;border-radius:12px;overflow:hidden;background:#fff"><img src="'+u2[i]+'" style="width:100%;height:200px;object-fit:cover;object-position:top center"></div>';}}document.getElementById("homeAlbumPreview").innerHTML=h;}var P={};try{P=JSON.parse(localStorage.getItem("my_profile")||"{}");}catch(e){}var photos=[];addPhotosFromProfile(P,photos);try{var det2=JSON.parse(localStorage.getItem("customer_details")||"[]");det2.forEach(function(e){if(e&&e.photo)photos.push(e.photo);});}catch(e){}showHomeAlbum(photos);if(window.firebase){try{firebase.database().ref("customer_profiles").once("value").then(function(s){var all=[];s.forEach(function(ch){var Q=ch.val()||{};var nm=(Q.profileName||Q.name||"");var ph=(Q.profilePhone||Q.phone||"");if(nm==="Manisha"||ph==="9660834888"||ph==="8769171078"){addPhotosFromProfile(Q,all);}});if(all.length)showHomeAlbum(all);firebase.database().ref("customer_albums").once("value").then(function(s2){var alb=[];s2.forEach(function(uidNode){uidNode.forEach(function(gc){var v=gc.val();if(v&&v.url)alb.push(v.url);else if(typeof v==="string")alb.push(v);else if(v&&v.photo)alb.push(v.photo);});});if(alb.length)showHomeAlbum(all.concat(alb));});});}catch(e){}}}catch(e){}</script>
 
 
   
