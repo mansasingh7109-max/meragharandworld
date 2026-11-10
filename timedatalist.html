@@ -31,6 +31,10 @@ function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 </script>
 </head><body>
 <div id="hdr"><button onclick="history.back()">←</button><b id="ttl">📅 Timeline</b></div>
+  
+  
+    
+
 <div id="tabs">
 <button id="tD" class="on" onclick="show('d')">📝 Detail</button>
 <button id="tT" onclick="show('t')">💭 Thinking</button>
@@ -112,7 +116,10 @@ if(FRIEND_UID){
   _fbDb.ref("customer_profiles/"+FRIEND_UID).once("value").then(function(snap){
     var P=snap.val();
     if(!P){ document.getElementById('list').innerHTML='<div class="empty">❌ User nahi mila</div>'; return; }
-    var isPublic=true; try{ if(P.privacy && P.privacy.timelinePublic===false) isPublic=false; }catch(e){}
+   
+    var isPublic=true; try{ if(P.privacy_timeline==="private" || (P.privacy && P.privacy.timelinePublic===false)) isPublic=false; }catch(e){}
+
+    
     if(!isPublic){ document.getElementById('list').innerHTML='<div class="empty">🔒 Timeline private hai<br>'+esc(P.profileName||P.name||"User")+' ne public nahi kiya</div>'; return; }
     FRIEND_DATA=P;
     document.getElementById('ttl').textContent='📅 '+(P.profileName||P.name||"Friend")+' ki Timeline (Friend ki)';
@@ -127,11 +134,36 @@ if(FRIEND_UID){
       });
     });
   }).catch(function(err){ document.getElementById('list').innerHTML='<div class="empty">❌ Error: '+esc(err.message)+'</div>'; });
+  
+
 } else {
   document.getElementById('ttl').textContent='📅 Mera Timeline';
-  renderList('d');
-}
+  var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
+  if(myUid && _fbDb){
+    _fbDb.ref("customer_profiles/"+myUid).once("value").then(function(snap){
+      var P=snap.val()||{};
+      FRIEND_DATA=P;
+      FRIEND_UID=myUid;
+      (function(){var nm="";try{var PP=JSON.parse(localStorage.getItem("my_profile")||"{}");nm=PP.profileName||PP.name||localStorage.getItem("customer_name")||"";}catch(e){}var _u="";try{_u=localStorage.getItem("auth_uid")||"";}catch(e){}function sN(n){if(!n)return;document.getElementById('ttl').textContent='📅 '+n+' ki Timeline';}if(nm)sN(nm);if(_fbDb&&_u){_fbDb.ref("customer_profiles/"+_u).once("value").then(function(s){var P2=s.val()||{};var n2=P2.profileName||P2.name||P2.customer_name||nm;if(n2)sN(n2);});}})();
+      _fbDb.ref("customer_details/"+myUid).once("value").then(function(s2){
+        var extra=[]; s2.forEach(function(ch){ extra.push(ch.val()); });
+        if(extra.length>0) FRIEND_DATA.details=extra;
+        _fbDb.ref("customer_thinkings/"+myUid).once("value").then(function(s3){
+          var extra2=[]; s3.forEach(function(ch){ extra2.push(ch.val()); });
+          if(extra2.length>0) FRIEND_DATA.thinkings=extra2;
+          renderList('d');
+        });
+      });
+    });
+  } else {
+    renderList('d');
+  }
+}  
 </script>
 <script src="privacy.js"></script>
 <script>try{PRIV_placeBtn("timelinePublic","hdr");}catch(e){}</script>
+
+<script src="mydata.js"></script>  
+
+<script src="headername.js"></script>  
 </body></html>

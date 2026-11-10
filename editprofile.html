@@ -57,8 +57,17 @@ _fbDb = firebase.database();
 <body>
 <header id="hdr">
 <button class="backbtn" onclick="location.href='index.html'">←</button>
-<h1>✏️ Mera Profile Edit Karo</h1>
+
+<h1 id="ttl">✏️ Mera Profile Edit Karo</h1>
 </header>
+  </div>  <!-- Line 60 - Basic Jankari khatam -->
+
+<!-- YAHAN PASTE KARO -->
+
+<!-- Extra Photos -->  <!-- Line 62 -->
+ <!-- Privacy -->
+
+  
 <div id="wrap">
 <div class="fld">
 <div class="lbl">📸 Main Photo</div>
@@ -100,7 +109,12 @@ _fbDb = firebase.database();
 <div id="thinkList"></div>
 <button class="addentry" onclick="addThinking()">+ Thinking Entry Add Karo</button>
 </div>
-<button class="pvbtn" onclick="preview()">👁️ Preview Dekho (friends ko kaisa dikhega)</button>
+  
+
+  <button class="pvbtn" onclick="preview()">👁️ Preview Dekho (friends ko kaisa dikhega)</button><button class="pvbtn" style="background:#e65100" onclick="location.href='profile.html'">👤 View Profile</button>
+<button class="pvbtn" style="background:#7b1fa2" onclick="location.href='album.html'">📸 View Album</button>
+<button class="pvbtn" style="background:#2196F3" onclick="location.href='timedatalist.html'">📅 View Timeline</button>
+  
 <button class="savebtn" onclick="saveAll()">💾 Save Karo</button>
 <div class="note">Save karte hi sab friends ko dikhega!</div>
 <!-- ✅ FIX 1: Edit panel button AB BODY me hai (script ke andar nahi) -->
@@ -137,13 +151,21 @@ function addMainLink(){var l=document.getElementById('mainLink').value.trim();if
 document.getElementById('exFile').onchange=function(){var fs=this.files;for(var j=0;j<fs.length;j++){(function(f){var r=new FileReader();r.onload=function(e){exPhotos.push(e.target.result);renderEx();};r.readAsDataURL(f);})(fs[j]);}this.value="";};
 function addExLink(){var l=document.getElementById('exLink').value.trim();if(!l){alert("Link paste karo!");return;}exPhotos.push(l);renderEx();document.getElementById('exLink').value="";}
 function preview(){var w=window.open("","_blank","width=400,height=600");w.document.write("<h2>"+esc(document.getElementById('fName').value||"Manisha")+"</h2><p>📞 "+esc(document.getElementById('fPhone').value)+"</p><p>🟢 "+esc(document.getElementById('fStatus').value)+"</p>");}
-function saveAll(){P.name=document.getElementById('fName').value.trim();P.phone=document.getElementById('fPhone').value.trim();P.status=document.getElementById('fStatus').value.trim();P.extraPhotos=exPhotos;P.details=details;P.thinkings=thinkings;localStorage.setItem("my_profile",JSON.stringify(P));alert("✅ Save ho gaya!");location.href="profile.html";}
+function saveAll(){P.name=document.getElementById('fName').value.trim();P.phone=document.getElementById('fPhone').value.trim();P.status=document.getElementById('fStatus').value.trim();P.extraPhotos=exPhotos;P.details=details;P.thinkings=thinkings;localStorage.setItem("my_profile",JSON.stringify(P));try{ localStorage.setItem("customer_name", P.name); }catch(e){}
+try{
+  var _u=localStorage.getItem("auth_uid")||"";
+  if(_u && _fbDb){
+    _fbDb.ref("customer_profiles/"+_u).update({profileName:P.name,name:P.name,customer_name:P.name,profilePhone:P.phone,phone:P.phone,profilePhoto:P.photo||"",photo:P.photo||"",extraPhotos:exPhotos,details:details,thinkings:thinkings,updatedAt:Date.now()});
+    _fbDb.ref("customer_details/"+_u).set(details);
+    _fbDb.ref("customer_thinkings/"+_u).set(thinkings);
+  }
+}catch(e){}alert("✅ Save ho gaya!");location.href="profile.html";}
 render();
-
+try{var _ln=localStorage.getItem("customer_name")||"";if(!P.name&&_ln){P.name=_ln;document.getElementById('fName').value=_ln;}if(_ln){var _h=document.getElementById('ttl');if(_h)_h.textContent="✏️ "+_ln+" ka Profile Edit Karo";}}catch(e){}
 // ✅ FIX 2: OPT object define karo (panel code ke liye) - P se data lekar
 var OPT = {
   customerEditOn: "on",
-  customerId: "customer1",
+  customerId: (localStorage.getItem("auth_uid")||"customer1"),
   profileName: P.name || "",
   profilePhone: P.phone || "",
   profilePhoto: P.photo || "",
@@ -273,7 +295,7 @@ if(type==='detail'){if(isEdit)_ceDetails[editIdx]=entry;else _ceDetails.push(ent
 else{if(isEdit)_ceThinks[editIdx]=entry;else _ceThinks.push(entry);_renderThinkList();}
 try{localStorage.setItem("customer_details",JSON.stringify(_ceDetails));}catch(e){}
 try{localStorage.setItem("customer_thinkings",JSON.stringify(_ceThinks));}catch(e){}
-var _cidS=OPT.customerId||"customer1";
+var _cidS=localStorage.getItem("auth_uid")||OPT.customerId||"customer1";
 if(window._fbDb){try{_fbDb.ref("customer_details/"+_cidS).set(_ceDetails);}catch(e){}
 try{_fbDb.ref("customer_thinkings/"+_cidS).set(_ceThinks);}catch(e){}}
 ov.remove();});}
@@ -308,8 +330,7 @@ for(var q=2;q<=15;q++){d['profilePhoto'+q]=_cePhotos[q-2]||"";}
 try{localStorage.setItem("customer_profile",JSON.stringify(d));}
 catch(e){alert("⚠️ Photo bahut badi hai! Chhoti photo use karo. ("+e.message+")");return;}
 // ✅ FIX: my_profile me bhi sync karo (is file ka format - profile.html yahi padhta hai)
-try{localStorage.setItem("my_profile",JSON.stringify({name:d.profileName,phone:d.profilePhone,status:d.customerStatus,photo:d.profilePhoto,extraPhotos:_cePhotos,details:_ceDetails,thinkings:_ceThinks}));}catch(e){}
-var cid=OPT.customerId||"customer1";
+var cid=localStorage.getItem("auth_uid")||OPT.customerId||"customer1";
 if(window._fbDb){try{
 _fbDb.ref("customer_details/"+cid).set(_ceDetails);
 _fbDb.ref("customer_thinkings/"+cid).set(_ceThinks);
@@ -318,6 +339,33 @@ else{alert("✅ Save ho gaya (local)!");location.href="profile.html";}
 });
 setTimeout(function(){var b=document.getElementById('custEditBtn');if(b){b.addEventListener('click',_openEdit);}},800);
 })();
+</script>
+
+  <script src="mydata.js"></script>
+
+<script src="headername.js"></script>
+
+  <script>
+setTimeout(function(){try{
+var _ln="";
+try{var _mp=JSON.parse(localStorage.getItem("my_profile")||"{}");if(_mp.name)_ln=_mp.name;}catch(e){}
+if(!_ln){try{var _cl=JSON.parse(localStorage.getItem("customer_login")||"{}");_ln=_cl.name||_cl.customer_name||_cl.profileName||"";}catch(e){}}
+if(!_ln)_ln=localStorage.getItem("customer_name")||"";
+if(_ln){
+var _h=document.getElementById('ttl');if(_h)_h.textContent="✏️ "+_ln+" ka Profile Edit Karo";
+var _f=document.getElementById('fName');if(_f&&!_f.value)_f.value=_ln;
+}else{
+var _u=localStorage.getItem("auth_uid")||"";if(_u&&window._fbDb){_fbDb.ref("customer_profiles/"+_u).once("value").then(function(s){var d=s.val()||{};var _n=d.profileName||d.name||d.customer_name||"";if(_n){var _h2=document.getElementById('ttl');if(_h2)_h2.textContent="✏️ "+_n+" ka Profile Edit Karo";var _f2=document.getElementById('fName');if(_f2&&!_f2.value)_f2.value=_n;}});}
+}
+}catch(e){}},500);
+</script>
+
+<script src="privacy.js"></script>
+<script>
+try{PRIV_placeBtn("profilePublic","hdr");}catch(e){}
+try{PRIV_placeBtn("albumPublic","hdr");}catch(e){}
+try{PRIV_placeBtn("timelinePublic","hdr");}catch(e){}
+try{PRIV_placeBtn("friendsPublic","hdr");}catch(e){}
 </script>
 </body></html>
   

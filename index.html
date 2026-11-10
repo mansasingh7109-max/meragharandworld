@@ -156,6 +156,8 @@ body{background:#fff8f0;color:#333}
 <div style="background:#fff;padding:10px;display:flex;gap:8px;overflow-x:auto;white-space:nowrap;position:sticky;top:0;z-index:99;box-shadow:0 2px 6px rgba(0,0,0,.1);">
 <a href="#" onclick="return checkLogin('friends.html')" style="background:#25D366;color:#fff;text-decoration:none;font-weight:bold;padding:10px 16px;border-radius:20px;font-size:14px;">👥 Friends</a>
 <a href="#" onclick="return checkLogin('profile.html')" style="background:#2196F3;color:#fff;text-decoration:none;font-weight:bold;padding:10px 16px;border-radius:20px;font-size:14px;">👤 Profile</a>
+
+ 
 <a href="#" onclick="return checkLogin('editprofile.html')" style="background:#FF9800;color:#fff;text-decoration:none;font-weight:bold;padding:10px 16px;border-radius:20px;font-size:14px;">✏️ Edit</a>
 <a href="#" onclick="return checkLogin('album.html')" style="background:#9C27B0;color:#fff;text-decoration:none;font-weight:bold;padding:10px 16px;border-radius:20px;font-size:14px;">📸 Album</a>
 <a href="#" onclick="return checkLogin('timedatalist.html')" style="background:#E91E63;color:#fff;text-decoration:none;font-weight:bold;padding:10px 16px;border-radius:20px;font-size:14px;">📅 Timeline</a>
@@ -1924,13 +1926,11 @@ document.getElementById("homeAlbumPreview").innerHTML='<div style="grid-column:1
 function addPhotosFromProfile(Q,arr){if(!Q)return;if(Q.profilePhoto)arr.push(Q.profilePhoto);if(Q.photo)arr.push(Q.photo);for(var q=2;q<=15;q++){var k='profilePhoto'+q;if(Q[k])arr.push(Q[k]);}(Q.extraPhotos||[]).forEach(function(p){if(p)arr.push(p);});}
 function showHomeAlbum(list){var seen={};var u2=[];list.forEach(function(x){if(x&&!seen[x]){seen[x]=1;u2.push(x);}});var h="";if(!u2.length){h='<div style="grid-column:1/-1;height:85px;display:flex;align-items:center;justify-content:center;color:#999">Abhi koi photo nahi hai</div>';}else{for(var i=0;i<Math.min(u2.length,12);i++){h+='<div style="height:130px;overflow:hidden;background:#fff"><img src="'+u2[i]+'" style="width:100%;height:130px;object-fit:cover;object-position:top center"></div>';}}document.getElementById("homeAlbumPreview").innerHTML=h;}
 var photos=[];
-try{var P1=JSON.parse(localStorage.getItem("my_profile")||"{}");addPhotosFromProfile(P1,photos);}catch(e){}
-try{var P2=JSON.parse(localStorage.getItem("customer_profile")||"{}");addPhotosFromProfile(P2,photos);}catch(e){}
-try{var det2=JSON.parse(localStorage.getItem("customer_details")||"[]");det2.forEach(function(e){if(e&&e.photo)photos.push(e.photo);});}catch(e){}
 showHomeAlbum(photos);
-if(window.firebase){try{firebase.database().ref("customer_profiles").once("value").then(function(s){var all=[];s.forEach(function(ch){var Q=ch.val()||{};var nm=(Q.profileName||Q.name||"");var ph=(Q.profilePhone||Q.phone||"");if(nm==="Manisha"||ph==="9660834888"||ph==="8769171078"){addPhotosFromProfile(Q,all);}});if(all.length)showHomeAlbum(all);firebase.database().ref("customer_albums").once("value").then(function(s2){var alb=[];s2.forEach(function(uidNode){uidNode.forEach(function(gc){var v=gc.val();if(v&&v.url)alb.push(v.url);else if(typeof v==="string")alb.push(v);else if(v&&v.photo)alb.push(v.photo);});});if(alb.length)showHomeAlbum(all.concat(alb));});});}catch(e){}}
+if(window.firebase){try{firebase.database().ref("customer_profiles").once("value").then(function(s){var all=[];var myUid=localStorage.getItem("auth_uid")||"";s.forEach(function(ch){var Q=ch.val()||{};if(ch.key===myUid||Q.uid===myUid||Q.auth_uid===myUid){addPhotosFromProfile(Q,all);}});if(all.length)showHomeAlbum(photos.concat(all));firebase.database().ref("customer_albums").once("value").then(function(s2){var alb=[];s2.forEach(function(uidNode){if(uidNode.key!==myUid)return;uidNode.forEach(function(gc){var v=gc.val();if(v&&v.url)alb.push(v.url);else if(typeof v==="string")alb.push(v);else if(v&&v.photo)alb.push(v.photo);});});if(alb.length)showHomeAlbum(photos.concat(all,alb));});});}catch(e){}}
 }
 }catch(e){}
+var myUid=localStorage.getItem("auth_uid")||"";  
 </script>
 
 
@@ -2217,6 +2217,8 @@ setTimeout(paint,3000);
 })();
 </script>
 
-  
+<script src="mydata.js"></script>  
+
+<script src="headername.js"></script>  
   
 </body></html>

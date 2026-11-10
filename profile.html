@@ -67,7 +67,7 @@ function renderFriend(uid){
     if(photo) bigPhoto.innerHTML='<img src="'+photo+'">';
     var pc=(P.extraPhotos||[]).length+(photo?1:0);
     document.getElementById('brand').textContent="👤 "+name+" ka Profile";
-    var isPublic=true; try{ var priv=P.privacy||{}; if(priv.profilePublic===false) isPublic=false; }catch(e){}
+    var isPublic=true; try{ var priv=P.privacy||{}; if(P.privacy_profile==="private" || priv.profilePublic===false) isPublic=false; }catch(e){}
     var h='';
     if(!isPublic){ h+='<div style="padding:20px;text-align:center;"><div style="font-size:48px;">🔒</div><b>Ye profile private hai</b><br><br>'+name+' ne apna profile public nahi kiya.<br><br><button class="pbtn" style="background:#25D366;" onclick="sendReq(\''+uid+'\',this)">📩 Friend Request Bhejo</button></div>'; document.getElementById('pbody').innerHTML=h; return; }
     h+='<div id="alreadyBox" style="display:none;background:#e8f5e9;color:#2e7d32;font-weight:bold;padding:12px;border-radius:12px;text-align:center;margin-bottom:10px;">✅ Already Friends - Mere Dost me hai</div>';
@@ -84,16 +84,24 @@ function renderFriend(uid){
   });
 }
 function renderOwn(){
-  var p=getProfile(); var login=getLogin(); var body=document.getElementById('pbody'); var bigPhoto=document.getElementById('bigPhoto');
-  if(!login){ body.innerHTML='<div style="padding:20px;"><div style="font-size:20px;font-weight:bold;margin-bottom:10px;">🔐 Login Karo</div><p style="color:#888;font-size:14px;margin-bottom:12px;">Apna naam aur phone likho,<br>phir aapka profile dikhega</p><a class="pbtn" style="background:#7b1fa2;" href="customerlogin.html">🔐 Customer Login</a><br><a class="pbtn" style="background:#e65100;margin-top:10px;" href="editprofile.html">✏️ Profile Edit Karo</a></div>'; return; }
-  var name=esc(p.name||login.name||"Manisha"); var phone=esc(p.phone||login.phone||"9660834888"); var status=esc(p.status||p.detail||"Hi"); var photoCount=(p.extraPhotos||[]).length+(p.photo?1:0); var details=getDetails(); var thinks=getThinks();
-  if(p.photo) bigPhoto.innerHTML='<img src="'+p.photo+'">'; document.getElementById('brand').textContent="👤 Mera Profile - "+name;
-  var h='<button class="photosbtn" onclick="location.href=\'album.html\'">📸 Photos Dekho ('+photoCount+')</button>'+'<div class="pname">'+name+'</div><div class="pphone">📞 '+phone+'</div>'+'<div><span class="status-bubble">🟢 '+status+'</span></div>';
-  h+='<div style="text-align:center;margin-top:8px;"><a class="pbtn" style="background:#e65100;width:auto;display:inline-block;padding:12px 32px;" href="editprofile.html">✏️ Mera Profile Edit Karo</a></div>'+'<a class="pbtn" style="background:#7b1fa2;" href="friends.html">📩 Meri Friend Requests</a>'+'<button class="pbtn" style="background:#f44336;" onclick="logout()">🚪 Logout</button>'; body.innerHTML=h;
+  var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
+  var body=document.getElementById('pbody'); var bigPhoto=document.getElementById('bigPhoto');
+  if(!myUid){ body.innerHTML='<div style="padding:20px;">🔐 Login Karo<br><a class="pbtn" style="background:#7b1fa2;" href="customerlogin.html">🔐 Customer Login</a></div>'; return; }
+  _fbDb.ref("customer_profiles/"+myUid).once("value").then(function(snap){
+    var p=snap.val()||{};
+    var name=esc(p.profileName||p.name||""); var phone=esc(p.profilePhone||p.phone||""); var status=esc(p.status||p.detail||"Hi");
+    var photoCount=(p.extraPhotos||[]).length+(p.photo?1:0)+(p.profilePhoto?1:0);
+    if(p.photo) bigPhoto.innerHTML='<img src="'+p.photo+'">'; else if(p.profilePhoto) bigPhoto.innerHTML='<img src="'+p.profilePhoto+'">';
+    document.getElementById('brand').textContent="👤 Mera Profile - "+name;
+    var h='<button class="photosbtn" onclick="location.href=\'album.html\'">📸 Photos Dekho ('+photoCount+')</button>'+'<div class="pname">'+name+'</div><div class="pphone">📞 '+phone+'</div>'+'<div><span class="status-bubble">🟢 '+status+'</span></div>';
+    h+='<div style="text-align:center;margin-top:8px;"><a class="pbtn" style="background:#e65100;width:auto;display:inline-block;padding:12px 32px;" href="editprofile.html">✏️ Mera Profile Edit Karo</a></div>'+'<a class="pbtn" style="background:#7b1fa2;" href="friends.html">📩 Meri Friend Requests</a>'+'<button class="pbtn" style="background:#f44336;" onclick="logout()">🚪 Logout</button>'; body.innerHTML=h;
+  });
 }
-function logout(){ if(confirm("Logout?")){ try{ localStorage.removeItem("customer_logged_in"); localStorage.removeItem("auth_uid"); localStorage.removeItem("customer_login"); }catch(e){} location.href="customerlogin.html"; } }
+function logout(){ if(confirm("Logout?")){ try{ localStorage.removeItem("customer_logged_in"); localStorage.removeItem("auth_uid"); localStorage.removeItem("customer_login");localStorage.removeItem("my_profile"); localStorage.removeItem("customer_details"); localStorage.removeItem("customer_thinkings"); }catch(e){} location.href="customerlogin.html"; } }
 var fid=getUid(); if(fid){ renderFriend(fid); } else { renderOwn(); }
 </script>
 <script src="privacy.js"></script>
 <script>try{PRIV_bar("hdr",["profilePublic","detailPublic","msgPublic"]);}catch(e){}</script>
+
+ <script src="headername.js"></script> 
 </body></html>

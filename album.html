@@ -29,6 +29,9 @@ function getUid(){ var m=location.search.match(/[?&]uid=([^&]+)/); if(m) return 
 </script>
 </head><body>
 <div id="hdr"><button onclick="history.back()">←</button><b id="ttl">📸 Album</b></div>
+  
+ 
+  
 <div class="ttl" id="cnt"></div>
 <button class="pbtn" id="reqBtn" style="display:none;background:#25D366;" onclick="sendReq()">📩 Friend Request Bhejo</button>
 <div id="grid"></div>
@@ -42,41 +45,52 @@ function renderOwn(){
   if(P.photo && P.photo!==P.profilePhoto) photos.push({src:P.photo,main:false});
   for(var q=2;q<=15;q++){ var k='profilePhoto'+q; if(P[k]&&P[k]!=="") photos.push({src:P[k],main:false}); }
   (P.extraPhotos||[]).forEach(function(p){ if(p) photos.push({src:p,main:false}); });
-  document.getElementById('ttl').textContent='📸 Mera Album';
+  (function(){var nm="";try{var PP=JSON.parse(localStorage.getItem("my_profile")||"{}");nm=PP.profileName||PP.name||localStorage.getItem("customer_name")||"";}catch(e){}var _u="";try{_u=localStorage.getItem("auth_uid")||"";}catch(e){}function sN(n){if(!n)return;document.getElementById('ttl').textContent='📸 '+n+' ka Album';var b=document.querySelector('#myPrivacyBar b');if(b)b.textContent='📸 '+n+' ka Album:';}if(nm)sN(nm);if(_fbDb&&_u){_fbDb.ref("customer_profiles/"+_u).once("value").then(function(s){var P2=s.val()||{};var n2=P2.profileName||P2.name||P2.customer_name||nm;if(n2)sN(n2);});}})();
   document.getElementById('cnt').textContent='📸 Total Photos: '+photos.length;
   var grid=document.getElementById('grid');
   if(photos.length===0){ grid.innerHTML='<div class="empty">Koi photo nahi<br>Edit me jakar photo add karo</div>'; }
   else{ var h=''; for(var i=0;i<photos.length;i++){ h+='<div class="ph'+(photos[i].main?' main':'')+'"><img src="'+photos[i].src+'" onclick="openLb(this.src)"></div>'; } grid.innerHTML=h; }
 }
 function renderFriend(uid){
-  // UID kabhi screen par nahi dikhayenge
-  document.getElementById('ttl').textContent='📸 Friend ka Album';
-  document.getElementById('cnt').textContent='⏳ Friend ka album load ho raha hai...';
+  document.getElementById('ttl').textContent="📸 Friend ka Album";
+  document.getElementById('cnt').textContent="⏳ Friend ka album load ho raha hai...";
   document.getElementById('reqBtn').style.display='block';
-  if(!_fbDb){ document.getElementById('grid').innerHTML='<div class="empty">❌ Load nahi hua, dobara try karo</div>'; return; }
+  var myUid2=""; try{myUid2=localStorage.getItem("auth_uid")||"";}catch(e){}
+  if(uid!==myUid2 && typeof canSeeSection==="function"){
+    canSeeSection(uid,'album',function(can){
+      if(!can){
+        document.getElementById('ttl').textContent="📸 Friend ka Album";
+        document.getElementById('cnt').textContent="🔒 Album Private Hai";
+        document.getElementById('grid').innerHTML='<div class="empty">🔒 Album private hai<br>Friend banne ke baad dikhega</div><div style="text-align:center"><button onclick="followUser(\''+uid+'\',function(m){alert(m);})" style="background:#7b1fa2;color:#fff;padding:12px 24px;border-radius:20px;border:none;font-weight:bold">➕ Follow</button></div>';
+        return;
+      }
+      loadFriendAlbumData(uid);
+    });
+    return;
+  }
+  loadFriendAlbumData(uid);
+}
+function loadFriendAlbumData(uid){
   _fbDb.ref("customer_profiles/"+uid).once("value").then(function(snap){
-    var P=snap.val();
-    if(!P){ document.getElementById('grid').innerHTML='<div class="empty">❌ User nahi mila</div>'; return; }
+    var P=snap.val()||{};
     var name=P.profileName||P.name||"Friend";
-    var isPublic=true; try{ if(P.privacy && P.privacy.albumPublic===false) isPublic=false; }catch(e){}
-    if(!isPublic){ document.getElementById('ttl').textContent='📸 '+name+' ka Album'; document.getElementById('cnt').textContent='🔒 Album Private Hai'; document.getElementById('grid').innerHTML='<div class="empty">🔒 '+name+' ne apna album private kiya hai<br>Friend banne ke baad dikhega</div>'; return; }
-    document.getElementById('ttl').textContent='📸 '+name+' ka Album (Friend ka)';
+    document.getElementById('ttl').textContent="📸 "+name+" ka Album (Friend ka)";
     var photos=[];
     if(P.profilePhoto) photos.push({src:P.profilePhoto,main:true});
     if(P.photo && P.photo!==P.profilePhoto) photos.push({src:P.photo,main:false});
-    for(var q=2;q<=15;q++){ var k='profilePhoto'+q; if(P[k]&&P[k]!=="") photos.push({src:P[k],main:false}); }
+    for(var q=2;q<=15;q++){ var k='profilePhoto'+q; if(P[k] && P[k]!=="") photos.push({src:P[k],main:false}); }
     (P.extraPhotos||[]).forEach(function(p){ if(p) photos.push({src:p,main:false}); });
-    _fbDb.ref("customer_albums/"+uid).once("value").then(function(s2){s2.forEach(function(ch){var v=ch.val();var u="";if(v&&v.url)u=v.url;else if(typeof v==="string")u=v;else if(v&&v.photo)u=v.photo;if(u)photos.push({src:u,main:false});});document.getElementById('cnt').textContent='📸 Total Photos: '+photos.length+' ('+name+' ka)';var grid2=document.getElementById('grid');var h2='';for(var j=0;j<photos.length;j++){h2+='<div class="ph'+(photos[j].main?' main':'')+'"><img src="'+photos[j].src+'" onclick="openLb(this.src)"></div>';}grid2.innerHTML=h2;}).catch(function(){});
-    document.getElementById('cnt').textContent='📸 Total Photos: '+photos.length+' ('+name+' ka)';
-    var grid=document.getElementById('grid');
-    if(photos.length===0){ grid.innerHTML='<div class="empty">📸 Koi public photo nahi hai<br>'+name+' ne abhi photo add nahi ki</div>'; }
-    else{ var h=''; for(var i=0;i<photos.length;i++){ h+='<div class="ph'+(photos[i].main?' main':'')+'"><img src="'+photos[i].src+'" onclick="openLb(this.src)"></div>'; } grid.innerHTML=h; }
-  }).catch(function(){
-    // permission_denied ya koi bhi error -> private dikhao, UID/error mat dikhao
-    document.getElementById('cnt').textContent='🔒 Album Private Hai';
-    document.getElementById('grid').innerHTML='<div class="empty">🔒 Album private hai ya load nahi hua<br>Friend banne ke baad dikhega</div>';
-  });
+    _fbDb.ref("customer_albums/"+uid).once("value").then(function(s2){
+      s2.forEach(function(ch){ var v=ch.val(); var u=""; if(v&&v.url)u=v.url; else if(typeof v==="string")u=v; else if(v&&v.photo)u=v.photo; if(u) photos.push({src:u,main:false}); });
+      document.getElementById('cnt').textContent="📸 Total Photos: "+photos.length+" ("+name+" ka)";
+      var grid2=document.getElementById('grid');
+      if(photos.length===0){ grid2.innerHTML='<div class="empty">📸 Koi public photo nahi hai<br>'+name+' ne abhi photo add nahi ki</div>'; }
+      else{ var h2=''; for(var j=0;j<photos.length;j++){ h2+='<div class="ph'+(photos[j].main?' main':'')+'"><img src="'+photos[j].src+'" onclick="openLb(this.src)"></div>'; } grid2.innerHTML=h2; }
+    }).catch(function(){});
+  }).catch(function(){});
 }
+
+  
 function sendReq(){
   var uid=getUid(); var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
   if(!myUid){alert("Pehle login karo!"); location.href="customerlogin.html"; return;}
@@ -86,4 +100,10 @@ function openLb(src){document.getElementById('lbImg').src=src;document.getElemen
 var fid=getUid();
 if(fid){ renderFriend(fid); } else { renderOwn(); }
 </script>
+<script src="headername.js"></script>
+<script src="mydata.js"></script>  
+
+<script src="privacy.js"></script>
+<script>try{PRIV_placeBtn("albumPublic","hdr");}catch(e){}</script>
+  
 </body></html>
