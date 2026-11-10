@@ -24,6 +24,10 @@
 :where(code, pre, kbd, samp) {
   font-family: "Optimistic Mono", ui-monospace, monospace;
 }
+
+body{background:#FCE4EC !important;margin:0;padding:0;}  
+.sec{background:transparent !important;box-shadow:none !important;}    
+    
 </style><meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   
@@ -75,7 +79,7 @@ body{background:#fff8f0;color:#333}
 #nav{display:flex;gap:14px}
 #nav a{text-decoration:none;color:#e65100;font-weight:bold;font-size:15px;padding:6px 8px}
 #nav a:active{background:#ffe0b2;border-radius:6px}
-#hero{background:linear-gradient(135deg,#ff7043,#e65100);color:#fff;padding:40px 20px;border-radius:0 0 24px 24px}
+#hero{background:linear-gradient(135deg,#ff7,#e65100);color:#fff;padding:40px 20px;border-radius:0 0 24px 24px}
 #hero h1{font-size:32px;margin-bottom:8px}
 #hero p{font-size:16px;margin-bottom:16px}
 .btn2{display:inline-block;background:#25D366;color:#fff;font-weight:bold;padding:12px 24px;border-radius:30px;text-decoration:none;font-size:16px}
@@ -157,7 +161,7 @@ body{background:#fff8f0;color:#333}
 <a href="#" onclick="return checkLogin('timedatalist.html')" style="background:#E91E63;color:#fff;text-decoration:none;font-weight:bold;padding:10px 16px;border-radius:20px;font-size:14px;">📅 Timeline</a>
 </div>
 <div style="background:#e65100;padding:10px;text-align:center;">
-<b style="color:#fff;font-size:18px;">📩 Meri Friend Requests</b>
+<b style="color:#FF9800;font-size:18px;">📩 Meri Friend Requests</b>
 </div>   
 
   
@@ -226,14 +230,14 @@ col4Width: "auto",
 row1Height: "auto",
 row2Height: "auto",
 boxCount: "1",
-box1Text: " make friends and chat and share your thinking !",
+box1Text: " ",
 box1Shape: "round",
 box1Pos: "center",
-box1Detail: "make new friends connect friends .",
-box2Text: "Offer: 2 pizza par 1 cold drink free!",
+box1Detail: " ",
+box2Text: "happiness!",
 box2Shape: "rectangle",
 box2Pos: "left",
-box2Detail: "Box 2 ka lamba detail yahan likho.",
+box2Detail: "smile",
 box3Text: "Timing: Subah 10 se raat 10 tak khula hai.",
 box3Shape: "square",
 box3Pos: "right",
@@ -389,7 +393,10 @@ friend6Chat: "", // OPTION: dost 6 ka WhatsApp number (khali = chat button nahi)
 
 
 
-<h1 id="siteTitleHead" style="background:#FFF176;color:#BA68C8;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">mera ghar and world</h1>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<h1 id="siteTitleHead" style="background:#FFFF00;color:#BA68C8;border:none;padding:50px 28px;border-radius:24px;font-weight:700;font-size:40px;width:100%;text-align:right;margin:0;font-family:'Dancing Script',cursive;font-style:italic;transform:skewX(-10deg);-webkit-text-stroke:2.6px #AD1457;text-shadow:1.5px 0 0 #BA68C8, -0.5px 0 0 #BA68C8;letter-spacing:1px;">MERA GHAR AND WORLD</h1>
+  
+
   
 <div id="brand"></div>
 <nav id="nav">
@@ -423,11 +430,11 @@ document.getElementById("loginCover").style.display="flex";
 <section id="hero"><div id="heroIn">
 
 
-<h1 id="siteTitleHead" style="background:#FFF176;color:#0000FF;border:none;padding:10px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">make friends and chat and share your thinking !........ mera ghar and world</h1>
+<h1 id="siteTitleHead" style="background:#B3E5FC;color:#F48FB1;border:none;padding:10px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">Make Friends And Chat And Share Your Thinking !........ Mera Ghar And World</h1>
   
-<h1 id="siteTitleHead2" style="background:#FFF176;color:#0000FF;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">make friends connect with friends</h1>
-<h1 id="helloHead" style="background:#FFF176;color:#0000FF;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">hello</h1>
-<a id="ordBtn" class="btn2" href="https://wa.me/918769171078">Order on WhatsApp</a>
+<h1 id="siteTitleHead2" style="background:#C8E6C9;color:#F48F;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">Make Friends Connect With Friends</h1>
+<h1 id="helloHead" style="background:#F8BBD0;color:#4A148C;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">WELCOME</h1>
+<a id="ordBtn" class="btn2" href="#" onclick="window.scrollTo(0,0);return false;">🏠 Home</a>
 </div></section>
 <div id="profileTop"></div>
 <section id="infobox" style="padding:0 20px"></section>
@@ -436,8 +443,9 @@ document.getElementById("loginCover").style.display="flex";
 <section id="friends" style="padding:10px 20px"></section>
 <footer id="ftr">
 <b></b> <br><br>
-<a class="btn2" href="https://wa.me/918769171078">WhatsApp: 8769171078</a><br><br>
-<span style="font-size:12px">meragharandworld.web.app</span>
+
+
+<a href="https://meragharandworld.web.app" style="display:none;">https://meragharandworld.web.app</a>
 <div id="profile"></div>
 </footer>
 
@@ -835,7 +843,7 @@ while(1){if(i>_bc)break;var tx=OPT['box'+i+'Text'];if(tx===undefined)break;
 var sh=OPT['box'+i+'Shape'],ps=OPT['box'+i+'Pos'],dt=OPT['box'+i+'Detail'];
 var br="28px";if(sh==="square")br="0px";else if(sh==="rectangle")br="12px";
 var jf="center";if(ps==="left")jf="flex-start";else if(ps==="right")jf="flex-end";
-h+='<div style="display:flex;justify-content:'+jf+';margin-top:12px"><div style="width:85%;background:#fff3e0;border:2px solid #e65100;padding:14px;border-radius:'+br+'"><b style="color:#e65100">Welcome '+i+'</b><br><span style="font-size:14px">'+tx+'</span>'+(dt?'<br><br><span style="font-size:13px;color:#555">'+dt+'</span>':'')+'</div></div>';i++;}
+h+='<div style="display:flex;justify-content:'+jf+';margin-top:12px"><div style="width:85%;background:#fff3e0;border:2px solid #e65100;padding:14px;border-radius:'+br+'"><b style="color:#e65100">👋 </b><br><span style="font-size:14px">'+tx+'</span>'+(dt?'<br><br><span style="font-size:13px;color:#555">'+dt+'</span>':'')+'</div></div>';i++;}
 document.getElementById('infobox').innerHTML=h;})();
 var items=[],_d=1;
 while(1){var dn=OPT['dish'+_d+'Name'];if(dn===undefined)break;
@@ -998,7 +1006,7 @@ ids.forEach(function(id){
 var P = all[id]||{}; var nm = P.profileName||P.name||"Friend";
 var ph = P.profilePhoto||"";
 var pic = (ph.indexOf("http")===0||ph.indexOf("data:")===0) ? '<img src="'+ph+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">' : '<span style="font-size:22px;">👤</span>';
-h+='<label style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #f5f5f5;cursor:pointer;"><input type="checkbox" class="inboxFrChk" value="'+id+'" style="width:18px;height:18px;">'+pic+'<b style="flex:1;font-size:14px;">'+nm+'</b></label>';
+h+='<label style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #F48F;cursor:pointer;"><input type="checkbox" class="inboxFrChk" value="'+id+'" style="width:18px;height:18px;">'+pic+'<b style="flex:1;font-size:14px;;color:#F48F;font-weight:700;">'+nm+'</b>">'+nm+'</b></label>';
 });
 box.innerHTML=h;
 });
@@ -2038,8 +2046,177 @@ document.getElementById('googleLoginBtn').addEventListener('click', function(){
 
 
 
-
   
 </script>
+  
+
+
+<script>
+(function(){
+  function fix(){
+    document.documentElement.style.setProperty("background","#FFE8CC","important");
+    document.body.style.setProperty("background","#FFE8CC","important");
+    // yellow box dhoondho
+    var all = document.querySelectorAll("*");
+    for(var i=0;i<all.length;i++){
+      var el = all[i];
+      // sirf wo element jisme "mera ghar and world" likha hai
+      if(el.children.length===0 && el.textContent && el.textContent.trim()==="mera ghar and world"){
+        // uske saare maa-baap (parent, grand-parent...) ko paint karo
+        // yellow box khud ko chhod ke
+        var p = el.parentElement;
+        while(p && p!==document.documentElement){
+          p.style.setProperty("background","#FFE8CC","important");
+          p.style.setProperty("box-shadow","none","important");
+          p = p.parentElement;
+        }
+        break;
+      }
+    }
+  }
+  fix();
+  setTimeout(fix,500); setTimeout(fix,1500); setTimeout(fix,3000);
+  new MutationObserver(fix).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+<script>
+(function(){
+  function paint(){
+    document.documentElement.style.background="#F8BBD0";
+    document.body.style.setProperty("background","#F8BBD0","important");
+    var els=document.querySelectorAll("div,section,main,article");
+    for(var i=0;i<els.length;i++){
+      var cs=window.getComputedStyle(els[i]).backgroundColor;
+      if(cs==="rgb(255, 255, 255)"||cs==="rgb(255, 248, 240)"||cs==="rgb(245, 245, 245)"||cs==="rgb(249, 249, 249)"){
+        els[i].style.setProperty("background","#FFF0F5","important");
+        els[i].style.boxShadow="none";
+      }
+    }
+  }
+  paint();
+  setTimeout(paint,500); setTimeout(paint,1500); setTimeout(paint,3000);
+  new MutationObserver(paint).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+
+<script>
+(function(){
+  function fix(){
+    var h = document.getElementById("siteTitleHead");
+    if(!h) return;
+    // h1 ke peeche wala dabba + uske upar wale saare dabbe
+    var p = h.parentElement;
+    while(p){
+      p.style.setProperty("background","#FCE4EC","important");
+      p.style.setProperty("box-shadow","none","important");
+      p = p.parentElement;
+    }
+    document.body.style.setProperty("background","#F8BBD0","important");
+    document.documentElement.style.setProperty("background","#EDE7F6","important");
+  }
+  fix();
+  setTimeout(fix,500); setTimeout(fix,1500);
+})();
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+ <script>
+(function(){
+  var all=document.querySelectorAll("div");
+  for(var i=0;i<all.length;i++){
+    if(all[i].textContent.indexOf("make friends and chat")!==-1 && all[i].textContent.length<300){
+      var box=all[i];
+      if(box.parentElement) box=box.parentElement;
+      box.style.setProperty("background","lightgreen","important");
+      box.style.setProperty("color","darkgreen","important");
+      break;
+    }
+  }
+})();
+</script> 
+
+
+
+ <script>
+(function(){
+function paint(){
+var b=document.querySelector("#infobox div div");
+if(!b) return;
+b.innerHTML=b.innerHTML.replace("Welcome 1","Welcome");
+b.style.setProperty("background","lightgreen","important");
+b.style.setProperty("border","2px solid darkgreen","important");
+b.style.setProperty("color","darkgreen","important");
+b.style.setProperty("width","100%","important");
+b.style.setProperty("margin","0px","important");
+// bahar wala pink dabba bhi green karo
+var p=b.parentElement;
+if(p){
+p.style.setProperty("background","lightgreen","important");
+p.style.setProperty("padding","0px","important");
+p.style.setProperty("margin","0px","important");
+}
+var all=b.querySelectorAll("b,span");
+for(var i=0;i<all.length;i++){
+all[i].style.setProperty("color","darkgreen","important");
+}
+}
+paint();
+setTimeout(paint,500);
+setTimeout(paint,1500);
+setTimeout(paint,3000);
+})();
+</script>
+
+
+
+<script>
+(function(){
+function paint(){
+var boxes=document.querySelectorAll("#infobox > div > div");
+if(!boxes.length) return;
+// Yahan har box ka alag colour hai - sirf yahan badalna hai
+var cols=[
+["lightgreen","darkgreen"],
+["lightblue","darkyellow"],
+["lightgreen","darkgreen"],
+["lightyellow","darkorange"],
+["lavender","purple"],
+["lightcyan","teal"]
+];
+for(var i=0;i<boxes.length;i++){
+var b=boxes[i];
+var c=cols[i]||cols[0];
+b.innerHTML=b.innerHTML.replace("Welcome "+(i+1),"Welcome");
+b.style.setProperty("background",c[0],"important");
+b.style.setProperty("border","2px solid "+c[1],"important");
+b.style.setProperty("color",c[1],"important");
+b.style.setProperty("width","100%","important");
+b.style.setProperty("margin","0px","important");
+var p=b.parentElement;
+if(p){p.style.setProperty("background",c[0],"important");p.style.setProperty("padding","0px","important");p.style.setProperty("margin","0px","important");}
+var all=b.querySelectorAll("b,span");
+for(var j=0;j<all.length;j++){all[j].style.setProperty("color",c[1],"important");}
+}
+}
+paint();
+setTimeout(paint,500);
+setTimeout(paint,1500);
+setTimeout(paint,3000);
+})();
+</script>
+
+  
   
 </body></html>
