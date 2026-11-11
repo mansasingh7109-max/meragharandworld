@@ -37,18 +37,15 @@ textarea.inp{resize:vertical;min-height:70px}
 <script>
 // ===== FIREBASE CONFIG =====
 var FIREBASE_CONFIG = {
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
   apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
   authDomain: "santramarketshoppingmall.firebaseapp.com",
   databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
   projectId: "santramarketshoppingmall",
   storageBucket: "santramarketshoppingmall.firebasestorage.app",
   messagingSenderId: "398490252924",
-  appId: "1:398490252924:web:8e85fdabd76ec86e3b7bf9",
-  measurementId: "G-D6079MBJ3C"
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"
 };
-
 var _fbDb = null;
 try {
 if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "") {
@@ -87,7 +84,7 @@ _fbDb = firebase.database();
 <div class="addrow">
 <label class="upbtn">📤 Photo Add<input type="file" id="exFile" accept="image/*" multiple style="display:none"></label>
 <input class="inp" id="exLink" placeholder="ya link paste karo">
-
+<button class="plusbtn" onclick="addExLink()">+</button>
 </div>
 </div>
 <div class="fld">
@@ -120,7 +117,8 @@ _fbDb = firebase.database();
   
 <button class="savebtn" onclick="saveAll()">💾 Save Karo</button>
 <div class="note">Save karte hi sab friends ko dikhega!</div>
-
+<!-- ✅ FIX 1: Edit panel button AB BODY me hai (script ke andar nahi) -->
+<button id="custEditBtn" style="background:#e65100;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:14px;width:100%;margin-top:12px;cursor:pointer;">✏️ Edit Panel Kholo</button>
 </div>
 <script>
 var P={};try{P=JSON.parse(localStorage.getItem("my_profile")||"{}");}catch(e){P={};}
