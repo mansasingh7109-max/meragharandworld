@@ -84,7 +84,8 @@ _fbDb = firebase.database();
 <div class="addrow">
 <label class="upbtn">📤 Photo Add<input type="file" id="exFile" accept="image/*" multiple style="display:none"></label>
 <input class="inp" id="exLink" placeholder="ya link paste karo">
-<button class="plusbtn" onclick="addExLink()">+</button>
+<!-- ✅ FIX 1: Edit panel button AB BODY me hai (script ke andar nahi) -->
+<button id="custEditBtn" style="background:#e65100;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:14px;width:100%;margin-top:12px;cursor:pointer;">✏️ Edit Panel Kholo</button><button class="plusbtn" onclick="addExLink()">+</button>
 </div>
 </div>
 <div class="fld">
@@ -117,8 +118,7 @@ _fbDb = firebase.database();
   
 <button class="savebtn" onclick="saveAll()">💾 Save Karo</button>
 <div class="note">Save karte hi sab friends ko dikhega!</div>
-<!-- ✅ FIX 1: Edit panel button AB BODY me hai (script ke andar nahi) -->
-<button id="custEditBtn" style="background:#e65100;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:14px;width:100%;margin-top:12px;cursor:pointer;">✏️ Edit Panel Kholo</button>
+
 </div>
 <script>
 var P={};try{P=JSON.parse(localStorage.getItem("my_profile")||"{}");}catch(e){P={};}
