@@ -33,7 +33,19 @@ textarea.inp{resize:vertical;min-height:80px}
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
-var FIREBASE_CONFIG = { apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA", authDomain: "santramarketshoppingmall.firebaseapp.com", databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com", projectId: "santramarketshoppingmall", storageBucket: "santramarketshoppingmall.firebasestorage.app", messagingSenderId: "398490252924", appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9" };
+var FIREBASE_CONFIG = {
+
+  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:8e85fdabd76ec86e3b7bf9",
+  measurementId: "G-D6079MBJ3C"
+};
+
+
 var _fbDb=null; try{ firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database(); }catch(e){}
 function getUid(){ var m=location.search.match(/[?&]uid=([^&]+)/); if(m) return decodeURIComponent(m[1]); m=location.search.match(/[?&]cid=([^&]+)/); return m?decodeURIComponent(m[1]):""; }
 </script>
