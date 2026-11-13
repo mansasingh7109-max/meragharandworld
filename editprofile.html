@@ -34,6 +34,9 @@ textarea.inp{resize:vertical;min-height:70px}
 </style></head>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="friend-data.js"></script>
+  <script src="clean.js"></script>
+</body>
 <script>
 // ===== FIREBASE CONFIG =====
 var FIREBASE_CONFIG = {
@@ -45,6 +48,7 @@ var FIREBASE_CONFIG = {
   messagingSenderId: "398490252924",
   appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
   measurementId: "G-M3YK28NTT0"
+
 };
 var _fbDb = null;
 try {
@@ -367,5 +371,10 @@ try{PRIV_placeBtn("albumPublic","hdr");}catch(e){}
 try{PRIV_placeBtn("timelinePublic","hdr");}catch(e){}
 try{PRIV_placeBtn("friendsPublic","hdr");}catch(e){}
 </script>
+
+<script src="connect.js"></script>  
+
+<script src="view.js"></script>
+  
 </body></html>
   

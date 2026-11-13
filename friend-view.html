@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="hi"><head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Friend ka Profile</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#fffaf3;color:#333}
+#hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
+.backbtn{background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px;text-decoration:none}
+#brand{font-size:19px;font-weight:bold;flex:1;text-align:center}
+#wrap{max-width:600px;margin:0 auto;padding:14px}
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0 12px}
+.tab{background:#0a9d4e;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:bold;cursor:pointer}
+.tab.off{background:#fff;color:#0a9d4e;border:1px solid #0a9d4e}
+.card{background:#fff;border-radius:20px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.top{display:flex;gap:14px;align-items:flex-start}
+.topLeft{flex:1}
+.pname{font-size:26px;font-weight:bold}
+.pphone{color:#555;margin-top:4px}
+.status{display:inline-block;background:#d9f2e3;border-radius:20px;padding:7px 14px;margin:10px 0;font-size:14px}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{background:#f1f1f1;border-radius:14px;padding:5px 10px;font-size:12px;font-weight:bold}
+.photoBox{text-align:center;flex-shrink:0}
+.bigPhoto{width:110px;height:110px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden;border:3px solid #ffcc80}
+.bigPhoto img{width:100%;height:100%;object-fit:cover}
+.miniBtn{background:#e65100;color:#fff;border:none;padding:7px 12px;border-radius:18px;font-weight:bold;font-size:12px;cursor:pointer;margin-top:6px}
+h3{margin:18px 0 8px;color:#111}
+.oldRow{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.oldCard{min-width:110px;text-align:center}
+.oldCard img{width:110px;height:90px;object-fit:cover;border-radius:10px}
+.oldCard .lbl{font-size:11px;color:#666;margin:4px 0}
+.detailRow{display:flex;justify-content:space-between;gap:10px;background:#fff8f0;border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px}
+.thinkRow{display:flex;justify-content:space-between;gap:10px;background:#fff7cc;border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px}
+.pdetailRow{display:flex;justify-content:space-between;align-items:center;background:#fff8f0;border-radius:10px;padding:10px;margin-bottom:6px;font-size:14px}
+.bigBtn{display:block;width:100%;padding:14px;border:none;border-radius:26px;font-weight:bold;font-size:15px;color:#fff;cursor:pointer;margin-top:10px;text-decoration:none;text-align:center;box-sizing:border-box}
+.note{text-align:center;color:#999;font-size:12px;margin-top:8px}
+.friendCard{display:flex;gap:10px;align-items:center;background:#fff8f0;border-radius:14px;padding:10px;margin-bottom:8px}
+.friendCard img{width:48px;height:48px;border-radius:50%;object-fit:cover;background:#ffe0b2}
+.friendCard .fbtn{margin-left:auto;background:#0a9d4e;color:#fff;border:none;padding:7px 12px;border-radius:16px;font-weight:bold;cursor:pointer}
+.lock{color:#999;font-size:13px}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="friend-data.js"></script>
+  <script>
+// ===== FIREBASE CONFIG (apni keys yahan bharo) =====
+var FIREBASE_CONFIG = {
+apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"  
+};
+
+var _fbDb = null;
+try {
+if (FIREBASE_CONFIG.apiKey !== "TUMHARI_API_KEY") {
+firebase.initializeApp(FIREBASE_CONFIG);
+_fbDb = firebase.database();
+}
+} catch(e) { console.log("Firebase nahi laga:", e); }
+</script>
+<script src="connect.js"></script>
+</head><body>
+<header id="hdr"><a class="backbtn" href="friends.html">← Back</a><div id="brand">👤 Friend ka Profile</div><div style="width:64px"></div></header>
+<div id="wrap">
+<div class="tabs">
+<button class="tab" id="tabProfile" onclick="showTab('profile')">Profile</button>
+<button class="tab off" id="tabAlbum" onclick="showTab('album')">Album</button>
+<button class="tab off" id="tabTimeline" onclick="showTab('timeline')">Timeline</button>
+<button class="tab off" id="tabFriends" onclick="showTab('friends')">Friends List</button>
+</div>
+
+<!-- PROFILE TAB - sirf Public -->
+<div id="secProfile" class="card">
+<div class="top"><div class="topLeft">
+<div class="pname" id="showName">—</div><div class="pphone" id="showPhone">—</div>
+<div><span class="status" id="showStatus">Hi</span></div>
+<div class="pills"><span class="pill" id="photoCount">📸 0 Photos</span><span class="pill">🟢 Status</span><span class="pill">💭 Thinking</span></div>
+</div>
+<div class="photoBox"><div class="bigPhoto" id="bigPhoto">👩</div></div></div>
+
+<h3>Personal Details <span style="font-size:11px;color:#999">(sirf Public)</span></h3>
+<div id="personalRows"></div>
+
+<h3>📝 Detail <span style="font-size:11px;color:#999">(sirf Public)</span></h3>
+<div id="detailList"></div>
+
+<h3>💭 Thinking <span style="font-size:11px;color:#999">(sirf Public)</span></h3>
+<div id="thinkList"></div>
+
+<!-- FRIEND VIEW ME KOI EDIT / ADD / DELETE NAHI - sirf ye 2 button -->
+<button class="bigBtn" style="background:#25D366" id="btnReq" onclick="sendReq()">📩 Friend Request Bhejo</button>
+<a class="bigBtn" style="background:#e65100" id="btnChat" href="friends.html">💬 Chat Karo</a>
+<div class="note">🔒 Private data yahan kabhi nahi dikhega • Edit / Add / Delete / Share / Logout yahan nahi hai</div>
+</div>
+
+<!-- ALBUM TAB - sirf Public Photos -->
+<div id="secAlbum" class="card" style="display:none">
+<h3 style="margin-top:0">📸 <span id="albumTitle">Friend ka Album</span></h3>
+<div id="albumMain"></div>
+<h3>Old Profile Photos</h3>
+<div class="oldRow" id="oldPhotos"></div>
+<div class="note" id="albumNote">Sirf Public Photos dikh rahi hain.</div>
+</div>
+
+<!-- TIMELINE TAB - Detail + Thinking date-wise, sirf Public -->
+<div id="secTimeline" class="card" style="display:none">
+<h3 style="margin-top:0">📅 <span id="timelineTitle">Friend ki Timeline</span></h3>
+<div id="timelineList"></div>
+</div>
+
+<!-- FRIENDS LIST TAB - dost ke Public Friends -->
+<div id="secFriends" class="card" style="display:none">
+<h3 style="margin-top:0">👥 <span id="friendsTitle">Friend ke Dost</span></h3>
+<div id="friendsList"><div class="lock">⏳ Load ho raha hai...</div></div>
+<div class="note">Sirf un doston ke naam dikhenge jinhone apna Friends List Public rakha hai.</div>
+</div>
+
+</div>
+
+<script>
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function myUid(){try{return localStorage.getItem("auth_uid")||"";}catch(e){return "";}}
+function friendUid(){var m=location.search.match(/[?&](uid|cid)=([^&]+)/);return m?decodeURIComponent(m[2]):"";}
+function getDb(){try{if(typeof _fbDb!=="undefined"&&_fbDb)return _fbDb;if(window._fbDb)return window._fbDb;if(typeof firebase!=="undefined"&&firebase.apps&&firebase.apps.length)return firebase.database();}catch(e){}return null;}
+function toArr(v){ if(Array.isArray(v)) return v; if(v && typeof v==="object") return Object.keys(v).map(function(k){return v[k];}); return []; }
+
+function showTab(t){
+  ["Profile","Album","Timeline","Friends"].forEach(function(k){
+    var btn=document.getElementById("tab"+k); if(btn) btn.classList.add("off");
+    var sec=document.getElementById("sec"+k); if(sec) sec.style.display="none";
+  });
+  document.getElementById("tab"+t).classList.remove("off");
+  document.getElementById("sec"+t).style.display="block";
+  if(t==="Friends") loadFriendList();
+}
+function isPublic(priv,key){
+  if(!priv) return true;
+  if(priv[key]==="private") return false;
+  if(priv[key+"Public"]==="off") return false;
+  if(priv[key]==="public") return true;
+  return true;
+}
+function sendReq(){
+  var my=myUid(), f=friendUid(); if(!my){alert("Pehle login karo!");location.href="customerlogin.html";return;}
+  var db=getDb(); if(!db){alert("Firebase nahi");return;}
+  var myName="User"; try{myName=localStorage.getItem("customer_name")||localStorage.getItem("customer_username")||my;}catch(e){}
+  db.ref("friend_requests/"+f).push({fromUid:my,fromName:myName,time:Date.now(),status:"pending"},function(err){
+    if(!err){var b=document.getElementById("btnReq");b.textContent="✅ Request Bheji!";b.disabled=true;b.style.background="#999";alert("✅ Request bhej di!");}
+  });
+  try{db.ref("friend_requests_sent/"+my+"/"+f).set({time:Date.now()});}catch(e){}
+}
+var FRIEND_PROFILE=null;
+function renderFriend(){
+  var f=friendUid(), my=myUid();
+  if(!f){document.getElementById("wrap").innerHTML='<div style="padding:30px;text-align:center"><b>❌ Koi Friend ID nahi mili</b><p style="color:#666;margin:10px 0;">Link aisa hona chahiye:<br>friend-view.html?uid=DOST_KI_ID</p></div>';return;}
+  if(my && f===my){document.getElementById("wrap").innerHTML='<div style="padding:30px;text-align:center"><b>👤 Ye tumhari apni ID hai</b><p style="color:#666;margin:10px 0;">Apna profile dekhne ke liye profile.html kholo.<br>Yahan sirf dost ka profile dikhega.</p><a href="profile.html" style="display:inline-block;background:#e65100;color:#fff;padding:12px 28px;border-radius:24px;text-decoration:none;font-weight:bold;">Mera Profile Kholo</a></div>';return;}
+  var db=getDb(); if(!db){document.getElementById("wrap").innerHTML='<div style="padding:30px;text-align:center">❌ Firebase nahi hai - connect.js check karo</div>';return;}
+  document.getElementById("brand").textContent="👤 Friend ka Profile - load ho raha...";
+  db.ref("customer_profiles/"+f).once("value").then(function(s){
+    var P=s.val()||{}; FRIEND_PROFILE=P;
+    var priv=P.privacy||{};
+    // Agar poora profile Private hai to sirf Request dikhao
+    if(priv.profile==="private"||priv.profilePublic==="off"||priv.profilePublic===false){
+      document.getElementById("wrap").innerHTML='<div style="padding:30px;text-align:center"><div style="font-size:48px">🔒</div><b>Ye profile Private hai</b><p style="color:#666;margin:10px 0;">'+esc(P.profileName||P.name||"Friend")+' ne apna profile Public nahi kiya.</p><button onclick="sendReq()" style="background:#25D366;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;">📩 Friend Request Bhejo</button></div>';
+      return;
+    }
+    var nm=P.profileName||P.name||P.customer_name||"Friend";
+    document.getElementById("brand").textContent="👤 "+nm+" ka Profile";
+    document.getElementById("showName").textContent=nm;
+    // Phone - sirf Public ho to
+    document.getElementById("showPhone").textContent = isPublic(priv,"phone") && (P.phone||P.profilePhone) ? "📞 "+(P.phone||P.profilePhone) : "";
+    document.getElementById("showStatus").textContent="🟢 "+(P.status||P.detail||"Hi");
+    // Main Photo - sirf Public ho to
+    var photo=P.profilePhoto||P.photo||"";
+    if(photo && isPublic(priv,"photo")) document.getElementById("bigPhoto").innerHTML='<img src="'+photo+'">';
+    else document.getElementById("bigPhoto").textContent="🔒";
+    // Personal Details - har ek ka alag Public/Private
+    var rows="";
+    if(isPublic(priv,"name")) rows+='<div class="pdetailRow"><span>Naam</span><b>'+esc(nm)+'</b></div>';
+    if((P.phone||P.profilePhone) && isPublic(priv,"phone")) rows+='<div class="pdetailRow"><span>Mobile No.</span><b>'+esc(P.phone||P.profilePhone)+'</b></div>';
+    if((P.email||P.profileEmail) && isPublic(priv,"email")) rows+='<div class="pdetailRow"><span>Email ID</span><b>'+esc(P.email||P.profileEmail)+'</b></div>';
+    if(P.status && isPublic(priv,"status")) rows+='<div class="pdetailRow"><span>Status</span><b>'+esc(P.status)+'</b></div>';
+    if(P.city && isPublic(priv,"city")) rows+='<div class="pdetailRow"><span>City</span><b>'+esc(P.city)+'</b></div>';
+    if(P.job && isPublic(priv,"job")) rows+='<div class="pdetailRow"><span>Job</span><b>'+esc(P.job)+'</b></div>';
+    document.getElementById("personalRows").innerHTML=rows||'<div class="lock">🔒 Koi Public Personal Detail nahi</div>';
+    // Detail - sirf vis=public
+    // UPDATE: Detail/Thinking agar profile me khali hai to alag node se lao - purana data gayab na dikhe
+    var _d2 = toArr(P.details); var _t2 = toArr(P.thinkings);
+    var pubD=(_d2).filter(function(x){return x && x.vis!=="private";});
+    // fallback neeche .then me fill hoga, pehle render karo
+    document.getElementById("detailList").innerHTML=pubD.map(function(e){return '<div class="detailRow"><span>📅 '+esc(e.date||"")+'<br>'+esc(e.text||"")+'</span></div>';}).join("")||'<div class="lock">🔒 Koi Public Detail nahi</div>';
+    // Thinking - sirf vis=public
+    var pubT=(_t2).filter(function(x){return x && x.vis!=="private";});
+    document.getElementById("thinkList").innerHTML=pubT.map(function(e){return '<div class="thinkRow"><span>📅 '+esc(e.date||"")+'<br>'+esc(e.text||"")+'</span></div>';}).join("")||'<div class="lock">🔒 Koi Public Thinking nahi</div>';
+    // Album
+    document.getElementById("albumTitle").textContent=nm+" ka Album";
+    var pubOld=(P.oldPhotos||[]).filter(function(_,i){return isPublic(priv,"oldPhoto"+i);});
+    var allPhotos=[];
+    if(photo && isPublic(priv,"photo")) allPhotos.push(photo);
+    pubOld.forEach(function(ph){allPhotos.push(ph);});
+    (P.extraPhotos||[]).forEach(function(ph){if(allPhotos.indexOf(ph)===-1) allPhotos.push(ph);});
+    document.getElementById("photoCount").textContent="📸 "+allPhotos.length+" Photos";
+    document.getElementById("albumMain").innerHTML=allPhotos.length?'<div class="oldRow">'+allPhotos.map(function(ph){return '<div class="oldCard"><img src="'+ph+'"><div class="lbl">Photo</div></div>';}).join("")+'</div>':'<div class="lock">🔒 Koi Public Photo nahi</div>';
+    document.getElementById("oldPhotos").innerHTML=pubOld.map(function(ph){return '<div class="oldCard"><img src="'+ph+'"><div class="lbl">Photo</div></div>';}).join("")||'<div class="lock">🔒 Koi Public Old Photo nahi</div>';
+    // Timeline - Detail + Thinking date-wise, sirf Public
+    document.getElementById("timelineTitle").textContent=nm+" ki Timeline";
+    var tl=[];
+    pubD.forEach(function(e){tl.push({date:e.date||"",text:e.text||"",type:"📝 Detail"});});
+    pubT.forEach(function(e){tl.push({date:e.date||"",text:e.text||"",type:"💭 Thinking"});});
+    tl.sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+    document.getElementById("timelineList").innerHTML=tl.map(function(e){return '<div class="'+(e.type.indexOf("Detail")>=0?"detailRow":"thinkRow")+'"><span>'+e.type+'<br>📅 '+esc(e.date)+'<br>'+esc(e.text)+'</span></div>';}).join("")||'<div class="lock">🔒 Koi Public Timeline nahi</div>';
+    document.getElementById("friendsTitle").textContent=nm+" ke Dost";
+    // UPDATE: Detail/Thinking alag node se bhi lao - profile me khali ho to bhi dikhe
+    try{
+      if(!pubD.length){ db.ref("customer_details/"+f).once("value").then(function(ds){ var dd=toArr(ds.val()); var pd=dd.filter(function(x){return x && x.vis!=="private";}); if(pd.length){ document.getElementById("detailList").innerHTML=pd.map(function(e){return '<div class="detailRow"><span>📅 '+esc(e.date||"")+'<br>'+esc(e.text||"")+'</span></div>';}).join(""); } }); }
+      if(!pubT.length){ db.ref("customer_thinkings/"+f).once("value").then(function(ts){ var tt=toArr(ts.val()); var pt=tt.filter(function(x){return x && x.vis!=="private";}); if(pt.length){ document.getElementById("thinkList").innerHTML=pt.map(function(e){return '<div class="thinkRow"><span>📅 '+esc(e.date||"")+'<br>'+esc(e.text||"")+'</span></div>';}).join(""); } }); }
+      // UPDATE: Album bhi alag node se lao agar profile me photo khali hai
+      if(!allPhotos.length){ db.ref("customer_albums/"+f).once("value").then(function(as){ var av=as.val()||{}; var arr=[]; Object.keys(av).forEach(function(k){ var x=av[k]; if(typeof x==="string") arr.push(x); else if(x&&(x.url||x.photo)) arr.push(x.url||x.photo); }); if(arr.length){ document.getElementById("photoCount").textContent="📸 "+arr.length+" Photos"; document.getElementById("albumMain").innerHTML='<div class="oldRow">'+arr.map(function(ph){return '<div class="oldCard"><img src="'+ph+'"><div class="lbl">Photo</div></div>';}).join("")+'</div>'; } }); }
+    }catch(e){}
+    // Already Friends check
+    if(my){db.ref("friends/"+my+"/"+f).once("value").then(function(s){if(s.exists()){var b=document.getElementById("btnReq");b.textContent="✅ Already Friends";b.disabled=true;b.style.background="#999";}});}
+  });
+}
+function loadFriendList(){
+  var f=friendUid(); var db=getDb(); if(!f||!db) return;
+  var box=document.getElementById("friendsList");
+  db.ref("friends/"+f).once("value").then(function(s){
+    var obj=s.val()||{}; var ids=Object.keys(obj);
+    if(!ids.length){box.innerHTML='<div class="lock">Abhi koi Friend nahi dikh raha.</div>';return;}
+    box.innerHTML='<div class="lock">⏳ Dost load ho rahe hain...</div>';
+    var done=0, h="";
+    ids.forEach(function(fid){
+      db.ref("customer_profiles/"+fid).once("value").then(function(ps){
+        done++;
+        var FP=ps.val()||{}; var nm=FP.profileName||FP.name||"Friend";
+        var ph=FP.profilePhoto||FP.photo||"";
+        h+='<div class="friendCard"><div style="width:48px;height:48px;border-radius:50%;overflow:hidden;background:#ffe0b2;display:flex;align-items:center;justify-content:center;">'+(ph?'<img src="'+ph+'">':'👤')+'</div><div><b>'+esc(nm)+'</b><br><span style="font-size:12px;color:#888">'+esc(FP.city||"")+'</span></div><button class="fbtn" onclick="location.href=\'friend-view.html?uid='+encodeURIComponent(fid)+'\'">👁️ Dekho</button></div>';
+        if(done===ids.length) box.innerHTML=h;
+      });
+    });
+  });
+}
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",renderFriend); else renderFriend();
+</script>
+
+<script src="view.js"></script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
