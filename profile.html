@@ -1,119 +1,464 @@
 <!DOCTYPE html>
-<html lang="hi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="hi"><head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mera Profile</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#fff8f0;color:#333}
+body{background:#fffaf3;color:#333}
 #hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
-#brand{font-size:22px;font-weight:bold;color:#000;flex:1}
-#ftr{background:#4e342e;color:#fff;text-align:center;padding:24px 16px}
-.btn2{display:inline-block;background:#25D366;color:#fff;font-weight:bold;padding:12px 24px;border-radius:30px;text-decoration:none;font-size:16px}
-#pcard{background:#fff;border-radius:20px;margin:16px;box-shadow:0 2px 12px rgba(0,0,0,.1);overflow:hidden;position:relative}
-.ptop{position:relative;min-height:60px}
-.pphoto-big{position:absolute;top:10px;right:16px;width:70px;height:70px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:40px;overflow:hidden}
-.pphoto-big img{width:100%;height:100%;object-fit:cover}
-.pbody{padding:16px;text-align:center}
-.photosbtn{display:inline-block;background:#e65100;color:#fff;font-weight:bold;padding:10px 24px;border-radius:24px;font-size:15px;border:none;cursor:pointer;margin-bottom:10px}
-.pname{font-size:22px;font-weight:bold}
-.pphone{color:#e65100;font-size:16px;margin-top:4px}
-.status-bubble{display:inline-block;background:#e8f5e9;border-radius:20px;padding:8px 16px;margin:10px 0;font-size:14px}
-.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
-.tab{background:#f5f5f5;border-radius:16px;padding:6px 14px;font-size:13px;font-weight:bold;cursor:pointer;border:none}
-.pbtn{display:block;width:100%;padding:14px;border:none;border-radius:30px;font-weight:bold;font-size:16px;margin-top:10px;color:#fff;cursor:pointer;text-decoration:none;box-sizing:border-box;text-align:center}
-.bigbtn{display:block;width:100%;padding:15px;border:none;font-weight:bold;font-size:17px;color:#fff;cursor:pointer;text-decoration:none;text-align:center;box-sizing:border-box}
-.backbtn{background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;text-decoration:none;font-size:14px}
-.entry{background:#fff8f0;border-radius:10px;padding:10px;margin-top:8px;font-size:13px;text-align:left}
-.entry .edt{color:#e65100;font-weight:bold}
-.thinkbox{background:#fffbe6;border-left:4px solid #ffc107;padding:10px;border-radius:0 10px 10px 0;margin-top:8px;text-align:left;font-size:13px}
-.inp{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin-bottom:10px;font-size:15px;box-sizing:border-box}
-textarea.inp{resize:vertical;min-height:80px}
-.msgsec{text-align:left;margin-top:12px;border-top:1px solid #eee;padding-top:12px}
-.msgsec h3{color:#e65100;font-size:17px}
+.backbtn{background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px}
+#brand{font-size:19px;font-weight:bold;flex:1;text-align:center}
+#wrap{max-width:600px;margin:0 auto;padding:14px}
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0 12px}
+.tab{background:#0a9d4e;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:bold;cursor:pointer}
+.tab.off{background:#fff;color:#0a9d4e;border:1px solid #0a9d4e}
+.card{background:#fff;border-radius:20px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.top{display:flex;gap:14px;align-items:flex-start}
+.topLeft{flex:1}
+.pname{font-size:26px;font-weight:bold}
+.pphone{color:#555;margin-top:4px}
+.status{display:inline-block;background:#d9f2e3;border-radius:20px;padding:7px 14px;margin:10px 0;font-size:14px}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{background:#f1f1f1;border-radius:14px;padding:5px 10px;font-size:12px;font-weight:bold}
+.photoBox{text-align:center;flex-shrink:0}
+.bigPhoto{width:110px;height:110px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden;border:3px solid #ffcc80}
+.bigPhoto img{width:100%;height:100%;object-fit:cover}
+.miniBtn{background:#e65100;color:#fff;border:none;padding:7px 12px;border-radius:18px;font-weight:bold;font-size:12px;cursor:pointer;margin-top:6px}
+.photosBtn{background:#fff;border:1px solid #e65100;color:#e65100;padding:7px 12px;border-radius:18px;font-weight:bold;font-size:12px;cursor:pointer;margin-top:6px}
+h3{margin:18px 0 8px;color:#111}
+.oldRow{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.oldCard{min-width:110px;text-align:center}
+.oldCard img{width:110px;height:90px;object-fit:cover;border-radius:10px}
+.oldCard .lbl{font-size:11px;color:#666;margin:4px 0}
+.rowBtns{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.sbtn{border:none;border-radius:14px;padding:5px 8px;font-size:11px;font-weight:bold;cursor:pointer}
+.pub{background:#0a9d4e;color:#fff}.pri{background:#ddd}.del{background:#fff;color:#d32f2f;border:1px solid #f5b5b5}.use{background:#fff;border:1px solid #ccc}
+.detailRow{display:flex;justify-content:space-between;gap:10px;background:#fff8f0;border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px}
+.thinkRow{display:flex;justify-content:space-between;gap:10px;background:#fff7cc;border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px}
+.pdetailRow{display:flex;justify-content:space-between;align-items:center;background:#fff8f0;border-radius:10px;padding:10px;margin-bottom:6px;font-size:14px}
+.inp{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin-bottom:8px;font-size:14px;box-sizing:border-box}
+textarea.inp{min-height:70px}
+.bigBtn{display:block;width:100%;padding:14px;border:none;border-radius:26px;font-weight:bold;font-size:15px;color:#fff;cursor:pointer;margin-top:10px}
+.previewBox{display:none;background:#fff;border-radius:16px;padding:14px;margin-top:12px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.note{text-align:center;color:#999;font-size:12px;margin-top:8px}
+.oldGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.oldCard2{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.08);text-align:center;padding-bottom:6px}
+.oldCard2 img{width:100%;height:110px;object-fit:cover;cursor:zoom-in;display:block}
+.oldCard2 .lbl{font-size:11px;color:#666;margin:4px 0}
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;padding:16px;flex-direction:column}
+#lightbox img{max-width:100%;max-height:75vh;border-radius:14px}
+#lightbox .cap{color:#fff;margin-top:10px;text-align:center;font-size:13px}
+.lbBtn{border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;margin:6px}
+.viewCard{border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-bottom:12px}
+.viewCover{height:70px;background:linear-gradient(135deg,#ff9800,#ff5722);display:flex;align-items:flex-end;padding:0 14px}
+.viewAvatar{width:64px;height:64px;border-radius:50%;border:3px solid #fff;background:#ffe0b2;overflow:hidden;transform:translateY(22px);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.viewAvatar img{width:100%;height:100%;object-fit:cover}
+.viewBody{padding:28px 14px 14px}
+.pGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.pCell{background:#fff8f0;border-radius:12px;padding:10px}
+.pCell .lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px}
+.pCell .val{font-size:14px;font-weight:bold;color:#222;word-break:break-word;margin-top:2px}
+.pCell.full{grid-column:1/-1}
+.viewBtnRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.viewBtnRow button{flex:1;border:none;padding:11px 8px;border-radius:12px;font-weight:bold;cursor:pointer;font-size:13px;color:#fff;min-width:90px}
+.modeBar{display:flex;gap:8px;margin:10px 0}
+.modeBar button{flex:1;border:none;padding:12px;border-radius:14px;font-weight:bold;cursor:pointer;font-size:13px;color:#fff}
+.modeBar button.off{opacity:.55}
+body.friendMode .editOnly{display:none!important}
+body.friendMode .friendOnly{display:block!important}
+.friendOnly{display:none}
+.viewSingle{margin-top:10px}
+.viewMiniGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.viewMiniGrid img{width:100%;height:70px;object-fit:cover;border-radius:10px;cursor:zoom-in}
+
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script><script src="friend-data.js"></script><script src="clean.js"></script>
+</body><script src="connect.js"></script>
 <script>
-var FIREBASE_CONFIG = {
-
+// Apni Firebase keys yahan bharo - key file me khuli mat chhodo, apne connect.js se lo
+var FIREBASE_CONFIG={
   apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
   authDomain: "santramarketshoppingmall.firebaseapp.com",
   databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
   projectId: "santramarketshoppingmall",
   storageBucket: "santramarketshoppingmall.firebasestorage.app",
   messagingSenderId: "398490252924",
-  appId: "1:398490252924:web:8e85fdabd76ec86e3b7bf9",
-  measurementId: "G-D6079MBJ3C"
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"
+
 };
-
-
-var _fbDb=null; try{ firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database(); }catch(e){}
-function getUid(){ var m=location.search.match(/[?&]uid=([^&]+)/); if(m) return decodeURIComponent(m[1]); m=location.search.match(/[?&]cid=([^&]+)/); return m?decodeURIComponent(m[1]):""; }
+var _fbDb=null; try{ if(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf("APNI_")!==0){ firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database(); } }catch(e){}
 </script>
 </head><body>
-<header id="hdr"><a class="backbtn" href="index.html">← Back</a><div id="brand" style="text-align:center">👤 Mera Profile</div><div style="width:70px"></div></header>
-<div id="pcard"><div class="ptop"><div class="pphoto-big" id="bigPhoto">👩</div></div><div class="pbody" id="pbody"><div style="padding:20px;color:#999">⏳ Loading...</div></div></div>
-<footer id="ftr"><b>Restro Apka | Pilibanga</b><br><br><a class="btn2" href="https://wa.me/918769171078">WhatsApp: 8769171078</a><br><br><span style="font-size:12px">meragharandworld.web.app</span></footer>
-<a class="bigbtn" href="album.html" style="background:#7b1fa2;">📸 Album Dekho</a>
-<a class="bigbtn" href="timedatalist.html" style="background:#2196F3;">📅 Timeline Dekho</a>
-<script>
-function esc(t){return String(t==null?"":t).split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');}
-function getProfile(){try{return JSON.parse(localStorage.getItem("my_profile")||"{}");}catch(e){return{};}}
-function getLogin(){ try{ var lg=JSON.parse(localStorage.getItem("customer_login")||"null"); if(lg) return lg; var logged=localStorage.getItem("customer_logged_in"); var uname=localStorage.getItem("customer_username")||localStorage.getItem("customer_name")||""; var umob=localStorage.getItem("customer_mobile")||localStorage.getItem("customer_phone")||""; if(logged==="1" && (uname||umob)){ var obj={name:uname||"Manisha", phone:umob||""}; localStorage.setItem("customer_login", JSON.stringify(obj)); return obj; } var idxLogin=localStorage.getItem("auth_uid"); if(idxLogin){ var n=localStorage.getItem("customer_name")||uname||"Manisha"; var p=localStorage.getItem("customer_phone")||umob||""; return {name:n, phone:p}; } }catch(e){} return null; }
-function getDetails(){try{return JSON.parse(localStorage.getItem("customer_details")||"[]");}catch(e){return[];}}
-function getThinks(){try{return JSON.parse(localStorage.getItem("customer_thinkings")||"[]");}catch(e){return[];}}
-function sendReq(uid,btn){ var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){} if(!myUid){ alert("Pehle login karo!"); location.href="customerlogin.html"; return; } if(!_fbDb){ alert("Firebase nahi"); return; } var myName="User"; try{myName=localStorage.getItem("customer_name")||localStorage.getItem("customer_username")||myUid;}catch(e){} _fbDb.ref("friend_requests/"+uid).push({fromUid:myUid,fromName:myName,time:Date.now(),status:"pending"},function(err){ if(!err){ btn.textContent="✅ Request Bheji!"; btn.disabled=true; btn.style.background="#999"; alert("✅ Request bhej di!"); } }); try{ _fbDb.ref("friend_requests_sent/"+myUid+"/"+uid).set({time:Date.now()}); }catch(e){} }
-function renderFriend(uid){
-  if(!_fbDb){ document.getElementById('pbody').innerHTML='<div style="padding:20px;">❌ Firebase nahi hai</div>'; return; }
-  var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
-  if(myUid && myUid===uid){ renderOwn(); return; }
-  document.getElementById('brand').textContent="👤 Friend ka Profile";
-  document.getElementById('pbody').innerHTML='<div style="padding:20px;color:#999">⏳ Friend ka public data load ho raha hai...</div>';
-  _fbDb.ref("customer_profiles/"+uid).once("value",function(snap){
-    var P=snap.val();
-    if(!P){ document.getElementById('pbody').innerHTML='<div style="padding:20px;">❌ User nahi mila</div>'; return; }
-    var name=esc(P.profileName||P.name||"User");
-    var phone=esc(P.profilePhone||P.phone||"");
-    var detail=esc(P.profileDetail||P.status||P.detail||"");
-    var photo=P.profilePhoto||P.photo||"";
-    var bigPhoto=document.getElementById('bigPhoto');
-    if(photo) bigPhoto.innerHTML='<img src="'+photo+'">';
-    var pc=(P.extraPhotos||[]).length+(photo?1:0);
-    document.getElementById('brand').textContent="👤 "+name+" ka Profile";
-    var isPublic=true; try{ var priv=P.privacy||{}; if(P.privacy_profile==="private" || priv.profilePublic===false) isPublic=false; }catch(e){}
-    var h='';
-    if(!isPublic){ h+='<div style="padding:20px;text-align:center;"><div style="font-size:48px;">🔒</div><b>Ye profile private hai</b><br><br>'+name+' ne apna profile public nahi kiya.<br><br><button class="pbtn" style="background:#25D366;" onclick="sendReq(\''+uid+'\',this)">📩 Friend Request Bhejo</button></div>'; document.getElementById('pbody').innerHTML=h; return; }
-    h+='<div id="alreadyBox" style="display:none;background:#e8f5e9;color:#2e7d32;font-weight:bold;padding:12px;border-radius:12px;text-align:center;margin-bottom:10px;">✅ Already Friends - Mere Dost me hai</div>';
-    h+='<button class="photosbtn" onclick="location.href=\'album.html?uid='+uid+'\'">📸 Friend Photos ('+pc+')</button>';
-    h+='<div class="pname">'+name+'</div>'; if(phone) h+='<div class="pphone">📞 '+phone+'</div>'; if(detail) h+='<div style="margin-top:8px;font-size:14px;color:#666;text-align:left;background:#fff8f0;padding:10px;border-radius:10px;">'+detail+'</div>';
-    h+='<div style="margin-top:14px;display:grid;gap:10px;">';
-    h+='<button id="reqBtn" class="pbtn" style="background:#25D366;" onclick="sendReq(\''+uid+'\',this)">📩 Friend Request Bhejo - '+name+' ko</button>';
-    h+='<a class="pbtn" style="background:#e65100;" href="friends.html?chat='+uid+'">💬 Chat Karo - '+name+' se</a>';
-    h+='<a class="bigbtn" href="album.html?uid='+uid+'" style="background:#7b1fa2;">📸 Friend Album - '+name+' ka Album Dekho</a>';
-    h+='<a class="bigbtn" href="timedatalist.html?uid='+uid+'" style="background:#2196F3;">📅 Friend Timeline - '+name+' ki Timeline Dekho</a>';
-    h+='<a class="bigbtn" href="index.html?uid='+uid+'" style="background:#ff7043;">🏠 Friend Home - '+name+' ke Posts Dekho</a>';
-    h+='</div>'; document.getElementById('pbody').innerHTML=h;
-    if(myUid && _fbDb){ _fbDb.ref("friends/"+myUid+"/"+uid).once("value",function(s){ var reqBtn=document.getElementById("reqBtn"); var alreadyBox=document.getElementById("alreadyBox"); if(s.exists()){ if(reqBtn) reqBtn.style.display="none"; if(alreadyBox) alreadyBox.style.display="block"; } else { _fbDb.ref("friend_requests_sent/"+myUid+"/"+uid).once("value",function(s2){ if(s2.exists() && reqBtn){ reqBtn.textContent="📤 Request Bheji Hai - Wait Karo"; reqBtn.disabled=true; reqBtn.style.background="#999"; } }); } }); }
-  });
-}
-function renderOwn(){
-  var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
-  var body=document.getElementById('pbody'); var bigPhoto=document.getElementById('bigPhoto');
-  if(!myUid){ body.innerHTML='<div style="padding:20px;">🔐 Login Karo<br><a class="pbtn" style="background:#7b1fa2;" href="customerlogin.html">🔐 Customer Login</a></div>'; return; }
-  _fbDb.ref("customer_profiles/"+myUid).once("value").then(function(snap){
-    var p=snap.val()||{};
-    var name=esc(p.profileName||p.name||""); var phone=esc(p.profilePhone||p.phone||""); var status=esc(p.status||p.detail||"Hi");
-    var photoCount=(p.extraPhotos||[]).length+(p.photo?1:0)+(p.profilePhoto?1:0);
-    if(p.photo) bigPhoto.innerHTML='<img src="'+p.photo+'">'; else if(p.profilePhoto) bigPhoto.innerHTML='<img src="'+p.profilePhoto+'">';
-    document.getElementById('brand').textContent="👤 Mera Profile - "+name;
-    var h='<button class="photosbtn" onclick="location.href=\'album.html\'">📸 Photos Dekho ('+photoCount+')</button>'+'<div class="pname">'+name+'</div><div class="pphone">📞 '+phone+'</div>'+'<div><span class="status-bubble">🟢 '+status+'</span></div>';
-    h+='<div style="text-align:center;margin-top:8px;"><a class="pbtn" style="background:#e65100;width:auto;display:inline-block;padding:12px 32px;" href="editprofile.html">✏️ Mera Profile Edit Karo</a></div>'+'<a class="pbtn" style="background:#7b1fa2;" href="friends.html">📩 Meri Friend Requests</a>'+'<button class="pbtn" style="background:#f44336;" onclick="logout()">🚪 Logout</button>'; body.innerHTML=h;
-  });
-}
-function logout(){ if(confirm("Logout?")){ try{ localStorage.removeItem("customer_logged_in"); localStorage.removeItem("auth_uid"); localStorage.removeItem("customer_login");localStorage.removeItem("my_profile"); localStorage.removeItem("customer_details"); localStorage.removeItem("customer_thinkings"); }catch(e){} location.href="customerlogin.html"; } }
-var fid=getUid(); if(fid){ renderFriend(fid); } else { renderOwn(); }
-</script>
-<script src="privacy.js"></script>
-<script>try{PRIV_bar("hdr",["profilePublic","detailPublic","msgPublic"]);}catch(e){}</script>
+<header id="hdr"><button class="backbtn" onclick="location.href='index.html'">← Back</button><div id="brand">👤 Mera Profile</div><div style="width:64px"></div></header>
 
- <script src="headername.js"></script> 
+  <div id="wrap">
+<div class="tabs"><button class="tab" onclick="showTab('profile')">Profile</button><button class="tab off" onclick="showTab('detail')">Personal Detail</button><button class="tab off" onclick="showTab('message')">Message</button></div>
+
+<div class="modeBar"><button id="btnSelf" style="background:#0a9d4e" onclick="setViewMode('self')">👤 Self - Edit Mode</button><button id="btnFriend" class="off" style="background:#2196F3" onclick="setViewMode('friend')">👥 Friend - Sundar View</button><button onclick="location.href='friend-view.html?uid='+encodeURIComponent(uid)">👁️ Dekho</button></div>
+<div id="friendViewBox" class="friendOnly"></div>
+<div class="card">
+<div class="top"><div class="topLeft">
+<div class="pname" id="showName">—</div><div class="pphone" id="showPhone">—</div>
+<div><span class="status" id="showStatus">Hi</span></div>
+<div class="pills"><span class="pill" id="photoCount">📸 0 Photos</span><span class="pill">🟢 Status</span><span class="pill">💭 Thinking</span></div>
+</div>
+<div class="photoBox"><div class="bigPhoto" id="bigPhoto">👩</div>
+<button class="miniBtn" onclick="document.getElementById('photoFile').click()">📸 Photo Add / Edit</button>
+<input type="file" id="photoFile" accept="image/*" style="display:none">
+<br><button class="photosBtn" onclick="location.href='album.html'">🖼️ Photos Dekho</button>
+</div></div>
+
+<h3>Old Profile Photos</h3>
+<div class="oldGrid" id="oldPhotos"></div><div id="lightbox" onclick="closeLightbox()"><img id="lbImg" src=""><div class="cap" id="lbCap"></div><div><button class="lbBtn" style="background:#fff" onclick="event.stopPropagation();closeLightbox()">❌ Band Karo</button><button class="lbBtn" style="background:#25D366;color:#fff" onclick="event.stopPropagation();useCurrentLb()">👤 Isko Profile Photo Banao</button></div></div>
+<div class="note">Grid me photo par click karo → badi khulegi • Nayi photo upload karne par purani photo yahan + Album me bhi save hogi.</div>
+
+<h3>Personal Details</h3>
+<div id="personalRows"></div>
+
+<h3>📝 Detail</h3>
+<div id="detailList"></div>
+<input class="inp" id="newDetailText" placeholder="Nayi Detail likho...">
+<button class="bigBtn" style="background:#ffcc80;color:#333" onclick="addDetail()">+ Detail Add Karo</button>
+
+<h3>💭 Thinking</h3>
+<div id="thinkList"></div>
+<input class="inp" id="newThinkText" placeholder="Nayi Thinking likho...">
+<button class="bigBtn" style="background:#ffcc80;color:#333" onclick="addThinking()">+ Thinking Add Karo</button>
+</div>
+
+<div id="previewBox" class="previewBox"></div>
+
+<button class="bigBtn" style="background:#2196F3" onclick="setViewMode(VIEW_MODE==='friend'?'self':'friend')">👁️ Preview Dekho - Self / Friend View Badlo</button>
+<div style="display:flex;gap:8px"><button class="bigBtn" style="background:#ff9800;flex:1" onclick="location.href='album.html'">🖼️ Album</button><button class="bigBtn" style="background:#2196F3;flex:1" onclick="location.href='timeline.html'">📅 Timeline</button><button class="bigBtn" style="background:#0a9d4e;flex:1" onclick="location.href='index.html'">🏠 Home</button></div>
+<button class="bigBtn" style="background:#e65100" onclick="location.href='editprofile.html'">✏️ Mera Profile Edit Karo</button>
+<button class="bigBtn" style="background:#0a9d4e" onclick="shareProfile()">🔗 Share Profile - New Login ID Friends Ko Bhejo</button>
+<button class="bigBtn" style="background:#795548" onclick="toggleRecycle()">🗑️ Recycle Bin Dekho - Hide Kiya Hua Data</button>
+<div id="recycleBox" class="previewBox"></div>
+<button class="bigBtn" style="background:#000" onclick="location.href='settings.html?recycle=1'">⚙️ Settings - Recycle Bin Dekho (Profile + Friends)</button><button class="bigBtn" style="background:#f44336" onclick="doLogout()">🚪 Logout</button>
+<div id="shareBox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;align-items:center;justify-content:center;padding:20px;">
+<div style="background:#fff;border-radius:18px;padding:18px;width:100%;max-width:380px;">
+<b style="font-size:17px;">🔗 Share Profile - Kahan bhejna hai?</b>
+<p style="font-size:13px;color:#666;margin:8px 0;">Kisko share karna hai, wo chuno:</p>
+<button class="bigBtn" style="background:#25D366" onclick="shareTo('whatsapp')">💬 WhatsApp par Bhejo</button>
+<button class="bigBtn" style="background:#E1306C" onclick="shareTo('instagram')">📸 Instagram par Bhejo</button>
+<button class="bigBtn" style="background:#EA4335" onclick="shareTo('gmail')">📧 Gmail par Bhejo</button>
+<button class="bigBtn" style="background:#2196F3" onclick="shareTo('sms')">💬 SMS / Message par Bhejo</button>
+<button class="bigBtn" style="background:#333" onclick="shareTo('copy')">🔗 Link Copy Karo</button>
+<button class="bigBtn" style="background:#eee;color:#333" onclick="closeShare()">❌ Band Karo</button>
+</div></div>
+<div class="note">Public = sabko dikhega • Private = sirf tumko dikhega • Delete = Recycle me jayega, Firebase se nahi mitega</div>
+</div>
+
+<script>
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function uid(){return localStorage.getItem("auth_uid")||"";}
+
+// FRIEND MODE: ?uid= kisi aur ka ho to uska Private data kabhi mat dikhao
+function friendUid(){ var m=location.search.match(/[?&]uid=([^&]+)/); return m?decodeURIComponent(m[1]):""; }
+function isFriendView(){ var f=friendUid(); return f && uid() && f!==uid(); }
+function applyFriendMode(){
+  if(!isFriendView()) return;
+  // Edit / Share / Logout / Add wale button chhupao - Friend edit nahi karega
+  document.querySelectorAll(".bigBtn").forEach(function(b){
+    var t=b.textContent||"";
+    if(t.indexOf("Edit Karo")>=0 || t.indexOf("Share Profile")>=0 || t.indexOf("Logout")>=0 || t.indexOf("Add Karo")>=0) b.style.display="none";
+  });
+  // Photo Add/Edit bhi chhupao
+  var pf=document.getElementById("photoFile"); if(pf) pf.style.display="none";
+  document.querySelectorAll(".miniBtn").forEach(function(b){ b.style.display="none"; });
+  document.getElementById("brand").textContent="👤 Friend ka Profile";
+}
+
+function loadProfile(){
+  // Safety: agar my_profile me kisi aur UID ka data hai to usko mat dikhao
+  try{ var _pp=JSON.parse(localStorage.getItem("my_profile")||"{}"); if(_pp._uid && uid() && _pp._uid!==uid()){ return {name:"",phone:"",email:"",status:"Hi",photo:"",extraPhotos:[],oldPhotos:[],details:[],thinkings:[],privacy:{},city:"",job:""}; } }catch(e){}
+  var p={}; try{p=JSON.parse(localStorage.getItem("my_profile")||"{}");}catch(e){}
+  var d=[]; try{d=JSON.parse(localStorage.getItem("customer_details")||"[]");}catch(e){}
+  var t=[]; try{t=JSON.parse(localStorage.getItem("customer_thinkings")||"[]");}catch(e){}
+  if(!p.details && d.length) p.details=d;
+  if(!p.thinkings && t.length) p.thinkings=t;
+  if(!p.name) p.name=localStorage.getItem("customer_name")||"";
+  if(!p.phone) p.phone=localStorage.getItem("customer_phone")||"";
+  if(!p.status) p.status="Hi";
+  if(!p.email) p.email=localStorage.getItem("customer_email")||"";
+  if(!p.city) p.city="";
+  if(!p.job) p.job="";
+  if(!p.photo) p.photo="";
+  if(!p.extraPhotos) p.extraPhotos=[];
+  if(!p.oldPhotos) p.oldPhotos=[];
+  if(!p.privacy) p.privacy={};
+  if(!p.history) p.history={};
+  ["name","phone","email","status","city","job"].forEach(function(k){ if(!p.history[k]) p.history[k]=[]; });
+  // detail/thinking me public/private flag
+  p.details=(p.details||[]).map(function(x){ if(typeof x==="string") x={date:"",text:x}; if(!x.vis) x.vis="public"; return x;});
+  p.thinkings=(p.thinkings||[]).map(function(x){ if(typeof x==="string") x={date:"",text:x}; if(!x.vis) x.vis="public"; return x;});
+  return p;
+}
+function saveProfile(p, goFirebase){
+  p._uid=uid(); localStorage.setItem("my_profile", JSON.stringify(p));
+  localStorage.setItem("customer_details", JSON.stringify(p.details||[]));
+  localStorage.setItem("customer_thinkings", JSON.stringify(p.thinkings||[]));
+  localStorage.setItem("customer_name", p.name||"");
+  localStorage.setItem("customer_email", p.email||"");
+  localStorage.setItem("customer_phone", p.phone||"");
+  if(goFirebase && _fbDb){
+    try{
+      _fbDb.ref("customer_profiles/"+uid()).update({profileName:p.name,name:p.name,profilePhone:p.phone,phone:p.phone,profileEmail:p.email,email:p.email,city:p.city,job:p.job,profilePhoto:p.photo,photo:p.photo,extraPhotos:p.extraPhotos||[],oldPhotos:p.oldPhotos||[],details:p.details||[],thinkings:p.thinkings||[],privacy:p.privacy||{},history:p.history||{},updatedAt:Date.now()});
+      _fbDb.ref("customer_details/"+uid()).set(p.details||[]);
+      _fbDb.ref("customer_thinkings/"+uid()).set(p.thinkings||[]);
+    }catch(e){}
+  }
+}
+function today(){var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function applyPendingRestore(){ try{ var pend=JSON.parse(localStorage.getItem("recycle_restore_pending")||"[]"); if(!pend.length) return; var prof=loadProfile(); pend.forEach(function(it){ if(it.type==="detail"&&it.data) prof.details.unshift(it.data); else if(it.type==="thinking"&&it.data) prof.thinkings.unshift(it.data); else if(it.type==="oldPhoto"&&it.photo) prof.oldPhotos.unshift(it.photo); else if(it.type&&it.type.indexOf("history_")===0){ var k=it.type.replace("history_",""); if(!prof.history) prof.history={}; if(!prof.history[k]) prof.history[k]=[]; prof.history[k].unshift(it.data);} }); localStorage.setItem("recycle_restore_pending","[]"); saveProfile(prof,true); }catch(e){} }
+function render(){ applyPendingRestore();
+  var p=loadProfile();
+  document.getElementById("brand").textContent="👤 Mera Profile - "+(p.name||"");
+  document.getElementById("showName").textContent=p.name||"Naam likho";
+  document.getElementById("showPhone").textContent=p.phone?("📞 "+p.phone):"";
+  document.getElementById("showStatus").textContent="🟢 "+(p.status||"Hi");
+  if(p.photo) document.getElementById("bigPhoto").innerHTML='<img src="'+p.photo+'">';
+  else document.getElementById("bigPhoto").textContent="👩";
+  document.getElementById("photoCount").textContent="📸 "+((p.extraPhotos||[]).length+(p.photo?1:0))+" Photos";
+  // old photos
+  var oldBox=document.getElementById("oldPhotos");
+  if(!p.oldPhotos.length) oldBox.innerHTML='<div style="color:#999;font-size:13px;grid-column:1/-1">Koi old photo nahi - nayi photo upload karne par yahan aayegi</div>';
+  else oldBox.innerHTML=p.oldPhotos.map(function(ph,i){
+    var vis=(p.privacy["oldPhoto"+i]||"public");
+    return '<div class="oldCard2"><img src="'+ph+'" onclick="openLightbox('+i+',\'old\')"><div class="lbl">📅 Old Profile Photo</div><div class="rowBtns"><button class="sbtn use" onclick="openLightbox('+i+',\'old\')">👁️ View</button><button class="sbtn use" onclick="useOld('+i+')">Use as Profile</button><button class="sbtn '+(vis==="public"?"pub":"pri")+'" onclick="toggleOldVis('+i+')">'+(vis==="public"?"Public":"Private")+'</button><button class="sbtn del" onclick="delOld('+i+')">Delete</button></div></div>';
+  }).join("");
+  // Personal Details - Starting me fill kiye sab fields
+  // Naam = hamesha Public, isliye usme Public/Private button NAHI hai
+  var rows="";
+  rows+='<div class="pdetailRow"><span><b>Naam</b><br>'+esc(p.name||"-")+'</span><span><button class="sbtn use" onclick="editField(\'name\',\'Naam\')">New Edit</button></span></div>';
+  // Naam ka History - purana naam date ke saath
+  (p.history.name||[]).forEach(function(h,i){
+    rows+='<div class="pdetailRow" style="background:#fdf6e3"><span style="font-size:12px;color:#777">📅 '+esc(h.date)+' - Purana Naam: <b style="color:#333">'+esc(h.text)+'</b></span><span><button class="sbtn '+(h.vis==="public"?"pub":"pri")+'" onclick="toggleHistoryVis(\'name\','+i+')">'+(h.vis==="public"?"Public":"Private")+'</button> <button class="sbtn del" onclick="delHistory(\'name\','+i+')">Hide</button></span></div>';
+  });
+  var pFields=[["Mobile No.","phone"],["Email ID","email"],["Status","status"],["City","city"],["Kaam / Job","job"]];
+  pFields.forEach(function(f){
+    var key=f[1]; var vis=p.privacy[key]||"public";
+    rows+='<div class="pdetailRow"><span><b>'+f[0]+'</b><br>'+esc(p[key]||"— Khali hai, Edit se bharo —")+'</span><span><button class="sbtn '+(vis==="public"?"pub":"pri")+'" onclick="togglePersonal(\''+key+'\')">'+(vis==="public"?"Public":"Private")+'</button> <button class="sbtn use" onclick="editField(\''+key+'\',\''+f[0]+'\')">New Edit</button></span></div>';
+    // Is field ka purana History - date ke saath, delete nahi hoga
+    (p.history[key]||[]).forEach(function(h,i){
+      rows+='<div class="pdetailRow" style="background:#fdf6e3"><span style="font-size:12px;color:#777">📅 '+esc(h.date)+' - Purana '+f[0]+': <b style="color:#333">'+esc(h.text)+'</b></span><span><button class="sbtn '+(h.vis==="public"?"pub":"pri")+'" onclick="toggleHistoryVis(\''+key+'\','+i+')">'+(h.vis==="public"?"Public":"Private")+'</button> <button class="sbtn del" onclick="delHistory(\''+key+'\','+i+')">Hide</button></span></div>';
+    });
+  });
+  document.getElementById("personalRows").innerHTML=rows;
+  // detail
+  document.getElementById("detailList").innerHTML=(p.details||[]).map(function(e,i){
+    return '<div class="detailRow"><span>📅 '+esc(e.date||"")+'<br>'+esc(e.text||"")+'</span><span><button class="sbtn '+(e.vis==="public"?"pub":"pri")+'" onclick="toggleDetail('+i+')">'+(e.vis==="public"?"Public":"Private")+'</button> <button class="sbtn use" onclick="editDetail('+i+')">Edit</button> <button class="sbtn del" onclick="delDetail('+i+')">Delete</button></span></div>';
+  }).join("") || '<div style="color:#999;font-size:13px">Koi Detail nahi</div>';
+  // FRIEND VIEW: Private wale ko Friend ko mat dikhao
+  if(isFriendView()){
+    // Personal me sirf Public wale dikhao
+    var pr=document.getElementById("personalRows");
+    if(pr){ var rows2=""; if(p.privacy.name!=="private") rows2+='<div class="pdetailRow"><span><b>Naam</b><br>'+esc(p.name||"-")+'</span></div>'; if((p.privacy.phone||"public")==="public") rows2+='<div class="pdetailRow"><span><b>Mobile No.</b><br>'+esc(p.phone||"-")+'</span></div>'; if((p.privacy.email||"public")==="public") rows2+='<div class="pdetailRow"><span><b>Email ID</b><br>'+esc(p.email||"-")+'</span></div>'; if((p.privacy.status||"public")==="public") rows2+='<div class="pdetailRow"><span><b>Status</b><br>'+esc(p.status||"")+'</span></div>'; if((p.privacy.city||"public")==="public" && p.city) rows2+='<div class="pdetailRow"><span><b>City</b><br>'+esc(p.city)+'</span></div>'; if((p.privacy.job||"public")==="public" && p.job) rows2+='<div class="pdetailRow"><span><b>Kaam / Job</b><br>'+esc(p.job)+'</span></div>'; pr.innerHTML=rows2 || '<div style="color:#999;font-size:13px">🔒 Ye Personal Details Private hain</div>'; }
+    // Detail / Thinking me sirf Public wali
+    var pubD=(p.details||[]).filter(function(x){return x.vis==="public";});
+    var pubT=(p.thinkings||[]).filter(function(x){return x.vis==="public";});
+    document.getElementById("detailList").innerHTML=pubD.map(function(e){ return '<div class="detailRow"><span>📅 '+esc(e.date||"")+'<br>'+esc(e.text||"")+'</span></div>'; }).join("") || '<div style="color:#999;font-size:13px">🔒 Koi Public Detail nahi</div>';
+    document.getElementById("thinkList").innerHTML=pubT.map(function(e){ return '<div class="thinkRow"><span>📅 '+esc(e.date||"")+'<br>'+esc(e.text||"")+'</span></div>'; }).join("") || '<div style="color:#999;font-size:13px">🔒 Koi Public Thinking nahi</div>';
+    // Old Photos me sirf Public wali
+    var ob=document.getElementById("oldPhotos");
+    var pubOld=(p.oldPhotos||[]).filter(function(_,i){ return (p.privacy["oldPhoto"+i]||"public")==="public"; });
+    ob.innerHTML=pubOld.map(function(ph){ return '<div class="oldCard"><img src="'+ph+'"><div class="lbl">Photo</div></div>'; }).join("") || '<div style="color:#999;font-size:13px">🔒 Koi Public Photo nahi</div>';
+    // Friend ko apna main photo bhi sirf tab dikhao jab Photo Public ho
+    if((p.privacy.photo||"public")==="private"){ document.getElementById("bigPhoto").textContent="🔒"; }
+  }
+  // thinking
+  document.getElementById("thinkList").innerHTML=(p.thinkings||[]).map(function(e,i){
+    return '<div class="thinkRow"><span>📅 '+esc(e.date||"")+'<br>'+esc(e.text||"")+'</span><span><button class="sbtn '+(e.vis==="public"?"pub":"pri")+'" onclick="toggleThink('+i+')">'+(e.vis==="public"?"Public":"Private")+'</button> <button class="sbtn use" onclick="editThink('+i+')">Edit</button> <button class="sbtn del" onclick="delThink('+i+')">Delete</button></span></div>';
+  }).join("") || '<div style="color:#999;font-size:13px">Koi Thinking nahi</div>';
+}
+function compress(file, cb){
+  var rd=new FileReader(); rd.onload=function(){ var img=new Image(); img.onload=function(){ var c=document.createElement("canvas"); var mx=600; var w=img.width,h=img.height; if(w>mx||h>mx){var r=Math.min(mx/w,mx/h); w=Math.round(w*r); h=Math.round(h*r);} c.width=w; c.height=h; c.getContext("2d").drawImage(img,0,0,w,h); cb(c.toDataURL("image/jpeg",0.7)); }; img.src=rd.result; }; rd.readAsDataURL(file);
+}
+document.getElementById("photoFile").addEventListener("change", function(e){
+  var f=e.target.files[0]; if(!f) return;
+  compress(f, function(data){
+    var p=loadProfile();
+    if(p.photo) { p.oldPhotos.unshift(p.photo); p.extraPhotos.unshift(p.photo); saveToAlbum(p.photo,'old'); }
+    p.photo=data; p.extraPhotos.unshift(data); saveToAlbum(data,'main');
+    saveProfile(p,true); // Unique Username rule: ID nahi hai to dusre ka data mat dikhao
+if(!uid()){ document.getElementById("wrap").innerHTML='<div style="padding:30px;text-align:center"><b>🔐 Pehle Login Karo</b><p style="color:#666;margin:10px 0;">Apni Unique ID se login karo, tabhi tumhara apna data dikhega.</p><a href="customerlogin.html" style="display:inline-block;background:#e65100;color:#fff;padding:12px 28px;border-radius:24px;text-decoration:none;font-weight:bold;">Login Karo</a></div>'; }
+else { render(); applyFriendMode(); } alert("✅ Photo save ho gayi! Purani photo Old Photos + Album me chali gayi.");
+  }); e.target.value="";
+});
+function useOld(i){ var p=loadProfile(); var ph=p.oldPhotos[i]; if(!ph) return; if(p.photo){ p.oldPhotos.unshift(p.photo); saveToAlbum(p.photo,'old'); } p.photo=ph; saveProfile(p,true); render(); }
+function toggleOldVis(i){ var p=loadProfile(); var k="oldPhoto"+i; p.privacy[k]=(p.privacy[k]||"public")==="public"?"private":"public"; saveProfile(p,true); render(); }
+function delOld(i){ if(!confirm("Ye photo Recycle me jayegi, Firebase se nahi mitegi. Hatao?")) return; var p=loadProfile(); var gone=p.oldPhotos.splice(i,1); var rb=[]; try{rb=JSON.parse(localStorage.getItem("recycle_bin")||"[]");}catch(e){} rb.push({type:"oldPhoto",photo:gone[0],time:Date.now()}); localStorage.setItem("recycle_bin",JSON.stringify(rb)); saveProfile(p,true); render(); }
+function editField(key,label){
+  var p=loadProfile();
+  var nv=prompt(label+" edit karo (purana History me save rahega):", p[key]||"");
+  if(nv===null) return; nv=nv.trim();
+  // Purana wala History me date ke saath save karo - delete NAHI hoga
+  if(p[key] && p[key]!==nv){
+    if(!p.history) p.history={}; if(!p.history[key]) p.history[key]=[];
+    p.history[key].unshift({date:today(),text:p[key],vis:p.privacy[key]||"public"});
+  }
+  p[key]=nv; saveProfile(p,true); render(); alert("✅ Naya save ho gaya! Purana wala neeche History me date ke saath dikhega.");
+}
+function toggleHistoryVis(key,idx){
+  var p=loadProfile(); var h=p.history[key][idx]; h.vis=h.vis==="public"?"private":"public"; saveProfile(p,true); render();
+}
+function delHistory(key,idx){
+  if(!confirm("Ye purana wala Recycle me jayega, Firebase se nahi mitega. Hatao?")) return;
+  var p=loadProfile(); var gone=p.history[key].splice(idx,1);
+  var rb=[]; try{rb=JSON.parse(localStorage.getItem("recycle_bin")||"[]");}catch(e){} rb.push({type:"history_"+key,data:gone[0],time:Date.now()}); localStorage.setItem("recycle_bin",JSON.stringify(rb));
+  saveProfile(p,true); render();
+}
+function togglePersonal(k){ var p=loadProfile(); p.privacy[k]=(p.privacy[k]||"public")==="public"?"private":"public"; saveProfile(p,true); render(); }
+function addDetail(){ var t=document.getElementById("newDetailText").value.trim(); if(!t) return alert("Detail likho!"); var p=loadProfile(); p.details.unshift({date:today(),text:t,vis:"public"}); document.getElementById("newDetailText").value=""; saveProfile(p,true); render(); }
+function addThinking(){ var t=document.getElementById("newThinkText").value.trim(); if(!t) return alert("Thinking likho!"); var p=loadProfile(); p.thinkings.unshift({date:today(),text:t,vis:"public"}); document.getElementById("newThinkText").value=""; saveProfile(p,true); render(); }
+function toggleDetail(i){ var p=loadProfile(); p.details[i].vis=p.details[i].vis==="public"?"private":"public"; saveProfile(p,true); render(); }
+function toggleThink(i){ var p=loadProfile(); p.thinkings[i].vis=p.thinkings[i].vis==="public"?"private":"public"; saveProfile(p,true); render(); }
+function editDetail(i){ var p=loadProfile(); var nt=prompt("Detail edit karo:", p.details[i].text); if(nt===null) return; p.details[i].text=nt; saveProfile(p,true); render(); }
+function editThink(i){ var p=loadProfile(); var nt=prompt("Thinking edit karo:", p.thinkings[i].text); if(nt===null) return; p.thinkings[i].text=nt; saveProfile(p,true); render(); }
+function delDetail(i){ if(!confirm("Detail Recycle me jayegi. Hatao?")) return; var p=loadProfile(); var gone=p.details.splice(i,1); var rb=[]; try{rb=JSON.parse(localStorage.getItem("recycle_bin")||"[]");}catch(e){} rb.push({type:"detail",data:gone[0],time:Date.now()}); localStorage.setItem("recycle_bin",JSON.stringify(rb)); saveProfile(p,true); render(); }
+function delThink(i){ if(!confirm("Thinking Recycle me jayegi. Hatao?")) return; var p=loadProfile(); var gone=p.thinkings.splice(i,1); var rb=[]; try{rb=JSON.parse(localStorage.getItem("recycle_bin")||"[]");}catch(e){} rb.push({type:"thinking",data:gone[0],time:Date.now()}); localStorage.setItem("recycle_bin",JSON.stringify(rb)); saveProfile(p,true); render(); }
+function showTab(t){ var btns=document.querySelectorAll(".tab"); btns.forEach(function(b){b.classList.add("off");}); if(t==="profile"){ btns[0].classList.remove("off"); } if(t==="detail"){ btns[1].classList.remove("off"); document.getElementById("personalRows").scrollIntoView({behavior:"smooth"}); } if(t==="message"){ btns[2].classList.remove("off"); location.href="friends.html"; } }
+
+var LB_IDX=-1; var LB_TYPE="old";
+function openLightbox(i,type){ var p=loadProfile(); LB_IDX=i; LB_TYPE=type||"old"; var src=""; var cap="";
+  if(type==="main"){ src=p.photo; cap="Main Profile Photo • "+(p.name||""); }
+  else if(type==="extra"){ src=(p.extraPhotos||[])[i]; cap="Album Photo • "+(p.name||""); }
+  else { src=p.oldPhotos[i]; cap="Old Profile Photo • "+(p.name||""); }
+  if(!src) return; document.getElementById("lbImg").src=src; document.getElementById("lbCap").textContent=cap; var lb=document.getElementById("lightbox"); lb.style.display="flex"; }
+function closeLightbox(){ document.getElementById("lightbox").style.display="none"; }
+function useCurrentLb(){ if(LB_TYPE==="old") useOld(LB_IDX); else if(LB_TYPE==="extra"){ var p=loadProfile(); var ph=(p.extraPhotos||[])[LB_IDX]; if(ph){ if(p.photo) p.oldPhotos.unshift(p.photo); p.photo=ph; saveProfile(p,true); render(); } } closeLightbox(); }
+function saveToAlbum(photo, kind){
+  // album.html isi key se padhega: album_photos
+  try{
+    var arr=[]; try{arr=JSON.parse(localStorage.getItem("album_photos")||"[]");}catch(e){}
+    arr.unshift({photo:photo, kind:kind||"old", date:today(), time:Date.now(), uid:uid(), name:loadProfile().name||"", vis:"public"});
+    localStorage.setItem("album_photos", JSON.stringify(arr));
+    if(_fbDb && uid()){ try{ _fbDb.ref("album_photos/"+uid()).push({photo:photo, kind:kind||"old", date:today(), time:Date.now()}); }catch(e){} }
+  }catch(e){}
+}
+function viewCardHTML(title, badge, badgeColor, p, showPrivate){
+  var pubDetails=(p.details||[]).filter(function(x){return showPrivate||x.vis==="public";});
+  var pubThinks=(p.thinkings||[]).filter(function(x){return showPrivate||x.vis==="public";});
+  var pubOld=(p.oldPhotos||[]).filter(function(_,i){return showPrivate||(p.privacy["oldPhoto"+i]||"public")==="public";});
+  var name=p.name||"";
+  var phone=showPrivate? (p.phone||"") : ((p.privacy.phone||"public")==="public" ? (p.phone||"") : "");
+  var email=showPrivate? (p.email||"") : ((p.privacy.email||"public")==="public" ? (p.email||"") : "");
+  var statusTxt=showPrivate? (p.status||"") : ((p.privacy.status||"public")==="public" ? (p.status||"") : "");
+  var cityTxt=showPrivate? (p.city||"") : ((p.privacy.city||"public")==="public" ? (p.city||"") : "");
+  var jobTxt=showPrivate? (p.job||"") : ((p.privacy.job||"public")==="public" ? (p.job||"") : "");
+  function cell(lbl,val){ if(!val) return ""; return '<div class="pCell"><div class="lbl">'+lbl+'</div><div class="val">'+esc(val)+'</div></div>'; }
+  var pGrid='<div class="pGrid">'+cell("👤 Naam",name)+cell("📞 Mobile No.",phone||(showPrivate?"—":"🔒 Private"))+cell("✉️ Email ID",email||(showPrivate?"—":"🔒 Private"))+cell("🏙️ City",cityTxt||(showPrivate?"—":"🔒 Private"))+cell("💼 Kaam / Job",jobTxt||(showPrivate?"—":"🔒 Private"))+cell("🟢 Status",statusTxt||(showPrivate?"—":"🔒 Private"))+'</div>';
+  var gridHtml="";
+  if(p.photo) gridHtml+='<img src="'+p.photo+'" onclick="openLightbox(0,\'main\')">';
+  pubOld.slice(0,5).forEach(function(ph,idx){ gridHtml+='<img src="'+ph+'" onclick="openLightbox('+idx+',\'old\')">'; });
+  if(!gridHtml) gridHtml='<div style="color:#999;font-size:12px;grid-column:1/-1">Koi photo nahi</div>';
+  var detHtml=pubDetails.slice(0,3).map(function(e){return '<div style="background:#fff8f0;border-radius:10px;padding:8px;margin-top:6px;font-size:13px">📅 '+esc(e.date||"")+'<br>'+esc(e.text||"")+'</div>';}).join("") || '<div style="color:#999;font-size:12px;margin-top:6px">Koi Detail nahi</div>';
+  var thHtml=pubThinks.slice(0,2).map(function(e){return '<div style="background:#fff7cc;border-radius:10px;padding:8px;margin-top:6px;font-size:13px">💭 '+esc(e.text||"")+'</div>';}).join("") || '<div style="color:#999;font-size:12px;margin-top:6px">Koi Thinking nahi</div>';
+  return '<div class="viewCard"><div class="viewCover"><span style="background:'+badgeColor+';color:#fff;padding:5px 10px;border-radius:14px;font-size:12px;font-weight:bold;transform:translateY(35px);margin-left:74px">'+badge+'</span></div><div class="viewBody"><div style="display:flex;gap:10px;align-items:flex-start"><div class="viewAvatar">'+(p.photo?'<img src="'+p.photo+'">':'👩')+'</div><div><b style="font-size:21px">'+esc(name)+'</b><br><span style="font-size:12px;color:#888">Profile View • Sirf '+(showPrivate?"Sab Kuch - Self":"Public Wala - Friends")+'</span></div></div><div style="font-size:13px;font-weight:bold;margin-top:12px">👤 Personal Details - Saaf Sutra Grid</div>'+pGrid+'<div style="font-size:13px;font-weight:bold;margin-top:10px">📸 Photos Grid - click karke View karo</div><div class="viewMiniGrid">'+gridHtml+'</div><div style="font-size:13px;font-weight:bold;margin-top:10px">📝 Detail</div>'+detHtml+'<div style="font-size:13px;font-weight:bold;margin-top:10px">💭 Thinking</div>'+thHtml+'<div class="viewBtnRow"><button style="background:#ff9800" onclick="location.href=\'album.html\'">🖼️ Album Dekho</button><button style="background:#2196F3" onclick="location.href=\'timeline.html\'">📅 Timeline Dekho</button><button style="background:#0a9d4e" onclick="location.href=\'index.html\'">🏠 Home Page</button></div></div></div>';
+}
+
+var VIEW_MODE="self";
+function setViewMode(mode){
+  VIEW_MODE=mode;
+  document.body.classList.toggle("friendMode", mode==="friend");
+  document.getElementById("btnSelf").classList.toggle("off", mode!=="self");
+  document.getElementById("btnFriend").classList.toggle("off", mode!=="friend");
+  if(mode==="friend"){ renderFriendView(); document.getElementById("friendViewBox").scrollIntoView({behavior:"smooth"}); }
+}
+function renderFriendView(){
+  var p=loadProfile();
+  // Friends ko sirf ek hi sundar card - bina Edit, bina Add, sirf Public
+  document.getElementById("friendViewBox").innerHTML='<div class="viewSingle">'+viewCardHTML("Friend","👥 FRIEND VIEW - Friends Ko Aise Dikhega","#2196F3",p,false)+'</div>';
+}
+function togglePreview(){
+  var p=loadProfile(); var box=document.getElementById("previewBox");
+  if(box.style.display==="block"){ box.style.display="none"; return; }
+  box.innerHTML='<b style="font-size:16px">👁️ View - Kaise Dikhega</b><p style="font-size:12px;color:#666;margin:6px 0">Upar wala = Tumko (Self) - sab kuch &nbsp;•&nbsp; Neeche wala = Friends ko - sirf Public</p>'+viewCardHTML("Self","👁️ SELF - Mujhe Kaisa Dikhega","#0a9d4e",p,true)+viewCardHTML("Friend","👥 FRIEND - Friends Ko Kaisa Dikhega","#2196F3",p,false)+'<p style="font-size:12px;color:#666;text-align:center">Album Preview = Upar wali Photos Grid &nbsp;•&nbsp; Timeline Preview = Detail + Thinking, date ke hisaab se</p>';
+  box.style.display="block"; box.scrollIntoView({behavior:"smooth"});
+}
+function shareProfile(){
+  var b=document.getElementById("shareBox"); b.style.display="flex";
+}
+function closeShare(){ document.getElementById("shareBox").style.display="none"; }
+function shareTo(where){
+  var p=loadProfile(); var link=location.origin+location.pathname+"?uid="+encodeURIComponent(uid());
+  var txt="Mera Profile dekho: "+(p.name||"")+" - "+link;
+  if(where==="whatsapp"){ window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank"); }
+  else if(where==="instagram"){ if(navigator.clipboard) navigator.clipboard.writeText(txt); alert("✅ Link copy ho gaya! Instagram kholo aur wahan paste karke Friend ko bhejo."); window.open("https://www.instagram.com/","_blank"); }
+  else if(where==="gmail"){ window.open("mailto:?subject="+encodeURIComponent("Mera Profile - "+(p.name||""))+"&body="+encodeURIComponent(txt),"_blank"); }
+  else if(where==="sms"){ window.open("sms:?body="+encodeURIComponent(txt),"_blank"); }
+  else if(where==="copy"){ if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ alert("✅ Link copy ho gaya!"); }); } else { prompt("Ye link copy karo:", txt); } }
+  closeShare();
+}
+
+function fmtDateTime(ts){
+  try{ var d=new Date(ts||Date.now()); var dd=String(d.getDate()).padStart(2,"0"); var mm=String(d.getMonth()+1).padStart(2,"0"); var yy=d.getFullYear(); var hh=String(d.getHours()).padStart(2,"0"); var mi=String(d.getMinutes()).padStart(2,"0"); return dd+"-"+mm+"-"+yy+"  "+hh+":"+mi; }catch(e){ return ""; }
+}
+function getRecycle(){ try{ return JSON.parse(localStorage.getItem("recycle_bin")||"[]"); }catch(e){ return []; } }
+function toggleRecycle(){
+  var box=document.getElementById("recycleBox");
+  if(box.style.display==="block"){ box.style.display="none"; return; }
+  renderRecycle(); box.style.display="block"; box.scrollIntoView({behavior:"smooth"});
+}
+function renderRecycle(){
+  var box=document.getElementById("recycleBox"); var rb=getRecycle();
+  if(!rb.length){ box.innerHTML='<b>🗑️ Recycle Bin Khali Hai</b><br><span style="font-size:13px;color:#666">Hide kiya hua data yahan date + time ke saath dikhega.</span>'; return; }
+  var h='<b>🗑️ Recycle Bin ('+rb.length+')</b><br><span style="font-size:12px;color:#666">Ye data Profile se Hide hua hai, Firebase se mita nahi hai. Restore dabane par wapas aa jayega.</span><br><br>';
+  rb.forEach(function(item,i){
+    var txt=""; var title=item.type||"Data";
+    if(item.photo) txt="📸 Photo";
+    else if(item.data && item.data.text) txt=item.data.text;
+    else if(item.data) txt=JSON.stringify(item.data);
+    else if(item.text) txt=item.text;
+    h+='<div style="background:#fff8f0;border-radius:10px;padding:10px;margin-bottom:8px;font-size:13px"><b>'+title+'</b><br><span style="color:#777;font-size:12px">📅 '+fmtDateTime(item.time)+'  •  Hide hua: '+fmtDateTime(item.time)+'</span><br><span>'+esc(String(txt).substring(0,120))+'</span><br><button class="sbtn pub" style="margin-top:6px" onclick="restoreRecycle('+i+')">♻️ Restore Karo</button></div>';
+  });
+  box.innerHTML=h;
+}
+function restoreRecycle(i){
+  var rb=getRecycle(); var item=rb[i]; if(!item) return;
+  var p=loadProfile();
+  // Jahan se Hide hua tha, wahi wapas lao
+  if(item.type==="detail" && item.data){ p.details.unshift(item.data); }
+  else if(item.type==="thinking" && item.data){ p.thinkings.unshift(item.data); }
+  else if(item.type==="oldPhoto" && item.photo){ p.oldPhotos.unshift(item.photo); }
+  else if(item.type && item.type.indexOf("history_")===0){
+    var k=item.type.replace("history_","");
+    if(!p.history) p.history={}; if(!p.history[k]) p.history[k]=[];
+    p.history[k].unshift(item.data);
+  }
+  rb.splice(i,1); localStorage.setItem("recycle_bin", JSON.stringify(rb));
+  saveProfile(p,true); render(); renderRecycle();
+  alert("✅ Restore ho gaya! Wapas Profile me aa gaya.");
+}
+
+function doLogout(){ if(confirm("Logout?")){ localStorage.removeItem("auth_uid"); localStorage.removeItem("customer_logged_in"); location.href="customerlogin.html"; } }
+// Firebase se bhi apna data lao (agar local khaali ho)
+try{ if(_fbDb && uid()){ _fbDb.ref("customer_profiles/"+uid()).once("value").then(function(s){ var d=s.val()||{}; var p=loadProfile(); var changed=false; if(d.profileName && !p.name){p.name=d.profileName; changed=true;} if(d.profilePhoto && !p.photo){p.photo=d.profilePhoto; changed=true;} if(changed) saveProfile(p,false); render(); }); } }catch(e){}
+render();
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script>
+
+<script src="view.js"></script>
 </body></html>
