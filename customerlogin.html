@@ -39,18 +39,13 @@ body{background:linear-gradient(135deg,#ff7043,#e65100);min-height:100vh;display
 <div class="box">
 <h1>Login</h1>
 <p>mera ghar and world</p>
-
-<!-- Profile (login hone par dikhega) -->
 <div id="profileBox" style="display:none;text-align:center;">
   <div id="pfAvatar" style="width:90px;height:90px;border-radius:50%;background:#ffe0b2;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden;">👤</div>
   <div id="pfName" style="font-size:22px;font-weight:bold;color:#333;"></div>
   <div id="pfPhone" style="font-size:15px;color:#e65100;margin:4px 0 16px;"></div>
   <button id="pfLogoutBtn" style="background:#f44336;color:#fff;border:none;padding:14px;width:100%;border-radius:30px;font-weight:bold;font-size:16px;cursor:pointer;">🚪 Logout</button>
 </div>
-
-<!-- Gmail form (logout hone par dikhega) -->
 <div id="gmailBox"><span id="loginBtn" style="display:none"></span></div>
-
 <button class="btn btn-back" onclick="location.href='index.html'" style="margin-top:10px;">Wapas</button>
 <div style="background:#e8f5e9;border-radius:10px;padding:10px;font-size:12px;color:#2e7d32;margin-top:12px;text-align:left;">🔒 <b>Safe hai!</b><br>Gmail se login karo — data har phone me milega! ✅</div>
 </div>
@@ -58,32 +53,42 @@ body{background:linear-gradient(135deg,#ff7043,#e65100);min-height:100vh;display
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script>
-// ===== FIREBASE CONFIG - index.html wali ASLI keys yahan bharo =====
+// API CODE - isi file me, index.html wali hi key yahan bharni hai
 var FIREBASE_CONFIG = {
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
   apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
   authDomain: "santramarketshoppingmall.firebaseapp.com",
   databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
   projectId: "santramarketshoppingmall",
   storageBucket: "santramarketshoppingmall.firebasestorage.app",
   messagingSenderId: "398490252924",
-  appId: "1:398490252924:web:8e85fdabd76ec86e3b7bf9",
-  measurementId: "G-D6079MBJ3C"
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"  
 };
-var _fbDb = null;
-try {
-  if (FIREBASE_CONFIG.apiKey !== "TUMHARI_API_KEY") {
-    firebase.initializeApp(FIREBASE_CONFIG);
-    _fbDb = firebase.database();
-    window._fbDb = _fbDb;
-  }
-} catch(e) {}
-// ===== FIREBASE END =====
+try{
+  if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  window._fbDb = firebase.database();
+  window._fbAuth = firebase.auth();
+}catch(e){ console.log("Firebase nahi laga:", e); }
 </script>
+<!-- UPDATE: connect.js SIRF 1 BAAR - pehle 2 baar thi, isliye 2 baar "Unexpected token '<'" aata tha -->
+<script src="connect.js"></script>
 <script>
-// Login hai to PROFILE dikhao, nahi to Gmail form
+// UPDATE: Login hai to PROFILE dikhao - par SIRF current auth_uid wala
 (function(){
+  function showProfile(nm, ph, photo){
+    try{ if(nm) localStorage.setItem("customer_name", nm); if(ph) localStorage.setItem("customer_phone", ph); if(photo) localStorage.setItem("customer_photo", photo); }catch(e){}
+    // UPDATE: pehle nm || "Mehmaan" tha, isliye naam na milte hi Mehmaan dikh jata tha. Ab Load dikhega.
+    document.getElementById("pfName").textContent = nm || "⏳ Naam load ho raha hai...";
+    document.getElementById("pfPhone").textContent = ph ? "📱 " + ph : "";
+    if(photo){
+      var av = document.getElementById("pfAvatar");
+      av.textContent = "";
+      var img = document.createElement("img");
+      img.src = photo;
+      img.style.width = "100%"; img.style.height = "100%"; img.style.objectFit = "cover";
+      av.appendChild(img);
+    }
+  }
   var loggedIn = false;
   try{ loggedIn = localStorage.getItem("customer_logged_in")==="1"; }catch(e){}
   var gmailBox = document.getElementById("gmailBox");
@@ -92,32 +97,56 @@ try {
     if(gmailBox) gmailBox.style.display = "none";
     if(profileBox){
       profileBox.style.display = "block";
+      var curUid = "";
+      try{ curUid = localStorage.getItem("auth_uid") || ""; }catch(e){}
+      try{ if(window.firebase && firebase.auth && firebase.auth().currentUser) curUid = firebase.auth().currentUser.uid || curUid; }catch(e){}
       var d = null, l = null;
       try{ d = JSON.parse(localStorage.getItem("customer_profile") || "null"); }catch(e){}
       try{ l = JSON.parse(localStorage.getItem("customer_login") || "null"); }catch(e){}
-      var nm = (d && d.profileName) || (l && l.name) || "";
-      var ph = (d && d.profilePhone) || (l && l.phone) || "";
-      var photo = (d && (d.profilePhoto || d.photo)) || "";
-      document.getElementById("pfName").textContent = nm || "Mehmaan";
-      document.getElementById("pfPhone").textContent = ph ? "📱 " + ph : "";
-      if(photo){
-        var av = document.getElementById("pfAvatar");
-        av.textContent = "";
-        var img = document.createElement("img");
-        img.src = photo;
-        img.style.width = "100%"; img.style.height = "100%"; img.style.objectFit = "cover";
-        av.appendChild(img);
+      var localOk = false;
+      if(d && curUid && d._uid && d._uid === curUid) localOk = true;
+      if(d && !d._uid && !curUid) localOk = true;
+      if(localOk){
+        showProfile((d && d.profileName) || (l && l.name) || "", (d && d.profilePhone) || (l && l.phone) || "", (d && (d.profilePhoto || d.photo)) || "");
+      } else {
+        // UPDATE: pehle yahan showProfile("","","") tha jo Mehmaan dikha deta tha. Ab Load dikhao, Firebase se aane do.
+        document.getElementById("pfName").textContent = "⏳ Naam load ho raha hai...";
+      }
+      if(curUid && (window._fbDb || (window.firebase && firebase.database && firebase.database()))){ var _fbDb = window._fbDb || firebase.database();
+        _fbDb.ref("customer_profiles/" + curUid).once("value").then(function(s){
+          var P = s.val() || {};
+          var nm = P.profileName || P.name || P.customer_name || "";
+          var ph = P.profilePhone || P.phone || "";
+          var photo = P.profilePhoto || P.photo || "";
+          if(nm || photo){ try{ localStorage.setItem("customer_logged_in","1"); if(curUid) localStorage.setItem("auth_uid", curUid); }catch(e){} showProfile(nm, ph, photo); }
+          else {
+            // Firebase me naam hi nahi hai - to Gmail wale naam se dikhao, Mehmaan nahi
+            try{
+              var gName = localStorage.getItem("customer_name") || (firebase.auth().currentUser && firebase.auth().currentUser.displayName) || "";
+              var gPhoto = localStorage.getItem("customer_photo") || (firebase.auth().currentUser && firebase.auth().currentUser.photoURL) || "";
+              if(gName || gPhoto) showProfile(gName, "", gPhoto);
+            }catch(e){}
+          }
+        });
       }
     }
   } else {
     if(profileBox) profileBox.style.display = "none";
     if(gmailBox) gmailBox.style.display = "block";
   }
+  var lb = document.getElementById("pfLogoutBtn");
+  if(lb){
+    lb.onclick = function(){
+      ["customer_profile","customer_login","customer_name","customer_username","customer_phone","customer_photo","my_profile","auth_uid"].forEach(function(k){ try{localStorage.removeItem(k);}catch(e){} });
+      try{ localStorage.setItem("customer_logged_in","0"); }catch(e){}
+      try{ if(window.firebase && firebase.auth) firebase.auth().signOut(); }catch(e){}
+      location.reload();
+    };
+  }
 })();
 </script>
 <script src="auth.js"></script>
 <script>
-// Fallback: agar 2 second me form na bane to khud banao / error dikhao
 setTimeout(function(){
   if(document.getElementById("authCardInner")) return;
   var gb = document.getElementById("gmailBox");
@@ -130,7 +159,31 @@ setTimeout(function(){
   }
 }, 2000);
 </script>
-<script src="mydata.js"></script>  
-<script src="headername.js"></script>  
-</body>
+<script>
+// UPDATE: Gmail login hote hi auth_uid + naam save karo, reload ka wait mat karo
+// UPDATE: pehle yahan Mehmaan dekh ke location.reload() tha, isliye baar-baar reload hota tha. Ab reload nahi hoga.
+try{
+  if(window.firebase && firebase.auth){
+    firebase.auth().onAuthStateChanged(function(u){
+      if(u && u.uid){
+        try{
+          if(!localStorage.getItem("auth_uid")) localStorage.setItem("auth_uid", u.uid);
+          localStorage.setItem("customer_logged_in","1");
+          if(u.displayName && !localStorage.getItem("customer_name")) localStorage.setItem("customer_name", u.displayName);
+          if(u.photoURL && !localStorage.getItem("customer_photo")) localStorage.setItem("customer_photo", u.photoURL);
+        }catch(e){}
+        try{
+          var pn=document.getElementById("pfName");
+          var pb=document.getElementById("profileBox");
+          if(pn && pb && pb.style.display!=="none" && (!pn.textContent || pn.textContent.indexOf("load ho raha")!==-1)){
+            var gN = u.displayName || localStorage.getItem("customer_name") || "";
+            if(gN) pn.textContent = gN;
+          }
+        }catch(e){}
+      }
+    });
+  }
+}catch(e){}
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
 </html>

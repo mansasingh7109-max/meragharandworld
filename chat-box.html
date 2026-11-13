@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="hi"><head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chat Box</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+// FIREBASE_CONFIG yahan friends.html wali copy karo (wahi apiKey / senderId / appId)
+var FIREBASE_CONFIG={
+  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"  
+};
+var _fbDb=null; try{firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database();}catch(e){}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#fff8f0;color:#333}
+#hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 6px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
+.backbtn{background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;text-decoration:none;font-size:14px}
+#chatHead{background:#e65100;color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;position:relative}
+#chatHead .fp{width:44px;height:44px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;flex-shrink:0}
+#chatHead .fp img{width:100%;height:100%;object-fit:cover}
+#chatHead .nm{font-weight:bold;flex:1}
+#chatHead .st{font-size:11px;opacity:.9}
+.menubtn{background:rgba(255,255,255,.25);color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;flex-shrink:0}
+#chatMenu{display:none;background:#fff;color:#333;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.25);padding:8px;position:absolute;right:10px;top:60px;z-index:30;width:230px}
+#chatMenu button{display:block;width:100%;text-align:left;background:none;border:none;padding:11px;font-size:14px;cursor:pointer;border-bottom:1px solid #f0f0f0}
+#chatMenu button:last-child{border-bottom:none}
+#viewBar{display:none;max-width:600px;margin:8px auto 0;background:#fff3e0;border-radius:12px;padding:10px;text-align:center;font-weight:bold;font-size:14px}
+#chatMsgs{background:#fff;min-height:340px;max-height:calc(100vh - 250px);overflow-y:auto;padding:12px;max-width:600px;margin:0 auto}
+.msg{max-width:78%;padding:8px 12px;border-radius:12px;margin-bottom:8px;font-size:14px;word-wrap:break-word;position:relative}
+.msg.me{background:#dcf8c6;margin-left:auto;text-align:right}
+.msg.them{background:#f1f1f1;margin-right:auto}
+.msg img{max-width:100%;border-radius:8px;margin-top:4px;display:block}
+.msg .tm{font-size:10px;color:#999;margin-top:4px}
+.msg .sel{position:absolute;left:4px;top:4px}
+.chat-input{display:flex;gap:8px;padding:10px;background:#fff;border:1px solid #eee;max-width:600px;margin:0 auto}
+.chat-input input{flex:1;padding:10px;border:1px solid #ddd;border-radius:20px;outline:none;font-size:14px}
+.attachbtn{background:#fff;border:1px solid #ddd;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sendchatbtn{background:#25D366;color:#fff;border:none;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;flex-shrink:0}
+.empty{text-align:center;color:#999;padding:20px;font-size:14px}
+</style></head><body>
+<header id="hdr"><a class="backbtn" href="friends.html">← Wapas</a><div style="flex:1;text-align:center;font-weight:bold">💬 Chat Box</div><div style="width:70px"></div></header>
+<div id="chatHead"><div class="fp" id="headPhoto">👤</div><div style="flex:1"><div class="nm" id="headName">Loading...</div><div class="st" id="headStatus"></div></div><button onclick="location.href='friend-profile.html?uid='+friendUid" style="background:#fff;color:#e65100;border:none;padding:8px 14px;border-radius:20px;font-weight:bold;cursor:pointer;flex-shrink:0">👤 Profile</button><button id="headBlockBtn" onclick="doBlockToggle()" style="background:#fff;color:#d32f2f;border:none;padding:8px 12px;border-radius:20px;font-weight:bold;cursor:pointer;flex-shrink:0">🚫 Block</button><button class="menubtn" onclick="toggleMenu(event)">⋮</button><div id="chatMenu"></div></div>
+<div id="viewBar"></div>
+<div id="chatMsgs"><div class="empty">⏳ Chat load ho raha hai...</div></div>
+<div class="chat-input"><label class="attachbtn">📎<input type="file" id="chatFile" accept="image/*,video/*" style="display:none" onchange="sendFile(this)"></label><input id="chatText" placeholder="Message likho..." onkeypress="if(event.key==='Enter')sendMsg()"><button class="sendchatbtn" onclick="sendMsg()">➤</button></div>
+<script>
+function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function getMyUid(){try{return localStorage.getItem("auth_uid")||"";}catch(e){return "";}}
+function getMyName(){try{return localStorage.getItem("customer_name")||localStorage.getItem("customer_username")||"Me";}catch(e){return "Me";}}
+var friendUid=""; try{var m=location.search.match(/[?&]uid=([^&]+)/); if(m) friendUid=decodeURIComponent(m[1]);}catch(e){}
+var myUid=getMyUid(); var friendName="Friend", friendPhoto="👤";
+var msgsCache=[], recycleCache=[], viewMode="chat", selectedIdx=[];
+var blockedNow=false;
+// DATE-TIME - hamesha poori date + time: 9 Nov 2026, 11:47 PM
+function fmtDT(ts){try{var d=new Date(ts||Date.now());var mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];var h=d.getHours();var ap=h>=12?"PM":"AM";h=h%12;if(h===0)h=12;return d.getDate()+" "+mo[d.getMonth()]+" "+d.getFullYear()+", "+h+":"+String(d.getMinutes()).padStart(2,"0")+" "+ap;}catch(e){return "";}}
+function chatTime(m){ if(m&&(m.ts||m.timestamp)) return fmtDT(m.ts||m.timestamp); return (m&&m.time)||""; }
+// LOCAL BACKUP KEY - hamesha save rahega, net na bhi ho to
+function backupKey(){ return "chat_backup_"+myUid+"_"+friendUid; }
+function loadBackup(){ try{return JSON.parse(localStorage.getItem(backupKey())||"[]");}catch(e){return [];} }
+function saveBackup(arr){ try{localStorage.setItem(backupKey(), JSON.stringify(arr));}catch(e){} }
+function recycleKey(){ return "chat_recycle_"+myUid+"_"+friendUid; }
+function loadRecycleLocal(){ try{return JSON.parse(localStorage.getItem(recycleKey())||"[]");}catch(e){return [];} }
+function saveRecycleLocal(arr){ try{localStorage.setItem(recycleKey(), JSON.stringify(arr));}catch(e){} }
+function chatPath(){ return "chats/"+myUid+"/"+friendUid; }
+function chatPathRev(){ return "chats/"+friendUid+"/"+myUid; }
+function recyclePath(){ return "recycle_bin/"+myUid+"/"+friendUid; }
+function loadFriend(){
+  if(!friendUid){document.getElementById('headName').textContent="Friend nahi mila - friends.html se kholo";return;}
+  if(!_fbDb) return;
+  _fbDb.ref("customer_profiles/"+friendUid).once("value").then(function(s){
+    var P=s.val()||{}; friendName=P.profileName||P.name||P.customer_name||"Friend";
+    friendPhoto=P.profilePhoto||P.photo||P.profileImage||"👤";
+    document.getElementById('headName').textContent=friendName;
+    document.getElementById('headStatus').textContent=(P.role||P.profileDetail||"");
+    var hp=document.getElementById('headPhoto');
+    if(String(friendPhoto).indexOf("http")===0||String(friendPhoto).indexOf("data:")===0) hp.innerHTML='<img src="'+friendPhoto+'">'; else hp.textContent=friendPhoto;
+  });
+  if(myUid){ _fbDb.ref("blocked/"+myUid+"/"+friendUid).once("value").then(function(s){ blockedNow=!!s.val(); updateHeadStatus(); }); }
+}
+function updateHeadStatus(){ document.getElementById('headStatus').textContent = blockedNow ? "🔴 Blocked" : ""; var bb=document.getElementById('headBlockBtn'); if(bb) bb.textContent = blockedNow ? "✅ Unblock" : "🚫 Block"; }
+// MENU - ⋮ dabane par popup: Block / Delete / Recycle / Gmail
+function toggleMenu(e){ if(e) e.stopPropagation(); var m=document.getElementById('chatMenu'); if(m.style.display==="block"){m.style.display="none";return;} renderMenu(); m.style.display="block"; }
+function renderMenu(){
+  var m=document.getElementById('chatMenu'); var h="";
+  h+='<button onclick="closeMenu();doBlockToggle()">'+(blockedNow?"✅ Unblock Karo":"🚫 Block Karo")+'</button>';
+  h+='<button onclick="closeMenu();deleteSelected()">🗑️ Delete Selected</button>';
+  h+='<button onclick="closeMenu();deleteAll()">🗑️ All Delete</button>';
+  h+='<button onclick="closeMenu();showRecycle()">♻️ Recycle Bin Dekho</button>';
+  h+='<button onclick="closeMenu();showChat()">💬 Chat Wapas Dekho</button>';
+  h+='<button onclick="closeMenu();sendToGmail()">📧 Send to Gmail</button>';
+  h+='<button onclick="closeMenu()">✕ Band Karo</button>';
+  m.innerHTML=h;
+}
+function closeMenu(){ document.getElementById('chatMenu').style.display="none"; }
+document.addEventListener('click',function(e){ var m=document.getElementById('chatMenu'); if(m&&m.style.display==="block"&&!m.contains(e.target)&&!e.target.classList.contains('menubtn')) m.style.display="none"; });
+// CHAT LOAD - Firebase se + local backup se, hamesha save rahega
+function loadMsgs(){
+  var box=document.getElementById('chatMsgs');
+  if(!myUid){box.innerHTML='<div class="empty">🔐 Pehle login karo</div>';return;}
+  var bk=loadBackup(); if(bk.length){ msgsCache=bk; renderList(bk); }
+  if(!_fbDb) return;
+  _fbDb.ref(chatPath()).on("value",function(snap){
+    var val=snap.val()||{}; var arr=Object.keys(val).map(function(k){var m=val[k];m.id=m.id||k;return m;});
+    arr.sort(function(a,b){return (a.ts||a.timestamp||0)-(b.ts||b.timestamp||0);});
+    msgsCache=arr; saveBackup(arr); if(viewMode==="chat") renderList(arr);
+  });
+  _fbDb.ref(recyclePath()).on("value",function(snap){
+    var val=snap.val()||{}; var arr=Object.keys(val).map(function(k){var m=val[k];m.id=m.id||k;return m;});
+    arr.sort(function(a,b){return (b.deletedTime||0)-(a.deletedTime||0);});
+    recycleCache=arr; saveRecycleLocal(arr); if(viewMode==="recycle") renderRecycle();
+  });
+}
+function renderList(arr){
+  viewMode="chat"; selectedIdx=[]; updateSelCount();
+  document.getElementById('viewBar').style.display="none";
+  var box=document.getElementById('chatMsgs');
+  if(!arr.length){box.innerHTML='<div class="empty">👋 '+esc(friendName)+' se chat shuru karo!</div>';return;}
+  var html=""; arr.forEach(function(m,i){
+    var cls=(m.fromUid===myUid||m.me===true)?"me":"them"; var content="";
+    if(m.type==="image") content='<img src="'+m.text+'">';
+    else if(m.type==="video") content='<video src="'+m.text+'" controls style="max-width:100%;border-radius:8px;"></video>';
+    else if(m.type==="file") content='📎 <a href="'+m.text+'" download="'+esc(m.fname||"file")+'">'+esc(m.fname||"file")+'</a>';
+    else content=esc(m.text||"");
+    var chk='<input type="checkbox" class="msgSel" data-idx="'+i+'" onchange="onSelChange()" style="width:18px;height:18px">';
+    html+='<div class="msg '+cls+'"><label class="sel">'+chk+'</label><div style="padding-left:22px">'+content+'</div><div class="tm">'+esc(chatTime(m))+'</div></div>';
+  });
+  box.innerHTML=html; box.scrollTop=box.scrollHeight;
+}
+function onSelChange(){ selectedIdx=[]; document.querySelectorAll('.msgSel:checked').forEach(function(c){selectedIdx.push(parseInt(c.getAttribute('data-idx')));}); updateSelCount(); }
+function toggleSelAll(on){ document.querySelectorAll('.msgSel').forEach(function(c){c.checked=on;}); onSelChange(); }
+function updateSelCount(){ var sc=document.getElementById('selCount'); if(sc) sc.textContent = selectedIdx.length ? selectedIdx.length+" selected" : ""; }
+function showChat(){ viewMode="chat"; renderList(msgsCache); }
+// SEND - Firebase (dono taraf) + local backup, hamesha save
+function sendMsg(){
+  var inp=document.getElementById('chatText'); var txt=inp.value.trim(); if(!txt) return;
+  if(!myUid){alert("Pehle login karo!");location.href="customerlogin.html";return;}
+  var ts=Date.now(); var id="m_"+ts+"_"+Math.floor(Math.random()*1000);
+  var msg={id:id,me:true,type:"text",text:txt,time:fmtDT(ts),ts:ts,fromUid:myUid,fromName:getMyName(),toUid:friendUid,toName:friendName};
+  msgsCache.push(msg); saveBackup(msgsCache); renderList(msgsCache); inp.value="";
+  if(_fbDb){ _fbDb.ref(chatPath()+"/"+id).set(msg); _fbDb.ref(chatPathRev()+"/"+id).set(msg); }
+}
+function sendFile(input){
+  var file=input.files[0]; if(!file) return;
+  if(file.size>5*1024*1024){alert("File 5MB se chhoti honi chahiye!");input.value="";return;}
+  var reader=new FileReader(); reader.onload=function(e){
+    var ts=Date.now(); var id="m_"+ts+"_"+Math.floor(Math.random()*1000);
+    var type="file"; if(file.type.indexOf("image")===0) type="image"; else if(file.type.indexOf("video")===0) type="video";
+    var msg={id:id,me:true,type:type,text:e.target.result,fname:file.name,time:fmtDT(ts),ts:ts,fromUid:myUid,fromName:getMyName(),toUid:friendUid,toName:friendName};
+    msgsCache.push(msg); saveBackup(msgsCache); renderList(msgsCache);
+    if(_fbDb){ _fbDb.ref(chatPath()+"/"+id).set(msg); _fbDb.ref(chatPathRev()+"/"+id).set(msg); }
+    input.value="";
+  }; reader.readAsDataURL(file);
+}
+// DELETE -> RECYCLE BIN (dost ke paas rahega, mere paas Recycle me jayega)
+function moveToRecycle(list){
+  if(!list.length) return;
+  list.forEach(function(m){
+    m.withName=friendName; m.withUid=friendUid; m.deletedTime=Date.now();
+    if(_fbDb) _fbDb.ref(recyclePath()+"/"+m.id).set(m);
+  });
+  var rl=loadRecycleLocal(); list.forEach(function(m){ if(!rl.some(function(x){return x.id===m.id;})) rl.push(m); });
+  saveRecycleLocal(rl); recycleCache=rl;
+  var delSet={}; list.forEach(function(m){delSet[m.id]=true;});
+  msgsCache=msgsCache.filter(function(m){return !delSet[m.id];});
+  saveBackup(msgsCache);
+  list.forEach(function(m){ if(_fbDb){ _fbDb.ref(chatPath()+"/"+m.id).remove(); _fbDb.ref(chatPathRev()+"/"+m.id).remove(); } });
+  renderList(msgsCache);
+}
+function deleteSelected(){
+  var list=selectedIdx.map(function(i){return msgsCache[i];}).filter(Boolean);
+  if(viewMode==="recycle"){ restoreSelected(); return; }
+  if(!list.length){alert("Pehle koi message select karo (checkbox tick karo)");return;}
+  if(!confirm(list.length+" message delete karein? Sirf TUMHARE paas se delete hoga, Recycle me jayega.")) return;
+  moveToRecycle(list); alert("✅ Delete ho gaya - Recycle Bin me hai");
+}
+function deleteAll(){
+  if(viewMode==="recycle"){ alert("Recycle me ho - wahan se Restore karo ya Recycle khaali karo"); return; }
+  if(!msgsCache.length){alert("Chat khaali hai");return;}
+  if(!confirm("Saara chat delete karein? Sirf TUMHARE paas se delete hoga, Recycle me jayega.")) return;
+  moveToRecycle(msgsCache.slice()); alert("✅ Saara chat Recycle Bin me hai");
+}
+// RECYCLE BIN - dekho + wapas lao
+function showRecycle(){
+  viewMode="recycle"; selectedIdx=[]; updateSelCount();
+  var bar=document.getElementById('viewBar'); bar.style.display="block";
+  bar.innerHTML='♻️ Recycle Bin - '+recycleCache.length+' deleted messages &nbsp; <button onclick="restoreAll()" style="background:#4caf50;color:#fff;border:none;padding:6px 12px;border-radius:14px;font-weight:bold;cursor:pointer">↩️ Sab Wapas Lao</button> <button onclick="emptyRecycle()" style="background:#f44336;color:#fff;border:none;padding:6px 12px;border-radius:14px;font-weight:bold;cursor:pointer">🗑️ Recycle Khaali Karo</button>';
+  renderRecycle();
+}
+function renderRecycle(){
+  var box=document.getElementById('chatMsgs');
+  if(!recycleCache.length){box.innerHTML='<div class="empty">♻️ Recycle khaali hai</div>';return;}
+  var html=""; recycleCache.forEach(function(m,i){
+    var content=""; if(m.type==="image") content='<img src="'+m.text+'">'; else if(m.type==="video") content='<video src="'+m.text+'" controls style="max-width:100%;border-radius:8px;"></video>'; else content=esc(m.text||"");
+    html+='<div class="msg them"><label class="sel"><input type="checkbox" class="msgSel" data-idx="'+i+'" onchange="onSelChange()" style="width:18px;height:18px"></label><div style="padding-left:22px">'+content+'</div><div class="tm">🗑️ Deleted: '+esc(fmtDT(m.deletedTime))+' • '+esc(chatTime(m))+'</div><div style="margin-top:6px"><button onclick="restoreOne('+i+')" style="background:#4caf50;color:#fff;border:none;padding:6px 12px;border-radius:14px;font-weight:bold;cursor:pointer">↩️ Wapas Lao</button></div></div>';
+  });
+  box.innerHTML=html;
+}
+function restoreOne(i){
+  var m=recycleCache[i]; if(!m) return; restoreList([m]);
+}
+function restoreSelected(){
+  var list=selectedIdx.map(function(i){return recycleCache[i];}).filter(Boolean);
+  if(!list.length){alert("Pehle koi message select karo");return;}
+  restoreList(list);
+}
+function restoreAll(){ if(!recycleCache.length){alert("Recycle khaali hai");return;} restoreList(recycleCache.slice()); }
+function restoreList(list){
+  list.forEach(function(m){
+    var nm={id:m.id,me:(m.fromUid===myUid||m.me===true),type:m.type||"text",text:m.text||"",fname:m.fname||"",time:m.time||fmtDT(m.ts),ts:m.ts||Date.now(),fromUid:m.fromUid||myUid,fromName:m.fromName||getMyName(),toUid:friendUid,toName:friendName};
+    if(_fbDb){ _fbDb.ref(chatPath()+"/"+nm.id).set(nm); _fbDb.ref(chatPathRev()+"/"+nm.id).set(nm); _fbDb.ref(recyclePath()+"/"+nm.id).remove(); }
+    if(!msgsCache.some(function(x){return x.id===nm.id;})) msgsCache.push(nm);
+  });
+  var delSet={}; list.forEach(function(m){delSet[m.id]=true;});
+  recycleCache=recycleCache.filter(function(m){return !delSet[m.id];});
+  saveRecycleLocal(recycleCache); saveBackup(msgsCache);
+  msgsCache.sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  alert("✅ "+list.length+" message wapas aa gaya!");
+  showChat();
+}
+function emptyRecycle(){
+  if(!recycleCache.length){alert("Recycle khaali hai");return;}
+  if(!confirm("Recycle Bin hamesha ke liye khaali karein? Ye wapas nahi aayega.")) return;
+  recycleCache.forEach(function(m){ if(_fbDb) _fbDb.ref(recyclePath()+"/"+m.id).remove(); });
+  recycleCache=[]; saveRecycleLocal([]); renderRecycle(); alert("✅ Recycle khaali ho gaya");
+}
+// BLOCK / UNBLOCK
+function doBlockToggle(){
+  if(blockedNow){ if(_fbDb&&myUid) _fbDb.ref("blocked/"+myUid+"/"+friendUid).remove(); blockedNow=false; alert("✅ Unblock ho gaya"); }
+  else{ if(!confirm(friendName+" ko Block karein?")) return; if(_fbDb&&myUid) _fbDb.ref("blocked/"+myUid+"/"+friendUid).set({name:friendName,time:Date.now()}); blockedNow=true; alert("🚫 Block ho gaya"); }
+  updateHeadStatus();
+}
+// SEND TO GMAIL - poora chat date-time ke saath
+function sendToGmail(){
+  var txt=msgsCache.map(function(m){return (m.fromUid===myUid||m.me===true?"Me":friendName)+": "+(m.text||"")+"  ["+chatTime(m)+"]";}).join("\n");
+  window.open("mailto:?subject="+encodeURIComponent("Chat with "+friendName)+"&body="+encodeURIComponent(txt||"Chat khaali hai"));
+  if(_fbDb) _fbDb.ref("chat_exports/"+myUid).push({with:friendName,text:txt,time:Date.now()});
+  alert("📧 Gmail khul gaya");
+}
+loadFriend(); loadMsgs();
+</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
