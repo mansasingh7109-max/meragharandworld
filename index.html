@@ -37,20 +37,19 @@ body{background:#FCE4EC !important;margin:0;padding:0;}
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  
+
+</body>
 <script>
 // ===== FIREBASE CONFIG (apni keys yahan bharo) =====
 var FIREBASE_CONFIG = {
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
   authDomain: "santramarketshoppingmall.firebaseapp.com",
   databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
   projectId: "santramarketshoppingmall",
   storageBucket: "santramarketshoppingmall.firebasestorage.app",
   messagingSenderId: "398490252924",
-  appId: "1:398490252924:web:8e85fdabd76ec86e3b7bf9",
-  measurementId: "G-D6079MBJ3C"
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"  
 };
 
 var _fbDb = null;
@@ -301,7 +300,7 @@ dish8Msg: "Message yahan likho",
 dish8Detail: "Dish 8 ka lamba detail yahan likho.",
 profileOn: "on", // OPTION: "on"=profile dikhega, "off"=gayab
 profilePhoto: "👩", // OPTION: emoji ya photo ka link (https://...)
-profileName: "Manisha", // OPTION: naam
+profileName: "", // OPTION: naam - khali rakho, Login wala naam aayega
 profilePhone: "8769171078", // OPTION: phone
 profileDetail: "Customer ka lamba detail yahan likho.", // OPTION: lamba detail
 profileThinking: "", // OPTION: customer kya soch raha hai - thinking box (unlimited words, khaali = nahi dikhega)
@@ -488,7 +487,7 @@ Object.keys(r[3].val()||{}).forEach(function(k){S[k]="blocked"});
 var val=r[4].val()||{}; var w="",a="",inc="",sent="";
 Object.keys(val).forEach(function(id){
 
-var P=val[id]||{}; var name=(P.profileName||P.name||"Friend"); var phone=(P.profilePhone||P.phone||""); if(id===uid) return; if(name==="Manisha") return; if(phone===localStorage.getItem("customer_phone")) return;
+var P=val[id]||{}; var name=(P.profileName||P.name||"Friend"); var phone=(P.profilePhone||P.phone||""); if(id===uid) return;  if(phone===localStorage.getItem("customer_phone")) return;
 if(q && name.toLowerCase().indexOf(q)===-1) return;
 var photo=P.profilePhoto||"👤";
 var ph='<div style="width:44px;height:44px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden">'+(photo!=="👤"?'<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover">':"👤")+'</div>';
@@ -922,7 +921,10 @@ var _d={};try{_d=JSON.parse(localStorage.getItem("customer_profile")||"{}");}cat
   
 try{localStorage.setItem("customer_profile",JSON.stringify(_d));}catch(e){}
 try{localStorage.setItem("customer_logged_in","1");}catch(e){}
-var _cid2=(OPT&&OPT.customerId)||"customer1";
+var _cid2=_ph2?("phone_"+_ph2.replace(/[^0-9]/g,"")):("name_"+_nm.toLowerCase().replace(/\s+/g,"_"));
+try{localStorage.setItem("auth_uid",_cid2);}catch(e){}
+_d._uid=_cid2;_d.profileName=_nm;_d.profilePhone=_ph2;
+try{localStorage.setItem("customer_profile",JSON.stringify(_d));}catch(e){}
 if(window._fbDb){try{_fbDb.ref("customer_profiles/"+_cid2).set(_d);}catch(e){}}
 alert("Welcome, "+_nm+"! ✅");
 location.reload();
@@ -956,7 +958,7 @@ document.getElementById('pfGalPage').style.display="block";});}
 var _bk=document.getElementById('pfGalBack');
 if(_bk){_bk.addEventListener('click',function(){document.getElementById('pfGalPage').style.display="none";});}
 },600);}
-var cardHtml='<div style="background:#fff;padding:16px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center;width:'+_bsz+'px;max-width:95%;">'+phHtml+'<div style="font-size:18px;font-weight:bold;margin-top:8px;color:#333">'+OPT.profileName+'</div>'+(OPT.profilePhone?'<div style="font-size:14px;color:#e65100">📞 '+OPT.profilePhone+'</div>':'')+(OPT.customerStatus?'<div style="margin-top:8px;"><span style="background:#e8f5e9;padding:6px 14px;border-radius:16px;display:inline-block;"><b style="font-size:12px;color:#2e7d32;">🟢 </b><span style="font-size:13px;color:#333;">'+OPT.customerStatus+'</span></span></div>':'')+'<div class="cardDetailTL" style="margin-top:8px;text-align:left;"></div><div class="cardThinkTL" style="margin-top:6px;text-align:left;"></div>'
+var cardHtml='<div style="background:#fff;padding:16px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center;width:'+_bsz+'px;max-width:95%;">'+phHtml+'<div style="font-size:18px;font-weight:bold;margin-top:8px;color:#333">'+(OPT.profileName||(function(){try{return JSON.parse(localStorage.getItem("customer_profile")||"{}").profileName||""}catch(e){return ""}})()||"Apna naam Login me likho")+'</div>'+(OPT.profilePhone?'<div style="font-size:14px;color:#e65100">📞 '+OPT.profilePhone+'</div>':'')+(OPT.customerStatus?'<div style="margin-top:8px;"><span style="background:#e8f5e9;padding:6px 14px;border-radius:16px;display:inline-block;"><b style="font-size:12px;color:#2e7d32;">🟢 </b><span style="font-size:13px;color:#333;">'+OPT.customerStatus+'</span></span></div>':'')+'<div class="cardDetailTL" style="margin-top:8px;text-align:left;"></div><div class="cardThinkTL" style="margin-top:6px;text-align:left;"></div>'
 // SUMMARY BADGES (maine kya-kya add kiya)
 +(function(){var _sc=0;for(var _sq=2;_sq<=15;_sq++){if(OPT['profilePhoto'+_sq]&&OPT['profilePhoto'+_sq]!=="")_sc++;}
 var _sb='<div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px;">';
@@ -2220,8 +2222,16 @@ setTimeout(paint,3000);
 })();
 </script>
 
+  <script src="clean.js"></script>
+
+   <script src="view.js"></script> 
+
+   <script src="friend-data.js"></script>
 <script src="mydata.js"></script>  
 
 <script src="headername.js"></script>  
-  
+
+<script src="connect.js"></script>
+
+
 </body></html>
