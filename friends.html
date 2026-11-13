@@ -73,21 +73,36 @@ body{background:#fff8f0;color:#333}
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
 var FIREBASE_CONFIG = {
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
   apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
   authDomain: "santramarketshoppingmall.firebaseapp.com",
   databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
   projectId: "santramarketshoppingmall",
   storageBucket: "santramarketshoppingmall.firebasestorage.app",
   messagingSenderId: "398490252924",
-  appId: "1:398490252924:web:8e85fdabd76ec86e3b7bf9",
-  measurementId: "G-D6079MBJ3C"
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"  
 };
-
 var _fbDb=null;
 try{ firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database(); }catch(e){}
 var FRIENDS=[];
+
+// UPDATE: Chat date-time - sirf time nahi, poori date + time (13 Nov, 7:30 PM)
+function FD_fmtDateTime(ts){
+  try{
+    var d=new Date(ts||Date.now());
+    var months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    var h=d.getHours(); var ap=h>=12?"PM":"AM"; h=h%12; if(h===0) h=12;
+    return d.getDate()+" "+months[d.getMonth()]+" "+d.getFullYear()+", "+h+":"+String(d.getMinutes()).padStart(2,"0")+" "+ap;
+  }catch(e){ return ""; }
+}
+function FD_chatTime(m){
+  // Purane msg me sirf "19:5" jaisa time tha - usko bhi date-time bana do
+  if(m && (m.ts||m.timestamp)) return FD_fmtDateTime(m.ts||m.timestamp);
+  return (m && m.time) || "";
+}
+// UPDATE: Status - sirf isi friend (uid) ka status
+function friendStatusOf(uid){ return (typeof FRIEND_STATUS!=="undefined" && FRIEND_STATUS[uid]) || "none"; }
+;
 var FRIEND_STATUS={};
 var myUid="";
 try{ myUid=localStorage.getItem("auth_uid")||""; }catch(e){}
@@ -144,8 +159,7 @@ function loadAll(){
       if(uid===myUid) return;
       if(_seen[uid]) return; _seen[uid]=true;
       var v=ch.val()||{};
-      var _dk=(v.profilePhone||v.phone||"")+"|"+(v.profileName||v.name||"");
-      if(_dk && _seen[_dk]) return; if(_dk) _seen[_dk]=true;
+      // UPDATE: Dedup sirf UID se karo - phone se nahi. Same phone pe Manisha + Santosh dono ka login hai to Santosh gayab ho jati thi. Ab saare login IDs dikhenge.
       arr.push({
         _uid: uid,
         name: v.profileName||v.name||"User",
@@ -316,15 +330,36 @@ function openDetailByUid(uid){
   } else {
     html+='<button class="pbtn" style="background:#25D366;" onclick="sendRequest(\''+f._uid+'\')">📩 Friend Request Bhejo - '+esc(f.name)+' ko</button>';
   }
-  html+='<a class="pbtn" style="background:#e65100;" href="profile.html?uid='+f._uid+'">👤 Friend Profile - '+esc(f.name)+' ka Profile Dekho</a>';
-  html+='<a class="pbtn" style="background:#7b1fa2;" href="album.html?uid='+f._uid+'">📸 Friend Album - '+esc(f.name)+' ka Album Dekho (Friend ka)</a>';
-  html+='<a class="pbtn" style="background:#2196F3;" href="timedatalist.html?uid='+f._uid+'">📅 Friend Timeline - '+esc(f.name)+' ki Timeline Dekho (Friend ki)</a>';
-  html+='<a class="pbtn" style="background:#ff7043;" href="index.html?uid='+f._uid+'">🏠 Friend Home - '+esc(f.name)+' ke Posts Dekho</a>';
+  html+='<a class="pbtn" style="background:#e65100;" href="friend-profile.html?uid='+f._uid+'">👤 Friend Profile - '+esc(f.name)+' ka Profile Dekho</a>';
+  html+='<a class="pbtn" style="background:#7b1fa2;" href="friend-view.html?uid='+f._uid+'&tab=album">📸 Friend Album - '+esc(f.name)+' ka Album Dekho (Friend ka)</a>';
+  html+='<a class="pbtn" style="background:#2196F3;" href="friend-view.html?uid='+f._uid+'&tab=timeline">📅 Friend Timeline - '+esc(f.name)+' ki Timeline Dekho (Friend ki)</a>';
+  html+='<a class="pbtn" style="background:#ff7043;" href="friend-view.html?uid='+f._uid+'&tab=friends">🏠 Friend Home - '+esc(f.name)+' ke Posts Dekho</a>';
   document.getElementById('detailCard').innerHTML=html;
   document.getElementById('listView').style.display="none";
   document.getElementById('detailPage').style.display="block";
   document.getElementById('chatPage').style.display="none";
 }
+
+
+// UPDATE: openDetailByUid - old code same, uske baad sirf isi uid ka fresh data Firebase se lao
+var _openDetailOrig = openDetailByUid;
+openDetailByUid = function(uid){
+  _openDetailOrig(uid);
+  if(!_fbDb || !uid || String(uid).indexOf("local_")===0) return;
+  _fbDb.ref("customer_profiles/"+uid).once("value").then(function(s){
+    var P=s.val()||{}; if(!P || !Object.keys(P).length) return;
+    var card=document.getElementById('detailCard'); if(!card) return;
+    var freshName=P.profileName||P.name||P.customer_name||"";
+    var freshPhoto=P.profilePhoto||P.photo||P.profileImage||"";
+    var freshDetail=P.profileDetail||P.status||P.detail||"";
+    var h2=card.querySelector('h2'); if(h2 && freshName) h2.textContent=freshName;
+    var desc=card.querySelector('.desc'); if(desc && freshDetail) desc.textContent=freshDetail;
+    var big=card.querySelector('.bigphoto'); if(big && freshPhoto){ big.innerHTML='<img src="'+freshPhoto+'">'; }
+    // FRIENDS list me bhi isi uid ka data update karo, baaki sab same
+    var ix=FRIENDS.findIndex(function(x){return x._uid===uid;});
+    if(ix!==-1){ if(freshName) FRIENDS[ix].name=freshName; if(freshPhoto) FRIENDS[ix].photo=freshPhoto; if(freshDetail) FRIENDS[ix].detail=freshDetail; }
+  }).catch(function(){});
+};
 
 function showList(){
   document.getElementById('listView').style.display="block";
@@ -438,15 +473,21 @@ function loadChatMsgs(){
     var fbMsgs=[];
     snap.forEach(function(ch){
       var v=ch.val()||{};
-      fbMsgs.push({me:true, text:v.msg||v.text||"", time:v.time||"", ts:v.timestamp||0, fromFb:true});
+      // UPDATE: Purani chat me from nahi hai - is path me hai to Meri hai (me=true)
+      var _isMe = v.from ? (v.from===myUid) : true;
+      fbMsgs.push({me:_isMe, text:v.msg||v.text||"", time:v.time||"", ts:v.timestamp||0, fromFb:true, from:v.from||""});
     });
     return _fbDb.ref("chats/"+chatWithUid+"/"+myUid).once("value").then(function(snap2){
       snap2.forEach(function(ch){
         var v=ch.val()||{};
-        fbMsgs.push({me:false, text:v.msg||v.text||"", time:v.time||"", ts:v.timestamp||0, fromFb:true});
+        // UPDATE: Purani chat me from nahi hai - is path me hai to Friend ki hai (me=false)
+        var _isMe2 = v.from ? (v.from===myUid) : false;
+        // Agar from==myUid hai to ye mera hi duplicate hai - dedup me mit jayega
+        fbMsgs.push({me:_isMe2, text:v.msg||v.text||"", time:v.time||"", ts:v.timestamp||0, fromFb:true, from:v.from||""});
       });
-      var _map={}; fbMsgs.forEach(function(m){ _map[(m.text||"")+"|"+(m.ts||"")+"|"+(m.me?"1":"0")]=m; });
-      localMsgs.forEach(function(m){ var k=(m.text||"")+"|"+(m.ts||"")+"|"+(m.me?"1":"0"); if(!_map[k]) _map[k]=m; });
+      // UPDATE: OLD + NEW sab dikhenge, duplicate 1 baar - key sirf text+time se, me se nahi
+      var _map={}; fbMsgs.forEach(function(m){ var _k=(m.text||"")+"|"+(m.ts||"")+"|"+(m.time||""); if(!_map[_k] || m.me) _map[_k]=m; });
+      localMsgs.forEach(function(m){ var k=(m.text||"")+"|"+(m.ts||"")+"|"+(m.time||""); if(!_map[k]) _map[k]=m; });
       var all=Object.keys(_map).map(function(k){return _map[k];});
       all.sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
       renderChat(all);
@@ -467,7 +508,7 @@ function renderChat(msgs){
   msgs.forEach(function(m, idx){
     var cls=m.me?"me":"them";
     var sel=selectedMsgs.indexOf(idx)!==-1;
-    html+='<div class="msg '+cls+'" onclick="selectMsg('+idx+')" style="'+(sel?'border:2px solid #e65100;':'')+'"><input type="checkbox" '+(sel?'checked':'')+' style="margin-right:6px;" onclick="event.stopPropagation(); selectMsg('+idx+')">'+esc(m.text||"")+'<div class="tm">'+esc(m.time||"")+' '+(m.fromFb?'📦 Firebase':'📱 Local')+'</div></div>';
+    html+='<div class="msg '+cls+'" onclick="selectMsg('+idx+')" style="'+(sel?'border:2px solid #e65100;':'')+'"><input type="checkbox" '+(sel?'checked':'')+' style="margin-right:6px;" onclick="event.stopPropagation(); selectMsg('+idx+')">'+esc(m.text||"")+'<div class="tm">'+esc(FD_chatTime(m))+'</div></div>';
   });
   box.innerHTML=html;
   box.scrollTop=box.scrollHeight;
@@ -520,7 +561,7 @@ function deleteAll(){
 
 function showRecycle(){
   var recycle=[]; try{ recycle=JSON.parse(localStorage.getItem(_k("chat_recycle"))||"[]"); }catch(e){}
-  if(_fbDb && myUid){ _fbDb.ref("recycle_bin/"+myUid).once("value").then(function(s){ var fb=[]; s.forEach(function(ch){ fb.push(ch.val()||{}); }); var all=recycle.concat(fb); if(all.length===0){ alert("Recycle Bin khali hai"); return; } var box=document.getElementById('chatMsgs'); var h='<div style="background:#fff3e0;padding:12px;border-radius:12px;"><b>♻️ Recycle Bin - '+all.length+' deleted messages (Firebase me safe hain, kabhi delete nahi hote)</b></div>'; all.forEach(function(m){ h+='<div class="msg them">'+esc(m.text||"")+'<div class="tm">'+esc(m.time||"")+' • '+esc(m.withName||chatWithName)+'</div></div>'; }); box.innerHTML=h; }); return; }
+  if(_fbDb && myUid){ _fbDb.ref("recycle_bin/"+myUid).once("value").then(function(s){ var fb=[]; s.forEach(function(ch){ fb.push(ch.val()||{}); }); var all=recycle.concat(fb); if(all.length===0){ alert("Recycle Bin khali hai"); return; } var box=document.getElementById('chatMsgs'); var h='<div style="background:#fff3e0;padding:12px;border-radius:12px;"><b>♻️ Recycle Bin - '+all.length+' deleted messages (Firebase me safe hain, kabhi delete nahi hote)</b></div>'; all.forEach(function(m){ h+='<div class="msg them">'+esc(m.text||"")+'<div class="tm">'+esc(FD_chatTime(m))+' • '+esc(m.withName||chatWithName)+'</div></div>'; }); box.innerHTML=h; }); return; }
   if(recycle.length===0){ alert("Recycle Bin khali hai"); return; }
   if(confirm(recycle.length+" messages - Undelete kare?")){ 
     var chats=getChats();
@@ -566,12 +607,12 @@ function sendChatMsg(){
   var inp=document.getElementById('chatText');
   var txt=inp.value.trim();
   if(!txt) return;
-  var time=new Date().getHours()+":"+String(new Date().getMinutes()).padStart(2,"0");
-  var ts=Date.now();
+  var ts0=Date.now(); var time=FD_fmtDateTime(ts0);
+  var ts=ts0;
   if(_fbDb && myUid && chatWithUid){
     try{
+      // UPDATE: Sirf 1 jagah save karo - 2 jagah save karne se ek hi message 2 baar dikhta tha (ek baar Me, ek baar Them - jaise AI bol raha ho)
       _fbDb.ref("chats/"+myUid+"/"+chatWithUid).push({from:myUid,to:chatWithUid,msg:txt,text:txt,time:time,timestamp:ts});
-      _fbDb.ref("chats/"+chatWithUid+"/"+myUid).push({from:myUid,to:chatWithUid,msg:txt,text:txt,time:time,timestamp:ts});
     }catch(e){}
   }
   var chats=getChats();
@@ -601,8 +642,8 @@ window.sendChatMessage=function(fid,txt){
   var ts=Date.now();
   if(_fbDb && myUid && fid){
     try{
+      // UPDATE: Sirf 1 jagah save karo - 2 jagah save karne se friend ko apna hi message uski taraf se dikhta tha
       _fbDb.ref("chats/"+myUid+"/"+fid).push({from:myUid,to:fid,msg:txt,text:txt,time:time,timestamp:ts});
-      _fbDb.ref("chats/"+fid+"/"+myUid).push({from:myUid,to:fid,msg:txt,text:txt,time:time,timestamp:ts});
     }catch(e){}
   }
   var chats=getChats();
@@ -632,10 +673,58 @@ window.onload=function(){
   var m=location.search.match(/[?&]chat=([^&]+)/);
   if(m){ setTimeout(function(){ openChatByUid(decodeURIComponent(m[1])); }, 2000); }
 };
+
+// ===== 1-LINE CONNECT: Chat alag file, Profile alag file =====
+function openFriendChat(uid){ location.href='chat-box.html?uid='+encodeURIComponent(uid); }
+function openFriendProfile(uid){ location.href='friend-profile.html?uid='+encodeURIComponent(uid); }
+openChatByUid = function(uid){ openFriendChat(uid); };
+
+// HEADER SETTINGS MENU - old layout wala (Profile / Privacy / Blocked / Recycle / Logout)
+function toggleHdrSettings(e){ if(e) e.stopPropagation(); var m=document.getElementById('hdrSettingsMenu'); if(!m) return; if(m.style.display==="block"){ m.style.display="none"; return; }
+  m.innerHTML='<button onclick="hdrGoProfile()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:11px;font-size:14px;cursor:pointer;border-bottom:1px solid #f0f0f0">👤 Mera Profile</button>'
+  +'<button onclick="hdrGoPrivacy()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:11px;font-size:14px;cursor:pointer;border-bottom:1px solid #f0f0f0">🔒 Privacy Settings</button>'
+  +'<button onclick="hdrShowBlocked()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:11px;font-size:14px;cursor:pointer;border-bottom:1px solid #f0f0f0">🚫 Blocked List</button>'
+  +'<button onclick="hdrShowRecycle()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:11px;font-size:14px;cursor:pointer;border-bottom:1px solid #f0f0f0">♻️ Recycle Bin</button>'
+  +'<button onclick="hdrGoHome()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:11px;font-size:14px;cursor:pointer;border-bottom:1px solid #f0f0f0">🏠 Home Wapas Jao</button>'
+  +'<button onclick="hdrLogout()" style="display:block;width:100%;text-align:left;background:none;border:none;padding:11px;font-size:14px;cursor:pointer;color:#d32f2f;font-weight:bold">🚪 Logout</button>';
+  m.style.display="block";
+}
+function hdrCloseSettings(){ var m=document.getElementById('hdrSettingsMenu'); if(m) m.style.display="none"; }
+document.addEventListener('click',function(e){ var m=document.getElementById('hdrSettingsMenu'); var b=document.getElementById('hdrSettingsBtn'); if(m&&m.style.display==="block"&&!m.contains(e.target)&&e.target!==b) m.style.display="none"; });
+function hdrGoProfile(){ hdrCloseSettings(); location.href='profile.html'; }
+function hdrGoPrivacy(){ hdrCloseSettings(); if(typeof openPrivacySettings==="function"){ openPrivacySettings(); } else { location.href='profile.html'; } }
+function hdrGoHome(){ hdrCloseSettings(); location.href='index.html'; }
+function hdrLogout(){ hdrCloseSettings(); if(!confirm("Logout karein?")) return; try{ localStorage.removeItem("auth_uid"); }catch(e){} location.href='customerlogin.html'; }
+function hdrShowBlocked(){
+  hdrCloseSettings();
+  if(!_fbDb||!myUid){ alert("Pehle login karo!"); return; }
+  _fbDb.ref("blocked/"+myUid).once("value").then(function(s){
+    var v=s.val()||{}; var ks=Object.keys(v);
+    if(!ks.length){ alert("🚫 Blocked List khaali hai"); return; }
+    var list=ks.map(function(k){return "• "+(v[k]&&v[k].name||k);}).join("\n");
+    if(confirm("🚫 Blocked List:\n"+list+"\n\nKisi ko Unblock karna hai? OK dabao, phir naam likho.")){
+      var nm=prompt("Kiska naam Unblock karna hai? (poora naam likho)");
+      if(!nm) return; var found=null;
+      ks.forEach(function(k){ if(v[k]&&v[k].name===nm) found=k; });
+      if(found){ _fbDb.ref("blocked/"+myUid+"/"+found).remove(); alert("✅ "+nm+" Unblock ho gaya"); } else alert("Naam nahi mila");
+    }
+  }).catch(function(){ alert("Blocked List load nahi hui"); });
+}
+function hdrShowRecycle(){
+  hdrCloseSettings();
+  if(!_fbDb||!myUid){ alert("Pehle login karo!"); return; }
+  _fbDb.ref("recycle_bin/"+myUid).once("value").then(function(s){
+    var v=s.val()||{}; var count=0; Object.keys(v).forEach(function(f){ count+=Object.keys(v[f]||{}).length; });
+    alert("♻️ Recycle Bin me "+count+" deleted messages hain.\nWapas lane ke liye us dost ka Chat kholo → ⋮ → Recycle Bin Dekho → Wapas Lao.");
+  }).catch(function(){ alert("Recycle load nahi hua"); });
+}
 </script>
 </head><body>
 <div id="listView">
-<header id="hdr"><a class="backbtn" href="index.html">← Back</a><div id="brand" style="text-align:center">👥 Mere Dost</div><div style="width:70px"></div></header>
+<header id="hdr" style="position:relative"><a class="backbtn" href="index.html">← Back</a><div id="brand" style="text-align:center">👥 Mere Dost</div><div style="position:relative"><button id="hdrSettingsBtn" onclick="toggleHdrSettings(event)" style="background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 12px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:15px">⚙️ Settings</button><div id="hdrSettingsMenu" style="display:none;position:absolute;right:0;top:44px;width:230px;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.25);padding:8px;z-index:99"></div></div></header>
+  <header id="hdr"><a class="backbtn" href="index.html">← Back</a><div id="brand" style="text-align:center">👥 Mere Dost</div><div style="width:70px"></div></header>
+
+<div class="topmenu" style="position:sticky;top:52px;z-index:9;background:#fff;padding:8px 6px;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.1)"><button style="background:#4caf50;color:#fff;border:none;padding:9px 14px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;flex-shrink:0" onclick="goSec('myFriendsSec',this)">💚 Accepted</button><button style="background:#ff9800;color:#fff;border:none;padding:9px 14px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;flex-shrink:0" onclick="goSec('incomingSec',this)">📩 Request Aayi</button><button style="background:#2196F3;color:#fff;border:none;padding:9px 14px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;flex-shrink:0" onclick="goSec('sentSec',this)">📤 Sent</button><button style="background:#f44336;color:#fff;border:none;padding:9px 14px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;flex-shrink:0" onclick="goSec('blockSec',this)">🔴 Block</button><button style="background:#7b1fa2;color:#fff;border:none;padding:9px 14px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;flex-shrink:0" onclick="goSec('worldSec',this)">🌍 World</button><button style="background:#000;color:#fff;border:none;padding:9px 14px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;flex-shrink:0" onclick="location.href='settings.html'">⚙️ Settings</button><button style="background:#e65100;color:#fff;border:none;padding:9px 14px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;flex-shrink:0" onclick="location.href='index.html'">🏠 Home</button></div>
 <div id="hero"><h1>👥 Doston ki Duniya</h1><p>Systematic Flow - Photo Fix</p></div>
 <div class="sec" id="notifSec"><h2>🔔 Notifications <span id="notifCount" style="background:#f44336;color:#fff;border-radius:12px;padding:2px 10px;font-size:13px;">0</span></h2><div id="notifList"><div class="empty">⏳ Notifications load ho rahi hain...</div></div></div>
 <div id="searchWrap"><input id="frSearch" type="search" placeholder="🔍 Dost ka naam likho..." oninput="filterFriends(this.value)"></div>
@@ -648,3 +737,7 @@ window.onload=function(){
 <div id="detailPage"><button class="backbtn" onclick="showList()">← Wapas</button><div class="detail-card" id="detailCard"></div></div>
 <div id="chatPage"><button class="backbtn" onclick="showList()" style="margin-bottom:12px">← Wapas</button><div class="chat-head" id="chatHead"></div><div id="chatMsgs"></div><div class="chat-input"><input id="chatText" placeholder="Message likho..." onkeypress="if(event.key==='Enter')sendChatMsg()"><button style="background:#25D366;color:#fff;border:none;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;" onclick="sendChatMsg()">➤</button></div></div>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
+
+
+
+See ye file sahi h bas last header line add kre 
