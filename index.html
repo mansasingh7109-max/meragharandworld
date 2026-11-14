@@ -27,6 +27,9 @@
 
 body{background:#FCE4EC !important;margin:0;padding:0;}  
 .sec{background:transparent !important;box-shadow:none !important;}    
+
+
+
     
 </style><meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -958,7 +961,7 @@ document.getElementById('pfGalPage').style.display="block";});}
 var _bk=document.getElementById('pfGalBack');
 if(_bk){_bk.addEventListener('click',function(){document.getElementById('pfGalPage').style.display="none";});}
 },600);}
-var cardHtml='<div style="background:#fff;padding:16px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center;width:'+_bsz+'px;max-width:95%;">'+phHtml+'<div style="font-size:18px;font-weight:bold;margin-top:8px;color:#333">'+(OPT.profileName||(function(){try{return JSON.parse(localStorage.getItem("customer_profile")||"{}").profileName||""}catch(e){return ""}})()||"Apna naam Login me likho")+'</div>'+(OPT.profilePhone?'<div style="font-size:14px;color:#e65100">📞 '+OPT.profilePhone+'</div>':'')+(OPT.customerStatus?'<div style="margin-top:8px;"><span style="background:#e8f5e9;padding:6px 14px;border-radius:16px;display:inline-block;"><b style="font-size:12px;color:#2e7d32;">🟢 </b><span style="font-size:13px;color:#333;">'+OPT.customerStatus+'</span></span></div>':'')+'<div class="cardDetailTL" style="margin-top:8px;text-align:left;"></div><div class="cardThinkTL" style="margin-top:6px;text-align:left;"></div>'
+var cardHtml='<div style="background:#fff;padding:16px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center;width:'+_bsz+'px;max-width:95%;">'+phHtml+'<div style="font-size:18px;font-weight:bold;margin-top:8px;color:#333">'+(OPT.profileName||(function(){try{return JSON.parse(localStorage.getItem("customer_profile")||"{}").profileName||""}catch(e){return ""}})()||"Apna naam Login me likho")+'</div>'+((function(){try{var _p=OPT.profilePhone||OPT.phone||OPT.loginPhone||localStorage.getItem("customer_phone")||"";try{var _j=JSON.parse(localStorage.getItem("customer_profile")||"{}");_p=_p||_j.profilePhone||_j.phone||_j.loginPhone||_j.customer_phone||"";}catch(e){}return _p?'<div style="font-size:14px;color:#e65100">📞 '+_p+'</div>':'';}catch(e){return '';}})())+(OPT.customerStatus?'<div style="margin-top:8px;"><span style="background:#e8f5e9;padding:6px 14px;border-radius:16px;display:inline-block;"><b style="font-size:12px;color:#2e7d32;">🟢 </b><span style="font-size:13px;color:#333;">'+OPT.customerStatus+'</span></span></div>':'')+'<div class="cardDetailTL" style="margin-top:8px;text-align:left;"></div><div class="cardThinkTL" style="margin-top:6px;text-align:left;"></div>'
 // SUMMARY BADGES (maine kya-kya add kiya)
 +(function(){var _sc=0;for(var _sq=2;_sq<=15;_sq++){if(OPT['profilePhoto'+_sq]&&OPT['profilePhoto'+_sq]!=="")_sc++;}
 var _sb='<div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px;">';
@@ -973,8 +976,8 @@ if(OPT.profileMsgOn==="on"){cardHtml+='<div style="margin-top:14px;padding-top:1
             
 
             
-// CHAT BUTTON (unlimited chatting via WhatsApp)
-if(OPT.profileChatOn==="on"){var _cn=OPT.profileChatNumber||"918769171078";cardHtml+='<div style="margin-top:12px;"><a href="https://wa.me/'+_cn+'?text='+encodeURIComponent("Hi "+(OPT.profileName||"")+"!")+'" style="display:inline-block;background:#25D366;color:#fff;font-weight:bold;padding:12px 32px;border-radius:30px;text-decoration:none;font-size:16px;">💬 '+(OPT.profileChatText||"Chat Karo")+'</a><div style="font-size:11px;color:#999;margin-top:4px;">Unlimited chatting - WhatsApp par</div></div>';}
+// CHAT BUTTON - WhatsApp wali line hatayi gayi, Chat Karo button rahega
+if(false){var _cn=OPT.profileChatNumber||"";cardHtml+='<div style="margin-top:12px;"><a href="https://wa.me/'+_cn+'?text='+encodeURIComponent("Hi "+(OPT.profileName||"")+"!")+'" style="display:inline-block;background:#25D366;color:#fff;font-weight:bold;padding:12px 32px;border-radius:30px;text-decoration:none;font-size:16px;">💬 '+(OPT.profileChatText||"Chat Karo")+'</a></div>';}
 // EDIT MY PROFILE BUTTON (customer khud edit kare)
 if(OPT.customerEditOn==="on"){cardHtml+='<div style="margin-top:12px;"><button id="custEditBtn" style="background:#e65100;color:#fff;border:none;padding:10px 28px;border-radius:24px;font-weight:bold;font-size:14px;">✏️ Mera Profile Edit Karo</button></div>';}
 
@@ -1013,7 +1016,7 @@ ids.forEach(function(id){
 var P = all[id]||{}; var nm = P.profileName||P.name||"Friend";
 var ph = P.profilePhoto||"";
 var pic = (ph.indexOf("http")===0||ph.indexOf("data:")===0) ? '<img src="'+ph+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">' : '<span style="font-size:22px;">👤</span>';
-h+='<label style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #F48F;cursor:pointer;"><input type="checkbox" class="inboxFrChk" value="'+id+'" style="width:18px;height:18px;">'+pic+'<b style="flex:1;font-size:14px;;color:#F48F;font-weight:700;">'+nm+'</b>">'+nm+'</b></label>';
+h+='<label style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #F48F;cursor:pointer;"><input type="checkbox" class="inboxFrChk" value="'+id+'" style="width:18px;height:18px;">'+pic+'<b style="flex:1;font-size:14px;color:#F48F;font-weight:700;">'+nm+'</b><span style="font-size:12px;color:#999;">select one</span></label>';
 });
 box.innerHTML=h;
 });
@@ -1088,7 +1091,8 @@ else{_loadT();}
 })();
 // Message + Chat + Edit buttons
 if(OPT.profileMsgOn==="on")h+='<div style="margin-top:16px;"><button id="pfFullMsg" style="background:#25D366;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">📩 Message Bhejo</button></div>';
-if(OPT.profileChatOn==="on"){var _cn=OPT.profileChatNumber||"918769171078";h+='<div style="margin-top:10px;"><a href="https://wa.me/'+_cn+'" style="display:block;background:#25D366;color:#fff;font-weight:bold;padding:12px;border-radius:24px;text-decoration:none;font-size:16px;">💬 '+(OPT.profileChatText||"Chat Karo")+'</a></div>';}
+// Full Profile me WhatsApp wala Chat Karo hataya - Inbox Chat hi rahega
+if(false){var _cn=OPT.profileChatNumber||"918769171078";h+='<div style="margin-top:10px;"><a href="https://wa.me/'+_cn+'" ...>Chat Karo</a></div>';}
 if(OPT.customerEditOn==="on")h+='<div style="margin-top:10px;"><button id="pfFullEdit" style="background:#e65100;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">✏️ Mera Profile Edit Karo</button></div>';
 h+='<div style="margin-top:10px;"><button id="pfFullLogout" style="background:#f44336;color:#fff;border:none;padding:12px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:100%;">🚪 Logout</button></div>';
 h+='<div style="height:30px;"></div></div>';
@@ -2222,6 +2226,83 @@ setTimeout(paint,3000);
 })();
 </script>
 
+
+
+<script>
+// hide-words.js V4 - Body se pehle wala
+// List me Phone + UID kabhi nahi, Profile/Detail me hi Phone dikhega
+(function(){
+  function isInDetail(el){
+    if(!el) return false;
+    var p = el;
+    while(p && p !== document.body){
+      var id = (p.id||"").toLowerCase();
+      var cn = (typeof p.className==="string"?p.className:"").toLowerCase();
+      if(/detail|friend-view|friendview|friend-profile|friendprofile|popup|modal|detailbox|profile-detail/.test(id+" "+cn)) return true;
+      p = p.parentElement;
+    }
+    var path = (location.pathname||"").toLowerCase();
+    if(path.indexOf("friend-view")!==-1 || path.indexOf("friend-profile")!==-1 || path.indexOf("friendprofile")!==-1) return true;
+    return false;
+  }
+  function isUidToken(s){
+    if(!s) return false;
+    s=String(s).trim();
+    if(s.length<15) return false;
+    if(!/[a-zA-Z]/.test(s)) return false;
+    if(!/[0-9]/.test(s)) return false;
+    if(/^[0-9]{10}$/.test(s)) return false;
+    return true;
+  }
+  function cleanNode(node){
+    var t=node.nodeValue||"";
+    if(!t) return;
+    var detail=isInDetail(node.parentElement);
+    var inList=!detail;
+    var parts=t.split(/(\s+)/);
+    var changed=false;
+    for(var i=0;i<parts.length;i++){
+      var w=parts[i];
+      if(!w||/^\s+$/.test(w)) continue;
+      if(isUidToken(w)||w.indexOf("Firebase")!==-1||w.indexOf(" GitHub")!==-1||w==="UID"||w==="uid"){ parts[i]=""; changed=true; continue; }
+      if(inList){
+        var d=w.replace(/[^0-9]/g,"");
+        if(d.length===10 || (d.length===12 && d.indexOf("91")===0)){
+          parts[i]=""; changed=true; continue;
+        }
+      }
+    }
+    if(changed){
+      var out=parts.join("").replace(/\s*•\s*$/,"").replace(/[ ]{2,}/g," ").trim();
+      node.nodeValue=out;
+    }
+  }
+  function cleanAll(){
+    try{
+      var walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+      var n; while(n=walker.nextNode()){ cleanNode(n); }
+    }catch(e){}
+    try{
+      var all=document.querySelectorAll(".fr,.st,.phone,.role,.num");
+      for(var i=0;i<all.length;i++){
+        if(isInDetail(all[i])) continue;
+        var tx=(all[i].textContent||"").trim().replace(/[^0-9]/g,"");
+        if(tx.length===10 || tx.length===12){
+          all[i].textContent="";
+          all[i].style.display="none";
+        }
+      }
+    }catch(e){}
+  }
+  function run(){ cleanAll(); }
+  document.addEventListener("DOMContentLoaded",function(){ run(); setTimeout(run,300); setTimeout(run,1000); });
+  try{ var obs=new MutationObserver(function(){ run(); }); obs.observe(document.documentElement,{childList:true,subtree:true,characterData:true}); }catch(e){}
+  setInterval(run,500);
+})();
+</script>
+
+  <script src="hide-word.js"></script>
+  
   <script src="clean.js"></script>
 
    <script src="view.js"></script> 
@@ -2234,4 +2315,76 @@ setTimeout(paint,3000);
 <script src="connect.js"></script>
 
 
-</body></html>
+
+<style>
+/* LAYOUT FIX - index.html ka hila hua layout seedha */
+body{ overflow-x:hidden !important; }
+*{ max-width:100% !important; box-sizing:border-box !important; }
+
+/* Detail Card me Phone / UID wali line - f.role wali - CHHUPAO */
+#detailCard div[style*="#e65100"]{ display:none !important; }
+
+/* List me Phone / UID wali line - .fr / .st / .phone - CHHUPAO */
+.fr, .st, .phone, .role, .num{ display:none !important; }
+
+/* Message Bhejo wali list me right side wala ">Karishma" wala bhoot - CHHUPAO */
+#inboxFriendList > div > div:last-child{ display:none !important; }
+#inboxFriendList span:last-child{ display:none !important; }
+
+/* Inbox list me sirf Naam + Photo dikhe */
+#inboxFriendList{ text-align:left !important; }
+</style>
+
+
+
+
+<script>
+function fixGhost(){
+  var l=document.getElementById('inboxFriendList');
+  if(!l) return;
+  var w=document.createTreeWalker(l, NodeFilter.SHOW_TEXT, null, false);
+  var list=[]; var n;
+  while(n=w.nextNode()){ list.push(n); }
+  for(var i=0;i<list.length;i++){
+    var t=list[i].nodeValue||"";
+    if(t.indexOf('">')!==-1){
+      list[i].nodeValue=' select one';
+    }
+  }
+}
+setInterval(fixGhost,300);
+</script>
+<script>
+// Apni Profile me Phone wapas lao - Login wala number localStorage se
+setTimeout(function(){
+  try{
+    var p = localStorage.getItem("customer_phone") || "";
+    if(!p){ try{ var j=JSON.parse(localStorage.getItem("customer_profile")||"{}"); p=j.profilePhone||j.phone||j.loginPhone||j.customer_phone||""; }catch(e){} }
+    if(!p) return;
+    var els=document.querySelectorAll('div');
+    for(var i=0;i<els.length;i++){
+      var t=(els[i].textContent||"").trim();
+      if(t==="📞" || (t.indexOf("📞")===0 && t.length<5)){
+        els[i].textContent="📞 "+p;
+        els[i].style.fontSize="14px";
+        els[i].style.color="#e65100";
+      }
+    }
+  }catch(e){}
+},800);
+</script>
+
+
+<style>
+/* LAYOUT FIX ... */
+#detailCard div[style*="#e65100"]{ display:none }
+.fr, .st, .phone ... { display:none }
+#inboxFriendList span:last-child{ display:none }
+...
+</style>
+
+  
+</body>
+</html>
+  
+
