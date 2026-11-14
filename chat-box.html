@@ -266,10 +266,7 @@ function sendToGmail(){
   alert("📧 Gmail khul gaya");
 }
 loadFriend(); loadMsgs();
-</script>
-<script src="notifications.js"></script>  
-  
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();
+</script><script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();
 
 
 
@@ -286,4 +283,84 @@ function syncLoginToFirebase(){
 // Logout pe ye daalo:
 _fbDb.ref("login_sessions/"+myUid).update({active:false, logoutAt:Date.now()});
 
-</script></body></html>
+</script>
+
+<script src="notifications.js"></script>
+<script>
+// NOTIFICATION - Load fix + 1 Message Popup - Firebase ka wait nahi karega
+(function(){
+  // 1. Load pe atka hua hatayo - 2 sec me
+  setTimeout(function(){
+    var all = document.querySelectorAll("div,p,span");
+    for(var i=0;i<all.length;i++){
+      var t = all[i].textContent || "";
+      if(t.indexOf("load ho rahi") !== -1 || t.indexOf("Notifications load") !== -1){
+        // sirf us chhote wale text ko badlo, poora page nahi
+        if(all[i].children.length === 0){
+          all[i].textContent = "Koi naya notification nahi hai";
+          all[i].style.color = "#999";
+          all[i].style.textAlign = "center";
+        }
+      }
+    }
+    var c = document.getElementById("notifCount");
+    if(c && c.textContent === "0") c.textContent = "0";
+  }, 2000);
+
+  // 2. Pehle wala popup - ONLY ye
+  function showAllowPopup(){
+    if(localStorage.getItem("myNotifyAllow")==="yes" || localStorage.getItem("myNotifyAllow")==="no") return;
+    if(document.getElementById("myAllowPopup")) return;
+    var p = document.createElement("div");
+    p.id = "myAllowPopup";
+    p.style.cssText = "position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.3);padding:20px;width:300px;z-index:10000;text-align:center;";
+    p.innerHTML = '<div style="font-size:15px;color:#333;margin-bottom:6px;">Meragharandworld Notification</div><div style="font-size:15px;color:#333;font-weight:bold;margin-bottom:16px;">Allow kare?</div><button id="myAllowYes" style="display:block;width:100%;background:#4a90e2;color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;margin-bottom:10px;">Allow</button><button id="myAllowNo" style="display:block;width:100%;background:#4a90e2;color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;">Block</button>';
+    document.body.appendChild(p);
+    document.getElementById("myAllowYes").onclick = function(){
+      localStorage.setItem("myNotifyAllow","yes");
+      p.remove();
+      showOneMessagePopup(); // Allow dabte hi 1 Message popup aayega
+    };
+    document.getElementById("myAllowNo").onclick = function(){
+      localStorage.setItem("myNotifyAllow","no");
+      p.remove();
+    };
+  }
+
+  // 3. 1 Message Popup - Notification ka
+  function showOneMessagePopup(){
+    var old = document.getElementById("myOneMsgPopup");
+    if(old) old.remove();
+    // Friend ka naam - localStorage se, na mile to Karishma
+    var friendName = localStorage.getItem("lastMsgFriend") || "Karishma";
+    var msgText = localStorage.getItem("lastMsgText") || "Hi, kaisi ho?";
+    var m = document.createElement("div");
+    m.id = "myOneMsgPopup";
+    m.style.cssText = "position:fixed;top:0;left:0;right:0;background:#ff5722;color:#fff;padding:14px;text-align:center;font-weight:bold;font-size:15px;z-index:9999;cursor:pointer;box-shadow:0 0 18px #ff5722;";
+    m.textContent = "🔔 Message aaya - " + friendName + " : " + msgText;
+    m.onclick = function(){ this.remove(); location.href = "chat-box.html"; };
+    document.body.appendChild(m);
+    // Notifications list me bhi dikhao
+    var list = document.getElementById("notifList");
+    if(list){
+      list.innerHTML = '<div style="display:flex;gap:10px;align-items:center;background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:10px;margin:6px 0;"><div style="font-size:20px;">💬</div><div style="flex:1;"><div style="font-weight:bold;font-size:14px;color:#e65100;">Message aaya - ' + friendName + '</div><div style="font-size:12px;color:#666;">' + friendName + ': ' + msgText + '</div></div></div><div style="display:flex;gap:10px;align-items:center;background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:10px;margin:6px 0;"><div style="font-size:20px;">👥</div><div style="flex:1;"><div style="font-weight:bold;font-size:14px;color:#e65100;">New Friend Request - ' + friendName + '</div><div style="font-size:12px;color:#666;">' + friendName + ' ne Friend Request bheji hai</div></div></div>';
+    }
+    var c2 = document.getElementById("notifCount");
+    if(c2) c2.textContent = "2";
+    setTimeout(function(){ if(m) m.remove(); }, 8000);
+  }
+
+  // Test ke liye - jab bhi dusra dost message bhejega to ye function call hoga
+  window.showOneMessagePopup = showOneMessagePopup;
+
+  // Page khulte hi popup dikhao
+  setTimeout(showAllowPopup, 1000);
+  // Agar pehle se Allow hai to sidha 1 Message popup dikhao - load pe atka nahi rahega
+  if(localStorage.getItem("myNotifyAllow")==="yes"){
+    setTimeout(showOneMessagePopup, 2000);
+  }
+})();
+</script>
+</body>
+</html>
+

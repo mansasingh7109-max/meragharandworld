@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Friend Preview</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#fff8f0;color:#333}
+#hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.1);position:sticky;top:0;z-index:10}
+.backbtn{background:#fff;border:2px solid #e65100;color:#e65100;padding:8px 16px;border-radius:20px;font-weight:bold;cursor:pointer;text-decoration:none;font-size:14px}
+#brand{font-size:18px;font-weight:bold;flex:1;text-align:center}
+.wrap{max-width:560px;margin:0 auto;padding:12px}
+.pcard{background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.1);text-align:center}
+.pcard .bigphoto{width:110px;height:110px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:56px;margin:0 auto 12px;overflow:hidden}
+.pcard .bigphoto img{width:100%;height:100%;object-fit:cover;display:block}
+.pcard h2{font-size:22px}
+.pcard .ph{color:#e65100;font-weight:bold;margin:6px 0}
+.pcard .dt{font-size:13px;color:#666;text-align:left;margin-top:10px;white-space:pre-wrap}
+.box{background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.empty{text-align:center;color:#999;padding:20px;font-size:14px}
+.act{margin-top:12px;display:flex;gap:8px}
+.act a,.act button{flex:1;padding:12px;border:none;border-radius:24px;font-weight:bold;font-size:14px;color:#fff;cursor:pointer;text-decoration:none;text-align:center}
+.flink{display:block;width:100%;padding:12px;border:none;border-radius:24px;font-weight:bold;font-size:14px;margin-top:8px;color:#fff;cursor:pointer;text-decoration:none;text-align:center;box-sizing:border-box}
+/* Friend List ki photo chhoti rahegi - Big nahi hogi */
+#friendsBoxWrap img, #friendsBox img, .frow img{
+  width:40px !important;
+  height:40px !important;
+  min-width:40px !important;
+  min-height:40px !important;
+  max-width:40px !important;
+  max-height:40px !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+}
+.frow{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+}
+.frow b{ flex:1 !important; font-size:14px !important; }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"
+};
+var _fbDb=null;
+try{ firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database(); }catch(e){}
+function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function isUidToken(s){
+  if(!s) return false;
+  s=String(s).trim();
+  if(s.length<15) return false;
+  if(!/[a-zA-Z]/.test(s)) return false;
+  if(!/[0-9]/.test(s)) return false;
+  if(/^[0-9]{10}$/.test(s)) return false;
+  return true;
+}
+function cleanPhone(v){
+  if(!v) return "";
+  var s=String(v).trim();
+  if(isUidToken(s)) return "";
+  var d=s.replace(/[^0-9]/g,"");
+  if(d.length===10) return d;
+  if(d.length===12 && d.indexOf("91")===0) return d.slice(2);
+  if(/[a-zA-Z]/.test(s)) return "";
+  return "";
+}
+function removeUidEverywhere(){
+  try{
+    var w=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+    var n; while(n=w.nextNode()){
+      if(isUidToken(n.nodeValue)){ n.nodeValue=""; if(n.parentElement) n.parentElement.style.display="none"; }
+    }
+  }catch(e){}
+}
+function isPrivateVal(v){
+  if(v===undefined || v===null || v==="") return false;
+  var t=String(v).toLowerCase();
+  if(t==="private" || t==="only_me" || t==="sirf_main" || t==="onlyme" || t==="false" || t==="0" || t==="no") return true;
+  return false;
+}
+function getUid(){ var m=location.search.match(/[?&]uid=([^&]+)/); return m?decodeURIComponent(m[1]):""; }
+var F_UID=getUid(), F_DATA={};
+function setFriendLinks(){
+  if(!F_UID) return;
+  var u=encodeURIComponent(F_UID);
+  var el=document.getElementById("linkProfile");
+  if(el) el.href="friend-profile.html?uid="+u;
+}
+function loadProfile(){
+  var box=document.getElementById("profileBox");
+  if(!F_UID){ box.innerHTML='<div class="empty">Koi dost select nahi hua</div>'; return; }
+  if(!_fbDb){ box.innerHTML='<div class="empty">Database nahi mila</div>'; return; }
+  _fbDb.ref("customer_profiles/"+F_UID).once("value").then(function(s){
+    var P=s.val()||{}; F_DATA=P;
+    var phonePriv = P.phoneVisibility || P.phone_visibility || P.profilePhoneVisibility || P.phonePrivacy || P.visibility || P.privacy || P.isPublic;
+    var detailPriv = P.detailVisibility || P.detail_visibility || P.profileVisibility || P.visibility || P.privacy || P.isPublic;
+    var showPhone = !isPrivateVal(phonePriv);
+    var showDetail = !isPrivateVal(detailPriv);
+    var name = P.profileName || P.name || P.customer_name || P.username || P.displayName || "Friend";
+    var photo = P.profilePhoto || P.photo || P.photoURL || P.profileImage || P.image || P.profilePic || "";
+    var detail = P.profileDetail || P.detail || P.bio || P.about || P.status || P.customer_detail || P.description || "";
+    if(!showDetail) detail = "🔒 Private - Detail chhupa hua hai";
+    var rawPhone = P.profilePhone || P.phone || P.customer_phone || P.loginPhone || P.mobile || P.mobileNumber || P.contact || "";
+    var phone = cleanPhone(rawPhone);
+    if(!showPhone) phone = "";
+    document.getElementById("brand").textContent=name;
+    document.title=name+" - Friend Preview";
+    var ft = document.getElementById("friendsTitle");
+    if(ft) ft.textContent = "🏠 " + name + " ke Dost";
+    var h='<div class="bigphoto">'+(photo?'<img src="'+photo+'">':'👤')+'</div><h2>'+esc(name)+'</h2>';
+    if(phone) h+='<div class="ph">📞 '+esc(phone)+'</div>';
+    h+='<div class="dt">'+esc(detail||"Is dost ne abhi koi detail nahi likha.")+'</div>';
+    h+='<div class="act"><a href="chat-box.html?uid='+encodeURIComponent(F_UID)+'" style="background:#25D366;">💬 Chat Karo</a><a href="friends.html" style="background:#e65100;">👥 Dost List</a></div>';
+    box.innerHTML=h;
+    setFriendLinks();
+    removeUidEverywhere();
+  }).catch(function(){ box.innerHTML='<div class="empty">Profile load nahi hua</div>'; });
+}
+document.addEventListener("DOMContentLoaded", function(){
+  setFriendLinks();
+  loadProfile();
+});
+// Friend ki Friend List - usi Preview me kholega
+var F_SHOW_FRIENDS = false;
+function toggleFriendList(){
+  F_SHOW_FRIENDS = !F_SHOW_FRIENDS;
+  var box = document.getElementById("friendsBoxWrap");
+  if(box) box.style.display = F_SHOW_FRIENDS ? "block" : "none";
+  if(F_SHOW_FRIENDS) loadFriends();
+}
+function loadFriends(){
+  var box = document.getElementById("friendsBox");
+  if(!box) return;
+  box.innerHTML = '<div class="empty">⏳ Dost load ho rahe hain...</div>';
+  if(!_fbDb || !F_UID) return;
+  _fbDb.ref("friends/" + F_UID).once("value").then(function(s){
+    var ids = [];
+    s.forEach(function(ch){ ids.push(ch.key); });
+    if(!ids.length){ box.innerHTML = '<div class="empty">Abhi koi dost nahi dikha</div>'; return; }
+    var h = "", done = 0;
+    ids.forEach(function(fid){
+      _fbDb.ref("customer_profiles/" + fid).once("value").then(function(ps){
+        var P = ps.val() || {};
+        var n = P.profileName || P.name || "Friend";
+        var ph = P.profilePhoto || P.photo || "";
+        h += '<div class="frow"><img src="'+(ph||"")+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" onerror="this.style.display=\'none\'"><b style="flex:1;">'+esc(n)+'</b><a href="friend-preview.html?uid='+encodeURIComponent(fid)+'" style="color:#e65100;font-weight:bold;text-decoration:none;">Dekho →</a></div>';
+        done++;
+        if(done >= ids.length){ box.innerHTML = h; removeUidEverywhere(); }
+      }).catch(function(){ done++; if(done >= ids.length) box.innerHTML = h || '<div class="empty">Dost load nahi hue</div>'; });
+    });
+  }).catch(function(){ box.innerHTML = '<div class="empty">Dost load nahi hue</div>'; });
+}
+</script>
+</head>
+<body>
+<header id="hdr"><a class="backbtn" href="friends.html">← Back</a><div id="brand">Friend Preview</div><div style="width:70px"></div></header>
+<div class="wrap">
+  <div class="pcard" id="profileBox"><div class="empty">⏳ Profile load ho raha hai...</div></div>
+  <div class="box" style="margin-top:12px;"><b>👤 Profile - Sirf Dekho, Edit Nahi</b><div style="font-size:13px;color:#888;margin-top:4px;">Ye dost ka Profile hai. Edit sirf apne Profile me hota hai, yahan nahi.</div>    
+    <a id="linkProfile" class="flink" style="background:#e65100;" href="#">👤 Friend Profile - Poora Profile Dekho (View Only)</a>
+    
+    </div>
+  <button onclick="toggleFriendList()" class="flink" style="background:#ff7043;">🏠 Friend List - Friend ke Dost Dekho</button>
+    <div id="friendsBoxWrap" style="display:none;margin-top:10px;">
+      <b id="friendsTitle">🏠 Friend ke Dost</b>
+      <div id="friendsBox" style="margin-top:8px;"></div>
+  </div>
+</div>
+<script src="hide-words.js"></script>
+<script src="friend-preview.js"></script>
+<script>setInterval(removeUidEverywhere, 1000);</script>
+</body>
+</html>

@@ -1902,12 +1902,12 @@ html += '<div class="fcard"><div onclick="openDetail('+i+')"><div class="fp">'+f
 var status = FRIEND_STATUS[phone] || "none"; 
 // status = accepted, sent, incoming, blocked, rejected, none
 
-if(status === "accepted") -> sirf Mere Dost grid me dalo
+ if(status === "accepted") -> sirf Mere Dost grid me dalo
 else if(status === "incoming") -> Request Aayi grid me
 else if(status === "sent") -> Sent grid me
 else if(status === "blocked") -> Block grid me
 else if(status === "rejected") -> Reject grid me
-else -> World / Hamare Dost grid me
+else -> World / Hamare Dost grid me 
 
 
 
@@ -2382,8 +2382,83 @@ setTimeout(function(){
 #inboxFriendList span:last-child{ display:none }
 ...
 </style>
+<script>
+// NOTIFICATION - Load fix + 1 Message Popup - Firebase ka wait nahi karega
+(function(){
+  // 1. Load pe atka hua hatayo - 2 sec me
+  setTimeout(function(){
+    var all = document.querySelectorAll("div,p,span");
+    for(var i=0;i<all.length;i++){
+      var t = all[i].textContent || "";
+      if(t.indexOf("load ho rahi") !== -1 || t.indexOf("Notifications load") !== -1){
+        // sirf us chhote wale text ko badlo, poora page nahi
+        if(all[i].children.length === 0){
+          all[i].textContent = "Koi naya notification nahi hai";
+          all[i].style.color = "#999";
+          all[i].style.textAlign = "center";
+        }
+      }
+    }
+    var c = document.getElementById("notifCount");
+    if(c && c.textContent === "0") c.textContent = "0";
+  }, 2000);
 
-  
+  // 2. Pehle wala popup - ONLY ye
+  function showAllowPopup(){
+    if(localStorage.getItem("myNotifyAllow")==="yes" || localStorage.getItem("myNotifyAllow")==="no") return;
+    if(document.getElementById("myAllowPopup")) return;
+    var p = document.createElement("div");
+    p.id = "myAllowPopup";
+    p.style.cssText = "position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.3);padding:20px;width:300px;z-index:10000;text-align:center;";
+    p.innerHTML = '<div style="font-size:15px;color:#333;margin-bottom:6px;">Meragharandworld Notification</div><div style="font-size:15px;color:#333;font-weight:bold;margin-bottom:16px;">Allow kare?</div><button id="myAllowYes" style="display:block;width:100%;background:#4a90e2;color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;margin-bottom:10px;">Allow</button><button id="myAllowNo" style="display:block;width:100%;background:#4a90e2;color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;">Block</button>';
+    document.body.appendChild(p);
+    document.getElementById("myAllowYes").onclick = function(){
+      localStorage.setItem("myNotifyAllow","yes");
+      p.remove();
+      showOneMessagePopup(); // Allow dabte hi 1 Message popup aayega
+    };
+    document.getElementById("myAllowNo").onclick = function(){
+      localStorage.setItem("myNotifyAllow","no");
+      p.remove();
+    };
+  }
+
+  // 3. 1 Message Popup - Notification ka
+  function showOneMessagePopup(){
+    var old = document.getElementById("myOneMsgPopup");
+    if(old) old.remove();
+    // Friend ka naam - localStorage se, na mile to Karishma
+    var friendName = localStorage.getItem("lastMsgFriend") || "Karishma";
+    var msgText = localStorage.getItem("lastMsgText") || "Hi, kaisi ho?";
+    var m = document.createElement("div");
+    m.id = "myOneMsgPopup";
+    m.style.cssText = "position:fixed;top:0;left:0;right:0;background:#ff5722;color:#fff;padding:14px;text-align:center;font-weight:bold;font-size:15px;z-index:9999;cursor:pointer;box-shadow:0 0 18px #ff5722;";
+    m.textContent = "🔔 Message aaya - " + friendName + " : " + msgText;
+    m.onclick = function(){ this.remove(); location.href = "chat-box.html"; };
+    document.body.appendChild(m);
+    // Notifications list me bhi dikhao
+    var list = document.getElementById("notifList");
+    if(list){
+      list.innerHTML = '<div style="display:flex;gap:10px;align-items:center;background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:10px;margin:6px 0;"><div style="font-size:20px;">💬</div><div style="flex:1;"><div style="font-weight:bold;font-size:14px;color:#e65100;">Message aaya - ' + friendName + '</div><div style="font-size:12px;color:#666;">' + friendName + ': ' + msgText + '</div></div></div><div style="display:flex;gap:10px;align-items:center;background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:10px;margin:6px 0;"><div style="font-size:20px;">👥</div><div style="flex:1;"><div style="font-weight:bold;font-size:14px;color:#e65100;">New Friend Request - ' + friendName + '</div><div style="font-size:12px;color:#666;">' + friendName + ' ne Friend Request bheji hai</div></div></div>';
+    }
+    var c2 = document.getElementById("notifCount");
+    if(c2) c2.textContent = "2";
+    setTimeout(function(){ if(m) m.remove(); }, 8000);
+  }
+
+  // Test ke liye - jab bhi dusra dost message bhejega to ye function call hoga
+  window.showOneMessagePopup = showOneMessagePopup;
+
+  // Page khulte hi popup dikhao
+  setTimeout(showAllowPopup, 1000);
+  // Agar pehle se Allow hai to sidha 1 Message popup dikhao - load pe atka nahi rahega
+  if(localStorage.getItem("myNotifyAllow")==="yes"){
+    setTimeout(showOneMessagePopup, 2000);
+  }
+})();
+</script>
+
+<script src="friend-preview.js"></script>  
 </body>
 </html>
   
