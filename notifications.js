@@ -1,11 +1,8 @@
-// notifications.js - Friend message aaye to website me Notification
+// notifications.js - V2 - Friend message aaye to website ke andar hi Banner
 // Connect: <script src="notifications.js"></script> - bas 1 line, </body> se pehle
+// Isme Browser wala popup nahi hai, isliye GitHub / Firebase word kahin nahi dikhega
 (function(){
   var _lastCount = 0;
-  var _lastUid = "";
-  function askNotify(){
-    try{ if("Notification" in window && Notification.permission==="default"){ Notification.requestPermission(); } }catch(e){}
-  }
   function showFriendNotify(name, text, uid){
     try{
       if(uid) window._lastFromUid = uid;
@@ -18,7 +15,6 @@
         document.body.appendChild(b);
       }
       b.textContent = "Friend Message 1 - " + (name||"Friend") + " ne message bheja: " + (text||"").slice(0,40);
-      try{ if("Notification" in window && Notification.permission==="granted"){ new Notification((name||"Friend") + " ka message", { body: text || "Naya message aaya hai" }); } }catch(e){}
       try{ var a = new Audio("https://www.soundjay.com/buttons/sounds/button-09a.mp3"); a.play(); }catch(e){}
       setTimeout(function(){ if(b) b.remove(); }, 6000);
     }catch(e){}
@@ -47,6 +43,6 @@
       }
     }catch(e){}
   }
-  document.addEventListener("DOMContentLoaded", function(){ askNotify(); setInterval(autoCheck, 5000); });
+  document.addEventListener("DOMContentLoaded", function(){ setInterval(autoCheck, 5000); });
   setInterval(autoCheck, 5000);
 })();
