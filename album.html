@@ -44,7 +44,10 @@ var _fbDb=null; try{firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.data
 function getUid(){ var m=location.search.match(/[?&]uid=([^&]+)/); if(m) return decodeURIComponent(m[1]); m=location.search.match(/[?&]cid=([^&]+)/); return m?decodeURIComponent(m[1]):""; }
 </script>
 </head><body>
-<div id="hdr"><button onclick="history.back()">←</button><b id="ttl">📸 Album</b></div>
+<div id="hdr"><button onclick="history.back()">←</button><b id="ttl">📸 Album</b><h3>📸 Album
+  <button data-privacy-key="album" data-privacy-val="public">Public</button>
+  <button data-privacy-key="album" data-privacy-val="private">Private</button>
+</h3></div>
   
  
   
@@ -115,6 +118,20 @@ function sendReq(){
 function openLb(src){document.getElementById('lbImg').src=src;document.getElementById('lb').style.display='flex';}
 var fid=getUid();
 if(fid){ renderFriend(fid); } else { renderOwn(); }
+
+
+ // Login Firebase se - sab files me ek hi login
+function syncLoginToFirebase(){
+  if(!_fbDb || !myUid) return;
+  _fbDb.ref("login_sessions/"+myUid).set({uid:myUid, active:true, loginAt:Date.now()});
+  _fbDb.ref("login_sessions/"+myUid+"/active").on("value", function(s){
+    if(s.val()===false){ localStorage.removeItem("auth_uid"); location.href='customerlogin.html'; }
+  });
+}
+// Login ke baad isko bulao: syncLoginToFirebase();
+
+// Logout pe ye daalo:
+_fbDb.ref("login_sessions/"+myUid).update({active:false, logoutAt:Date.now()}); 
 </script>
 <script src="headername.js"></script>
 <script src="mydata.js"></script>  
@@ -123,5 +140,6 @@ if(fid){ renderFriend(fid); } else { renderOwn(); }
 <script>try{PRIV_placeBtn("albumPublic","hdr");}catch(e){}</script>
 
 <script src="connect.js"></script>
-<script src="view.js"></script>  
+<script src="view.js"></script> 
+<script src="privacy-all.js"></script>  
 </body></html>

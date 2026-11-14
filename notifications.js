@@ -1,8 +1,7 @@
-// notifications.js - ONLY ye popup + Highlight
+// notifications.js - ONLY ye popup + Highlight + List
 // Meragharandworld Notification
 // Allow kare?
 // [ Allow ] [ Block ]
-// + Message / Friend Request aaye to Highlight hoga
 // Connect: <script src="notifications.js"></script> - bas 1 line, </body> se pehle
 (function(){
   function showAllowPopup(){
@@ -99,6 +98,125 @@
       });
     }catch(e){}
   }
-  document.addEventListener("DOMContentLoaded", function(){ setTimeout(showAllowPopup, 1000); setInterval(autoCheck, 5000); });
+  function getMyUid2(){
+    try{
+      if(typeof myUid!=="undefined" && myUid) return myUid;
+      if(typeof window.myUid!=="undefined" && window.myUid) return window.myUid;
+    }catch(e){}
+    try{
+      return localStorage.getItem("auth_uid")||localStorage.getItem("customer_uid")||localStorage.getItem("myUid")||localStorage.getItem("uid")||"";
+    }catch(e){ return ""; }
+  }
+  function getDb(){
+    try{
+      if(typeof _fbDb!=="undefined" && _fbDb) return _fbDb;
+      if(typeof window._fbDb!=="undefined" && window._fbDb) return window._fbDb;
+      if(typeof window._fb!=="undefined" && window._fb) return window._fb;
+      if(typeof window.db!=="undefined" && window.db) return window.db;
+      if(typeof firebase!=="undefined" && firebase.database) return firebase.database();
+    }catch(e){}
+    return null;
+  }
+  function findNotifList(){
+    var el = document.getElementById("notifList")||document.getElementById("notifBox")||document.getElementById("notificationsList")||document.getElementById("notifContainer");
+    if(el) return el;
+    var all = document.querySelectorAll("div,p,span");
+    for(var i=0;i<all.length;i++){
+      var t = (all[i].textContent||"");
+      if(t.indexOf("Notifications load ho rahi")!==-1 || t.indexOf("load ho rahi hain")!==-1){
+        return all[i];
+      }
+    }
+    return null;
+  }
+  function renderNotifList(items){
+    try{
+      var list = findNotifList();
+      var countEl = document.getElementById("notifCount")||document.getElementById("notifBadge")||document.querySelector("[id*=notifCount]");
+      if(countEl) countEl.textContent = String(items.length);
+      if(!list) return;
+      if(!items.length){
+        list.innerHTML = '<div style="text-align:center;color:#999;padding:12px;font-size:13px;">Koi naya notification nahi hai</div>';
+        return;
+      }
+      var h = "";
+      items.forEach(function(it){
+        var icon = it.type==="request" ? "👥" : "💬";
+        var title = it.type==="request" ? ("New Friend Request - " + it.name) : ("Message aaya - " + it.name);
+        var sub = it.type==="request" ? (it.name + " ne Friend Request bheji hai") : (it.name + ": " + (it.text||"").slice(0,60));
+        h += '<div style="display:flex;gap:10px;align-items:center;background:#fff3e0;border:1px solid #ffcc80;border-radius:10px;padding:10px;margin:6px 0;cursor:pointer;" onclick="location.href=\'chat-box.html?uid=' + (it.uid||"") + '\'"><div style="font-size:20px;">'+icon+'</div><div style="flex:1;"><div style="font-weight:bold;font-size:14px;color:#e65100;">'+title+'</div><div style="font-size:12px;color:#666;">'+sub+'</div></div><div style="font-size:12px;color:#999;">Abhi</div></div>';
+      });
+      list.innerHTML = h;
+    }catch(e){}
+  }
+  function loadNotifList(){
+    var uid = getMyUid2();
+    var db = getDb();
+    if(!db || !uid){ return; }
+    try{
+      var items = [];
+      var done = 0;
+      function finish(){
+        done++;
+        if(done>=2){
+          items.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+          renderNotifList(items.slice(0,20));
+        }
+      }
+      db.ref("chats").once("value").then(function(s){
+        try{
+          var v = s.val()||{};
+          Object.keys(v).forEach(function(k){
+            var arr = v[k]; if(!Array.isArray(arr)) arr = Object.values(arr||{});
+            arr.forEach(function(m){
+              if(m && m.fromUid && m.fromUid!==uid){
+                if(k.indexOf(uid)===-1 && m.toUid!==uid && m.to!==uid) return;
+                items.push({type:"message", name: m.fromName||m.name||"Friend", text: m.text||"", uid: m.fromUid, ts: m.ts||m.time||m.createdAt||Date.now()});
+              }
+            });
+          });
+        }catch(e){}
+        finish();
+      }).catch(function(){ finish(); });
+      var paths = ["friendRequests/"+uid, "requests/"+uid, "friendReq/"+uid, "notifications/"+uid];
+      var reqDone = 0;
+      paths.forEach(function(path){
+        db.ref(path).once("value").then(function(s){
+          try{
+            var v = s.val()||{};
+            var arr = Array.isArray(v) ? v : Object.values(v);
+            arr.forEach(function(r){
+              if(!r) return;
+              if(r.type==="request" || r.type==="friend_request" || r.status==="pending" || r.status==="sent" || r.fromUid || r.fromName){
+                if(r.type==="message") return;
+                items.push({type:"request", name: r.fromName||r.name||r.senderName||"Friend", text: "", uid: r.fromUid||r.uid||r.senderUid||"", ts: r.ts||r.time||r.createdAt||Date.now()});
+              }
+            });
+          }catch(e){}
+          reqDone++;
+          if(reqDone>=paths.length) finish();
+        }).catch(function(){ reqDone++; if(reqDone>=paths.length) finish(); });
+      });
+    }catch(e){}
+  }
+  setTimeout(function(){
+    var list = findNotifList();
+    if(list){
+      var t = (list.textContent||"");
+      if(t.indexOf("load ho rahi")!==-1){
+        renderNotifList([]);
+      }
+    }
+  }, 3000);
+  document.addEventListener("DOMContentLoaded", function(){
+    setTimeout(showAllowPopup, 1000);
+    setInterval(autoCheck, 5000);
+    setInterval(loadNotifList, 5000);
+    setTimeout(loadNotifList, 800);
+    setTimeout(loadNotifList, 2000);
+    setTimeout(loadNotifList, 4000);
+  });
   setInterval(autoCheck, 5000);
+  setInterval(loadNotifList, 5000);
+  setTimeout(loadNotifList, 1500);
 })();

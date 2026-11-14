@@ -174,6 +174,38 @@ if(FRIEND_UID){
     renderList('d');
   }
 }  
+
+
+
+// Login Firebase se - sab files me ek hi login
+function syncLoginToFirebase(){
+  if(!_fbDb || !myUid) return;
+  _fbDb.ref("login_sessions/"+myUid).set({uid:myUid, active:true, loginAt:Date.now()});
+  _fbDb.ref("login_sessions/"+myUid+"/active").on("value", function(s){
+    if(s.val()===false){ localStorage.removeItem("auth_uid"); location.href='customerlogin.html'; }
+  });
+}
+// Login ke baad isko bulao: syncLoginToFirebase();
+
+// Logout pe ye daalo:
+_fbDb.ref("login_sessions/"+myUid).update({active:false, logoutAt:Date.now()});  
+
+
+
+
+
+// Login Firebase se - sab files me ek hi login
+function syncLoginToFirebase(){
+  if(!_fbDb || !myUid) return;
+  _fbDb.ref("login_sessions/"+myUid).set({uid:myUid, active:true, loginAt:Date.now()});
+  _fbDb.ref("login_sessions/"+myUid+"/active").on("value", function(s){
+    if(s.val()===false){ localStorage.removeItem("auth_uid"); location.href='customerlogin.html'; }
+  });
+}
+// Login ke baad isko bulao: syncLoginToFirebase();
+
+// Logout pe ye daalo:
+_fbDb.ref("login_sessions/"+myUid).update({active:false, logoutAt:Date.now()});  
 </script>
 <script src="privacy.js"></script>
 <script>try{PRIV_placeBtn("timelinePublic","hdr");}catch(e){}</script>
@@ -185,4 +217,5 @@ if(FRIEND_UID){
 
 <script src="connect.js"></script>
 <script src="view.js"></script>  
+<script src="privacy-all.js"></script>  
 </body></html>

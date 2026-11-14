@@ -760,7 +760,10 @@ try{
 <div class="sec" id="notifSec"><h2>🔔 Notifications <span id="notifCount" style="background:#f44336;color:#fff;border-radius:12px;padding:2px 10px;font-size:13px;">0</span></h2><div id="notifList"><div class="empty">⏳ Notifications load ho rahi hain...</div></div></div>
 <div id="searchWrap"><input id="frSearch" type="search" placeholder="🔍 Dost ka naam likho..." oninput="filterFriends(this.value)"></div>
 <div class="sec"><div class="inboxBox"><b style="color:#e65100;font-size:15px;">💬 Message Bhejo - Inbox Chat</b><div style="font-size:12px;color:#888;margin:4px 0 8px;">Dost select karo, ek ko ya sabko ek saath bhejo</div><div class="inboxRow"><button type="button" id="selAllFr" style="background:#e65100;color:#fff;" class="inboxBtn">✅ All Friends</button><button type="button" id="clearAllFr" style="background:#eee;" class="inboxBtn">❌ Clear</button></div><div id="inboxFriendList" class="inboxList"><div style="color:#999;font-size:13px;text-align:center;">⏳ Dost load ho rahe hain...</div></div><textarea id="pfMsgText" placeholder="Message likho... (ek saath sabko jayega)" rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:14px;"></textarea><button id="pfMsgSend" style="background:#25D366;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;margin-top:8px;width:100%;">📩 Inbox Me Bhejo</button><div id="inboxSentMsg" style="font-size:12px;color:#2e7d32;text-align:center;margin-top:6px;"></div></div></div>
-<div class="sec" id="myFriendsSec"><h2>💚 Mere Dost - Accepted</h2><div id="myFriendsList"></div></div>
+<div class="sec" id="myFriendsSec"><h2>💚 Mere Dost - Accepted<h3>👥 Friend List
+  <button data-privacy-key="friends" data-privacy-val="public">Public</button>
+  <button data-privacy-key="friends" data-privacy-val="private">Private</button>
+</h3></h2><div id="myFriendsList"></div></div>
 <div class="sec" id="sentSec" style="display:none"><h2>📤 Bheji Gayi Requests - Sent</h2><div id="sentList"></div></div>
 <div class="sec"><h2>👥 Hamare Dost (World) - Sab Friends</h2><div class="fgrid" id="friendsGrid"></div></div>
 <footer id="ftr"><b>Mere Dost</b><br><br><a href="index.html" style="color:#ffcc80">← Home wapas jao</a></footer>
@@ -986,6 +989,8 @@ renderAll("");
 
 <script src="friend-preview.html"></script> 
  <script src="friend-preview.js"></script> 
+<script src="privacy-all.js"></script>
+  
 </body>
 </html>
 
