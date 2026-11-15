@@ -1,5 +1,26 @@
 <!DOCTYPE html>
-<html lang="hi"><head>
+<html lang="hi"><head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Timeline - mera ghar and world</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -17,7 +38,21 @@ body{background:#fff8f0;color:#333}
 .entry{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .entry .dt{font-size:13px;color:#e65100;font-weight:bold;margin-bottom:8px}
 .entry .tx{font-size:15px;color:#333;line-height:1.7;margin-bottom:8px;white-space:pre-wrap}
-.entry img{width:100%;border-radius:10px;margin-top:8px}
+/* Photo - Poori Fit, No Cut */
+.entry img, #msgList img{
+  width:200px !important; max-width:65% !important;
+  height:auto !important; max-height:320px !important;
+  object-fit:contain !important; background:#F48FB1;
+  display:block; margin:8px auto !important;
+  border-radius:10px; cursor:zoom-in;
+}
+.entry video, #msgList video{
+  width:230px !important; max-width:70% !important;
+  height:auto !important; max-height:320px !important;
+  object-fit:contain !important; background:#F48FB1;
+  display:block; margin:8px auto !important;
+  border-radius:10px;
+}
 .entry video{width:100%;border-radius:10px;margin-top:8px}
 .empty{text-align:center;color:#aaa;padding:40px 20px;font-size:15px}
 .sec-h{font-size:16px;font-weight:bold;color:#e65100;margin:16px 0 10px}
@@ -27,7 +62,6 @@ body{background:#fff8f0;color:#333}
 </body>
 <script>
 var FIREBASE_CONFIG = {
-  
 apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
   authDomain: "santramarketshoppingmall.firebaseapp.com",
   databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
@@ -36,9 +70,6 @@ apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
   messagingSenderId: "398490252924",
   appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
   measurementId: "G-M3YK28NTT0"
-
-  
-
 };
 var _fbDb=null; try{ firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database(); }catch(e){}
 function getUid(){ var m=location.search.match(/[?&]uid=([^&]+)/); if(m) return decodeURIComponent(m[1]); m=location.search.match(/[?&]cid=([^&]+)/); return m?decodeURIComponent(m[1]):""; }
@@ -46,14 +77,344 @@ function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 </script>
 </head><body>
 <div id="hdr"><button onclick="history.back()">←</button><b id="ttl">📅 Timeline</b></div>
-  
-  
-    
-
 <div id="tabs">
-<button id="tD" class="on" onclick="show('d')">📝 Detail</button>
+<button id="tD" onclick="show('d')">📝 Detail</button>
 <button id="tT" onclick="show('t')">💭 Thinking</button>
 <button id="tM" onclick="show('m')">💬 Messages</button>
+</div>
+<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;padding:6px;background:#fff;font-size:12px;">
+<span>Detail:</span><button data-privacy-key="detail" data-privacy-val="public">Public</button><button data-privacy-key="detail" data-privacy-val="friend">👥 Friend</button><button data-privacy-key="detail" data-privacy-val="private">Private</button>
+<span>Thinking:</span><button data-privacy-key="thinking" data-privacy-val="public">Public</button><button data-privacy-key="thinking" data-privacy-val="friend">👥 Friend</button><button data-privacy-key="thinking" data-privacy-val="private">Private</button>
+<span>Message:</span><button data-privacy-key="message" data-privacy-val="public">Public</button><button data-privacy-key="message" data-privacy-val="friend">👥 Friend</button><button data-privacy-key="message" data-privacy-val="private">Private</button>
+</div>
+<div id="msgTabBox" style="display:none;">
+  <input id="msgInput" placeholder="Message likho...">
+  <button onclick="sendMsg()">💬 Message</button>
+  <button onclick="sendMsg()">💭 Comment</button>
+  <button onclick="tagMsg()">🏷️ Tag</button>
+  <button onclick="document.getElementById('photoFile').click()">📸 Photo</button>
+  <button onclick="document.getElementById('videoFile').click()">🎥 Video</button>
+  <input type="file" id="photoFile" accept="image/*" multiple style="display:none">
+  <input type="file" id="videoFile" accept="video/*" multiple multiple style="display:none">
+  <div id="msgList"></div>
+</div>
+<div id="typing" style="display:none; font-size:12px; color:#888; margin:6px;">✍️ Manisha likh rahi hai...</div>
+<script>
+// ==== Date-Time - Sab File Ke Liye - Ek Hi Block - UPAR WALA (pehle se ban jaye isliye) ====
+function fmtDT(ts){
+  try{
+    var d = new Date(ts || Date.now());
+    var dd = String(d.getDate()).padStart(2,"0");
+    var mm = String(d.getMonth()+1).padStart(2,"0");
+    var yy = d.getFullYear();
+    var hh = String(d.getHours()).padStart(2,"0");
+    var mi = String(d.getMinutes()).padStart(2,"0");
+    return dd+"-"+mm+"-"+yy+"  "+hh+":"+mi;
+  }catch(e){ return ""; }
+}
+function showDT(m){
+  if(!m) return "";
+  var t = m.time || m.createdAt || m.created || Date.now();
+  var u = m.updatedAt || m.updated || m.editTime;
+  if(u && u != t){ return "📅 "+fmtDT(t)+"  •  ✏️ Updated: "+fmtDT(u); }
+  return "📅 "+fmtDT(t);
+}
+function dtHTML(m){ return "<span style='font-size:11px;color:#888;'>"+showDT(m)+"</span><br>"; }
+function setNewTime(m){ m.time = Date.now(); m.updatedAt = Date.now(); return m; }
+function setUpdateTime(m){ m.updatedAt = Date.now(); return m; }
+</script>
+<script>
+var _mi = document.getElementById("msgInput");
+if(_mi){
+  _mi.addEventListener("input", function(){
+    var ty = document.getElementById("typing");
+    if(ty) ty.style.display = "block";
+    clearTimeout(window._t);
+    window._t = setTimeout(function(){
+      if(ty) ty.style.display = "none";
+    }, 2000);
+  });
+}
+</script>
+<script>
+function getGroupMsgs(){ try{ return JSON.parse(localStorage.getItem("group_msgs")||"[]"); }catch(e){ return []; } }
+function saveGroupMsgs(a){
+  localStorage.setItem("group_msgs", JSON.stringify(a));
+  // Firebase me bhi save
+  try{
+    var u = localStorage.getItem("auth_uid") || "Manisha";
+    if(_fbDb) _fbDb.ref("group_msgs/"+u).set(a);
+  }catch(e){}
+}
+function showGroupMsgs(){
+  // Cancel / Save ke baad atka hua Edit mode reset - warna agli Single Photo bhi Edit wali samajh ke gayab ho jayegi
+  // NOTE: Edit khula ho tab ye call nahi hota, isliye pending safe hai
+  _appendTo = -1; _pendingFor = -1; _pendingPhotos = [];
+  var arr = getGroupMsgs();
+  var badla = false;
+  arr.forEach(function(m){
+    if(!m.time){ m.time = Date.now(); m.updatedAt = Date.now(); badla = true; }
+  });
+  if(badla) saveGroupMsgs(arr);
+  var box = document.getElementById("msgList");
+  if(!box) return;
+  if(!arr.length){ box.innerHTML = '<div style="color:#999;text-align:center">Koi message nahi</div>'; return; }
+  box.innerHTML = "";
+  // Naya upar, Purana neeche - Date-Time ke hisaab se
+  var _sorted = arr.map(function(m,idx){ return {m:m, idx:idx}; });
+  _sorted.sort(function(a,b){ return (b.m.time||0)-(a.m.time||0); });
+  _sorted.forEach(function(_o){
+    var m = _o.m; var i = _o.idx;
+    var div = document.createElement("div");
+    div.style = "background:#fff;padding:10px;border-radius:10px;margin:6px;";
+    div.setAttribute("data-idx", i);
+    var dt = "<span style='font-size:11px;color:#888;'>"+showDT(m)+"</span><br>";
+    if(m.who === "Manisha"){
+      div.innerHTML = (m.untitled ? "" : "<b>"+m.who+":</b> ") + "<span>"+m.text+"</span><br>" + dt +
+        "<button onclick='editGroupMsg("+i+")'>✏️ Edit</button> " +
+        "<button onclick='delGroupMsg("+i+")'>🗑️ Delete</button><br>" +
+        "<button onclick='commentGroupMsg("+i+")'>💭 Comment</button> " +
+        "<button onclick='tagFriendMsg("+i+")'>🏷️ Tag</button> " +
+        "<button onclick='photoForMsg("+i+")'>📸 Photo</button> " +
+        "<button onclick='videoForMsg("+i+")'>🎥 Video</button>";
+    } else {
+      var likes = m.likes || 0;
+      div.innerHTML = (m.untitled ? "" : "<b>"+m.who+":</b> ") + "<span>"+m.text+"</span><br>" + dt +
+        "<button onclick='likeGroupMsg("+i+")'>❤️ Like ("+likes+")</button> " +
+        "<button onclick='commentGroupMsg("+i+")'>💭 Comment</button> " +
+        "<button onclick='tagFriendMsg("+i+")'>🏷️ Tag</button> " +
+        "<button onclick='photoForMsg("+i+")'>📸 Photo</button> " +
+        "<button onclick='videoForMsg("+i+")'>🎥 Video</button><br>" +
+        "<button onclick='hideGroupMsg("+i+")'>🙈 Hide</button> " +
+        "<button onclick='hideGroupMsg("+i+")'>👎 Dislike</button>";
+    }
+    box.appendChild(div);
+  });
+}
+function likeGroupMsg(i){
+  var arr = getGroupMsgs();
+  arr[i].likes = (arr[i].likes || 0) + 1;
+  arr[i].updatedAt = Date.now();
+  saveGroupMsgs(arr); showGroupMsgs();
+}
+function commentGroupMsg(i){
+  var arr = getGroupMsgs();
+  var t = prompt("Is Message pe Comment likho:", "");
+  if(!t) return;
+  var obj = setNewTime({who:"Manisha", text:"💭 @"+arr[i].who+" - "+t, type:"group_msg"});
+  arr.push(obj); saveGroupMsgs(arr); showGroupMsgs();
+}
+function tagFriendMsg(i){
+  var arr = getGroupMsgs();
+  var name = prompt("Kisko Tag karna hai?", arr[i].who);
+  if(!name) return;
+  var t = prompt("Tag ke saath Message likho:", "");
+  if(!t) return;
+  var obj = setNewTime({who:"Manisha", text:"🏷️ @"+name+" - "+t, type:"group_msg", tag:name});
+  arr.push(obj); saveGroupMsgs(arr); showGroupMsgs();
+}
+var _replyTo = -1;
+var _appendTo = -1;
+var _pendingPhotos = [];
+var _pendingFor = -1;
+function photoForMsg(i){ _replyTo = i; _appendTo = -1; _pendingFor = -1; _pendingPhotos = []; document.getElementById("photoFile").click(); }
+function videoForMsg(i){ _replyTo = i; _appendTo = -1; _pendingFor = -1; _pendingPhotos = []; document.getElementById("videoFile").click(); }
+function photoForEdit(i){ _appendTo = i; _replyTo = -1; document.getElementById("photoFile").click(); }
+function videoForEdit(i){ _appendTo = i; _replyTo = -1; document.getElementById("videoFile").click(); }
+function sendMsg(){
+  var inp = document.getElementById("msgInput");
+  if(!inp) return;
+  var t = inp.value.trim();
+  if(!t) return;
+  var arr = getGroupMsgs();
+  var obj = setNewTime({who:"Manisha", text:t, type:"group_msg"});
+  arr.push(obj);
+  saveGroupMsgs(arr);
+  inp.value = "";
+  var box = document.getElementById("msgTabBox");
+  if(box) box.style.display = "block";
+  var list = document.getElementById("msgList");
+  if(list) list.style.display = "block";
+  var ty = document.getElementById("typing");
+  if(ty) ty.style.display = "none";
+  showGroupMsgs();
+}
+function tagMsg(){
+  var inp = document.getElementById("msgInput");
+  if(!inp) return;
+  var t = inp.value.trim();
+  if(!t){ alert("Pehle Message likho, fir Tag dabao!"); inp.focus(); return; }
+  var name = prompt("Kisko Tag karna hai? Friend ka naam likho:", "Karishma");
+  if(name === null) return;
+  if(!name.trim()) name = "Friend";
+  var arr = getGroupMsgs();
+  var obj = setNewTime({who:"Manisha", text:"🏷️ @"+name.trim()+" - "+t, type:"group_msg", tag:name.trim()});
+  arr.push(obj);
+  saveGroupMsgs(arr);
+  inp.value = "";
+  var box = document.getElementById("msgTabBox");
+  if(box) box.style.display = "block";
+  showGroupMsgs();
+}
+function editGroupMsg(i){
+  var arr = getGroupMsgs();
+  var box = document.getElementById("msgList").querySelector('[data-idx="'+i+'"]');
+  if(!box) return;
+  if(box.querySelector("input")) return;
+  // Photo / Video wala hai to code mat dikhao - par Caption + More Photo jod sakte ho
+  if(arr[i].text && (arr[i].text.indexOf("<img")>=0 || arr[i].text.indexOf("<video")>=0)){
+    box.innerHTML = "<b>"+arr[i].who+":</b><br>" + arr[i].text + "<br>" +
+    "<label style='font-size:13px;'><input type='checkbox' id='untitledChk"+i+"' "+(arr[i].untitled?"checked":"")+"> Untitled - bina naam / bina title ke dikhao</label><br>" +
+    "<div id='pendingBox"+i+"' style='margin:6px 0;'></div>" +
+    "<span style='font-size:12px;color:#888;'>📸 Is Photo pe Message / Aur Photo jodo</span><br>" +
+    '<input id="editCaption'+i+'" placeholder="Is photo pe message likho..." style="width:70%;padding:6px;"> ' +
+    '<button onclick="savePhotoCaption('+i+')">✅ Save</button> ' +
+    '<button onclick="showGroupMsgs()">❌ Cancel</button><br>' +
+    "<button onclick='delGroupMsg("+i+")'>🗑️ Delete</button> " +
+    "<button onclick='commentGroupMsg("+i+")'>💭 Comment</button> " +
+    "<button onclick='tagFriendMsg("+i+")'>🏷️ Tag</button> " +
+    "<button onclick='photoForEdit("+i+")'>📸 + Photo</button> " +
+    "<button onclick='videoForEdit("+i+")'>🎥 + Video</button> ";
+    return;
+  }
+  box.innerHTML = "<b>"+arr[i].who+":</b><br>" +
+    "<label style='font-size:13px;'><input type='checkbox' id='untitledChk"+i+"' "+(arr[i].untitled?"checked":"")+"> Untitled - bina naam / bina title ke dikhao</label><br>" +
+    "<div id='pendingBox"+i+"' style='margin:6px 0;'></div>" +
+    '<input id="editInput'+i+'" value="'+arr[i].text+'" style="width:70%;padding:6px;"> ' +
+    '<button onclick="saveEditMsg('+i+')">✅ Save</button> ' +
+    '<button onclick="showGroupMsgs()">❌ Cancel</button><br>' +
+    '<button onclick="commentGroupMsg('+i+')">💭 Comment</button> ' +
+    '<button onclick="tagFriendMsg('+i+')">🏷️ Tag</button> ' +
+    '<button onclick="photoForEdit('+i+')">📸 + Photo</button> ' +
+    '<button onclick="videoForEdit('+i+')">🎥 + Video</button>';
+}
+function savePhotoCaption(i){
+  var arr = getGroupMsgs();
+  var el = document.getElementById("editCaption"+i);
+  var v = el ? el.value.trim() : "";
+  var _has = false;
+  var _uc = document.getElementById("untitledChk"+i);
+  if(_uc){ if(arr[i].untitled !== !!_uc.checked){ arr[i].untitled = _uc.checked; _has = true; } }
+  if(v){ arr[i].text = arr[i].text + "<br><span>"+v+"</span>"; _has = true; }
+  if(_pendingFor === i && _pendingPhotos.length){
+    _pendingPhotos.forEach(function(u){ if(String(u).indexOf("VIDEO::")==0){ arr[i].text = arr[i].text + '<br><video src="'+u.slice(7)+'" controls style="width:260px;max-width:70%;border-radius:10px;"></video>'; } else { arr[i].text = arr[i].text + '<br><img src="'+u+'" style="width:200px;max-width:60%;border-radius:10px;">'; } });
+    _has = true;
+  }
+  if(_has){ setUpdateTime(arr[i]); saveGroupMsgs(arr); }
+  _pendingPhotos = []; _pendingFor = -1; _appendTo = -1;
+  showGroupMsgs();
+}
+function saveEditMsg(i){
+  var arr = getGroupMsgs();
+  var el = document.getElementById("editInput"+i);
+  if(!el) return;
+  var v = el.value.trim();
+  var _has2 = false;
+  var _uc2 = document.getElementById("untitledChk"+i);
+  if(_uc2){ arr[i].untitled = _uc2.checked; _has2 = true; }
+  if(v){ arr[i].text = v; if(!arr[i].time) arr[i].time = Date.now(); _has2 = true; }
+  if(_pendingFor === i && _pendingPhotos.length){
+    _pendingPhotos.forEach(function(u){ if(String(u).indexOf("VIDEO::")==0){ arr[i].text = arr[i].text + '<br><video src="'+u.slice(7)+'" controls style="width:260px;max-width:70%;border-radius:10px;"></video>'; } else { arr[i].text = arr[i].text + '<br><img src="'+u+'" style="width:200px;max-width:60%;border-radius:10px;">'; } });
+    _has2 = true;
+  }
+  if(_has2){ setUpdateTime(arr[i]); saveGroupMsgs(arr); }
+  _pendingPhotos = []; _pendingFor = -1; _appendTo = -1;
+  showGroupMsgs();
+}
+function hideGroupMsg(i){
+  var arr = getGroupMsgs();
+  var gaya = arr.splice(i,1)[0];
+  if(!gaya) return;
+  var rb = []; try{ rb = JSON.parse(localStorage.getItem("recycle_bin")||"[]"); }catch(e){}
+  rb.push({type:"group_msg", data:gaya, time:Date.now()});
+  localStorage.setItem("recycle_bin", JSON.stringify(rb));
+  saveGroupMsgs(arr); showGroupMsgs();
+}
+function delGroupMsg(i){ hideGroupMsg(i); }
+var _pf = document.getElementById("photoFile");
+if(_pf){
+  _pf.addEventListener("change", function(e){
+    var files = e.target.files;
+    if(!files || !files.length) return;
+    // Edit wale + Photo - pehle Edit box me dikhao, Save pe pakka save hoga
+    if(_appendTo >= 0 && document.getElementById("pendingBox"+_appendTo)){
+      var _idx = _appendTo;
+      if(_pendingFor !== _idx){ _pendingPhotos = []; }
+      _pendingFor = _idx;
+      Array.prototype.forEach.call(files, function(f){
+        var r = new FileReader();
+        r.onload = function(){
+          _pendingPhotos.push(r.result);
+          var _pb = document.getElementById("pendingBox"+_idx);
+          if(_pb){ _pb.innerHTML = _pendingPhotos.map(function(u){ return '<img src="'+u+'" style="width:100px;height:100px;object-fit:cover;border-radius:8px;margin:3px;">'; }).join("") + "<br><span style='font-size:11px;color:green;'>✅ "+_pendingPhotos.length+" photo select hui - Save dabao</span>"; }
+        };
+        r.readAsDataURL(f);
+      });
+      e.target.value = "";
+      return;
+    }
+    var _replyWho = "";
+    if(_replyTo >= 0){
+      var _a = getGroupMsgs();
+      _replyWho = _a[_replyTo] ? _a[_replyTo].who : "";
+      if(_replyWho === "Manisha") _replyWho = "";
+    }
+    Array.prototype.forEach.call(files, function(f){
+      var r = new FileReader();
+      r.onload = function(){
+        var arr = getGroupMsgs();
+        var txt = '<img src="'+r.result+'" style="width:200px;max-width:60%;border-radius:10px;">';
+        if(_replyWho){ txt = "📸 @"+_replyWho+" - " + txt; }
+        arr.push({who:"Manisha", text:txt, time:Date.now(), updatedAt:Date.now(), type:"group_msg"});
+        saveGroupMsgs(arr); showGroupMsgs();
+      };
+      r.readAsDataURL(f);
+    });
+    _replyTo = -1;
+    e.target.value = "";
+  });
+}
+var _vf = document.getElementById("videoFile");
+if(_vf){
+  _vf.addEventListener("change", function(e){
+    var files = e.target.files; if(!files || !files.length) return;
+    if(_appendTo >= 0 && document.getElementById("pendingBox"+_appendTo)){
+      var _idxV = _appendTo; if(_pendingFor !== _idxV){ _pendingPhotos = []; } _pendingFor = _idxV;
+      Array.prototype.forEach.call(files, function(f){
+        var r = new FileReader();
+        r.onload = function(){
+          _pendingPhotos.push("VIDEO::"+r.result);
+          var pb = document.getElementById("pendingBox"+_idxV);
+          if(pb){ pb.innerHTML = "<span style='font-size:11px;color:green;'>✅ "+_pendingPhotos.length+" video select hui - Save dabao</span><br>" + _pendingPhotos.map(function(u){ return '<video src="'+u.slice(7)+'" controls style="width:120px;border-radius:8px;margin:3px;"></video>'; }).join(""); }
+        };
+        r.readAsDataURL(f);
+      });
+      e.target.value = ""; return;
+    }
+    Array.prototype.forEach.call(files, function(f){
+      var r = new FileReader();
+      r.onload = function(){
+        var arr = getGroupMsgs();
+        var txtV = '<video src="'+r.result+'" controls style="width:260px;max-width:70%;border-radius:10px;"></video>';
+        if(_replyTo >= 0){ var arr3 = getGroupMsgs(); var _w2 = arr3[_replyTo] ? arr3[_replyTo].who : "Friend"; if(_w2 !== "Manisha"){ txtV = "🎥 @"+_w2+" - " + txtV; } _replyTo = -1; }
+        arr.push({who:"Manisha", text:txtV, time:Date.now(), updatedAt:Date.now(), type:"group_msg"});
+        saveGroupMsgs(arr); showGroupMsgs();
+      };
+      r.readAsDataURL(f);
+    });
+    e.target.value = "";
+  });
+}
+// Page khulte hi Firebase se lao
+try{
+  var u2 = localStorage.getItem("auth_uid") || "Manisha";
+  if(_fbDb) _fbDb.ref("group_msgs/"+u2).once("value").then(function(s){
+    var v = s.val();
+    if(v && v.length) { localStorage.setItem("group_msgs", JSON.stringify(v)); showGroupMsgs(); }
+  });
+}catch(e){}
+showGroupMsgs();
+</script>
 </div>
 <button class="pbtn" id="reqBtn" style="display:none;background:#25D366;" onclick="sendReq()">📩 Friend Request Bhejo</button>
 <div id="list"><div class="empty">⏳ Loading...</div></div>
@@ -64,11 +425,9 @@ function _today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth(
 function _tag(dt){var t=_today();return dt<t?'📌 Past':dt===t?'🟢 Aaj':'🔮 Future';}
 function _sort(arr){arr.sort(function(a,b){var x=(a.date||'')+''+(a.time||'');var y=(b.date||'')+''+(b.time||'');return x>y?-1:x<y?1:0;});return arr;}
 function _load(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):[];}catch(e){return[];}}
-
 var FRIEND_DATA=null;
 var FRIEND_UID=getUid();
 var CUR_TAB='d';
-
 function renderList(which){
   CUR_TAB=which;
   document.getElementById('tD').className=which==='d'?'on':'';
@@ -76,11 +435,9 @@ function renderList(which){
   document.getElementById('tM').className=which==='m'?'on':'';
   var box=document.getElementById('list'); var h='';
   if(FRIEND_UID && FRIEND_DATA){
-    // FRIEND ka timeline - Firebase se
     var name=esc(FRIEND_DATA.profileName||FRIEND_DATA.name||"Friend");
     if(which==='d'){
       var arr=_sort((FRIEND_DATA.details||[]).slice());
-      // customer_details node se bhi merge
       h='<div class="sec-h">📝 Detail Timeline - '+name+' ki ('+arr.length+')</div>';
       if(arr.length===0) h+='<div class="empty">Koi detail entry nahi<br>'+name+' ne abhi detail add nahi ki</div>';
       for(var i=0;i<arr.length;i++){var e=arr[i]; h+='<div class="entry"><div class="dt">'+_tag(e.date)+' 📅 '+_fd(e.date)+'</div>'; if(e.text) h+='<div class="tx">'+esc(e.text)+'</div>'; if(e.photo) h+='<img src="'+e.photo+'">'; if(e.video) h+='<video src="'+e.video+'" controls></video>'; h+='</div>';}
@@ -98,7 +455,6 @@ function renderList(which){
     box.innerHTML=h;
     return;
   }
-  // OWN timeline - localStorage
   if(which==='d'){
     var arr=_sort(_load("customer_details"));
     h='<div class="sec-h">📝 Detail Timeline - Mera ('+arr.length+')</div>';
@@ -117,28 +473,33 @@ function renderList(which){
   }
   box.innerHTML=h;
 }
-function show(which){ renderList(which); }
-
+function show(which){
+  var list = document.getElementById("list");
+  var msgBox = document.getElementById("msgTabBox");
+  if(which === 'm'){
+    if(list) list.style.display = "none";
+    if(msgBox) msgBox.style.display = "block";
+  } else {
+    if(list) list.style.display = "block";
+    if(msgBox) msgBox.style.display = "none";
+  }
+  renderList(which);
+}
 function sendReq(){
   var uid=FRIEND_UID; var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
   if(!myUid){alert("Pehle login karo!"); location.href="customerlogin.html"; return;}
   _fbDb.ref("friend_requests/"+uid).push({fromUid:myUid,time:Date.now(),status:"pending"},function(){ alert("✅ Request bhej di!"); });
 }
-
 if(FRIEND_UID){
   document.getElementById('ttl').textContent='📅 Friend ki Timeline';
   document.getElementById('reqBtn').style.display='block';
   _fbDb.ref("customer_profiles/"+FRIEND_UID).once("value").then(function(snap){
     var P=snap.val();
     if(!P){ document.getElementById('list').innerHTML='<div class="empty">❌ User nahi mila</div>'; return; }
-   
     var isPublic=true; try{ if(P.privacy_timeline==="private" || (P.privacy && P.privacy.timelinePublic===false)) isPublic=false; }catch(e){}
-
-    
     if(!isPublic){ document.getElementById('list').innerHTML='<div class="empty">🔒 Timeline private hai<br>'+esc(P.profileName||P.name||"User")+' ne public nahi kiya</div>'; return; }
     FRIEND_DATA=P;
     document.getElementById('ttl').textContent='📅 '+(P.profileName||P.name||"Friend")+' ki Timeline (Friend ki)';
-    // extra nodes bhi load karo
     return _fbDb.ref("customer_details/"+FRIEND_UID).once("value").then(function(s2){
       var extra=[]; s2.forEach(function(ch){ extra.push(ch.val()); });
       if(extra.length>0) FRIEND_DATA.details=extra;
@@ -149,8 +510,6 @@ if(FRIEND_UID){
       });
     });
   }).catch(function(err){ document.getElementById('list').innerHTML='<div class="empty">❌ Error: '+esc(err.message)+'</div>'; });
-  
-
 } else {
   document.getElementById('ttl').textContent='📅 Mera Timeline';
   var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
@@ -173,11 +532,7 @@ if(FRIEND_UID){
   } else {
     renderList('d');
   }
-}  
-
-
-
-// Login Firebase se - sab files me ek hi login
+}
 function syncLoginToFirebase(){
   if(!_fbDb || !myUid) return;
   _fbDb.ref("login_sessions/"+myUid).set({uid:myUid, active:true, loginAt:Date.now()});
@@ -185,37 +540,54 @@ function syncLoginToFirebase(){
     if(s.val()===false){ localStorage.removeItem("auth_uid"); location.href='customerlogin.html'; }
   });
 }
-// Login ke baad isko bulao: syncLoginToFirebase();
-
-// Logout pe ye daalo:
-_fbDb.ref("login_sessions/"+myUid).update({active:false, logoutAt:Date.now()});  
-
-
-
-
-
-// Login Firebase se - sab files me ek hi login
-function syncLoginToFirebase(){
-  if(!_fbDb || !myUid) return;
-  _fbDb.ref("login_sessions/"+myUid).set({uid:myUid, active:true, loginAt:Date.now()});
-  _fbDb.ref("login_sessions/"+myUid+"/active").on("value", function(s){
-    if(s.val()===false){ localStorage.removeItem("auth_uid"); location.href='customerlogin.html'; }
-  });
-}
-// Login ke baad isko bulao: syncLoginToFirebase();
-
-// Logout pe ye daalo:
-_fbDb.ref("login_sessions/"+myUid).update({active:false, logoutAt:Date.now()});  
 </script>
 <script src="privacy.js"></script>
 <script>try{PRIV_placeBtn("timelinePublic","hdr");}catch(e){}</script>
-
-<script src="mydata.js"></script>  
-
-<script src="headername.js"></script>  
-
-
+<script src="datetime-all.js"></script>
+<script>
+// ==== Date-Time - Sab File Ke Liye - Ek Hi Block - NEECHE WALA (old code, rakha hua) ====
+function fmtDT(ts){
+  try{
+    var d = new Date(ts || Date.now());
+    var dd = String(d.getDate()).padStart(2,"0");
+    var mm = String(d.getMonth()+1).padStart(2,"0");
+    var yy = d.getFullYear();
+    var hh = String(d.getHours()).padStart(2,"0");
+    var mi = String(d.getMinutes()).padStart(2,"0");
+    return dd+"-"+mm+"-"+yy+"  "+hh+":"+mi;
+  }catch(e){ return ""; }
+}
+function showDT(m){
+  if(!m) return "";
+  var t = m.time || m.createdAt || m.created || Date.now();
+  var u = m.updatedAt || m.updated || m.editTime;
+  if(u && u != t){ return "📅 "+fmtDT(t)+"  •  ✏️ Updated: "+fmtDT(u); }
+  return "📅 "+fmtDT(t);
+}
+function dtHTML(m){ return "<span style='font-size:11px;color:#888;'>"+showDT(m)+"</span><br>"; }
+function setNewTime(m){ m.time = Date.now(); m.updatedAt = Date.now(); return m; }
+function setUpdateTime(m){ m.updatedAt = Date.now(); return m; }
+</script>
+<script src="mydata.js"></script>
+<script src="headername.js"></script>
 <script src="connect.js"></script>
-<script src="view.js"></script>  
-<script src="privacy-all.js"></script>  
+<script src="view.js"></script>
+<script src="privacy-all.js"></script>
+<div id="photoPreview" onclick="this.style.display='none'" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;text-align:center;">
+  <img id="photoPreviewImg" style="max-width:95%;max-height:90%;margin-top:20px;border-radius:10px;">
+  <div style="color:#fff;margin-top:10px;">❌ Band karne ke liye photo pe tap karo</div>
+</div>
+<script>
+document.addEventListener("click", function(e){
+  if(e.target.tagName==="IMG" && e.target.src){
+    var p=document.getElementById("photoPreview");
+    var pi=document.getElementById("photoPreviewImg");
+    if(p && pi){ pi.src=e.target.src; p.style.display="block"; }
+  }
+});
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script>
+
+<script src="upload-photo.js"></script>
+
 </body></html>
