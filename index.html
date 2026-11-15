@@ -2461,6 +2461,75 @@ setTimeout(function(){
 })();
 </script>
 
+<script>
+// FIX: Profile kholte hi page gayab - DetailPage ko List se bahar nikalo
+(function(){
+  function fixPage(){
+    var list = document.getElementById('listView');
+    var detail = document.getElementById('detailPage');
+    var chat = document.getElementById('chatPage');
+    if(!list || !detail) return;
+    // Agar Detail abhi bhi List ke andar hai, to usko bahar nikalo
+    if(list.contains(detail)){
+      list.parentNode.insertBefore(detail, list.nextSibling);
+    }
+    if(chat && list.contains(chat)){
+      list.parentNode.insertBefore(chat, list.nextSibling);
+    }
+    // List band hai to Detail dikhna chahiye
+    if(list.style.display==="none" && detail.style.display==="block"){
+      detail.style.display="block";
+    }
+  }
+
+  // Page khulte hi fix karo, aur baad me bhi fix karte raho
+  document.addEventListener("DOMContentLoaded", function(){
+    fixPage();
+    setTimeout(fixPage, 500);
+    setTimeout(fixPage, 1500);
+  });
+  setTimeout(fixPage, 1000);
+
+  // Purana openDetailByUid tuta hua hai to isse pakka khulega
+  window.openDetailByUid_SAFE = function(){
+    fixPage();
+    try{
+      var args = Array.prototype.slice.call(arguments);
+      if(typeof _openDetailOrig==="function") _openDetailOrig.apply(null, args);
+      else if(typeof openDetailByUid==="function" && openDetailByUid!==window.openDetailByUid_SAFE) openDetailByUid.apply(null, args);
+    }catch(e){}
+    setTimeout(function(){
+      fixPage();
+      var list = document.getElementById('listView');
+      var detail = document.getElementById('detailPage');
+      if(list) list.style.display="none";
+      if(detail) detail.style.display="block";
+      window.scrollTo(0,0);
+    }, 100);
+  };
+
+  // Wapas button pakka kaam kare
+  window.showList_SAFE = function(){
+    fixPage();
+    var list = document.getElementById('listView');
+    var detail = document.getElementById('detailPage');
+    var chat = document.getElementById('chatPage');
+    if(list) list.style.display="block";
+    if(detail) detail.style.display="none";
+    if(chat) chat.style.display="none";
+    window.scrollTo(0,0);
+  };
+
+  // Preview button jo openPreview bol raha tha, usko bhi theek karo
+  window.openPreview = function(uid){
+    window.openDetailByUid_SAFE(uid);
+  };
+})();
+</script>
+
+
+  
+<script src="friend-request.js"></script>
 <script src="friend-preview.js"></script>  
 <script src="privacy-all.js"></script>  
 </body>
