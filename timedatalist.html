@@ -484,15 +484,32 @@ function show(which){
     if(msgBox) msgBox.style.display = "none";
   }
   renderList(which);
+  updateReqBtn();
 }
 function sendReq(){
   var uid=FRIEND_UID; var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
   if(!myUid){alert("Pehle login karo!"); location.href="customerlogin.html"; return;}
   _fbDb.ref("friend_requests/"+uid).push({fromUid:myUid,time:Date.now(),status:"pending"},function(){ alert("✅ Request bhej di!"); });
 }
+
+// FIX: Friend add hai to Request button mat dikhao, Messages tab me bhi mat dikhao
+function updateReqBtn(){
+  var b = document.getElementById('reqBtn'); if(!b) return;
+  if(!FRIEND_UID || CUR_TAB==='m'){ b.style.display='none'; return; }
+  var myUid=""; try{ myUid=localStorage.getItem("auth_uid")||""; }catch(e){}
+  if(!myUid || FRIEND_UID===myUid){ b.style.display='none'; return; }
+  if(!_fbDb){ b.style.display='none'; return; }
+  _fbDb.ref("friends/"+myUid+"/"+FRIEND_UID).once("value").then(function(s){
+    if(s.val()){ b.style.display='none'; return; }
+    _fbDb.ref("friend_requests_sent/"+myUid+"/"+FRIEND_UID).once("value").then(function(s2){
+      if(s2.val()){ b.textContent="⏳ Request Bheji Gayi - Wait Karo"; b.style.display='block'; b.onclick=function(){}; }
+      else { b.textContent="📩 Friend Request Bhejo"; b.style.display='block'; b.onclick=function(){ sendReq(); }; }
+    });
+  });
+}  
 if(FRIEND_UID){
   document.getElementById('ttl').textContent='📅 Friend ki Timeline';
-  document.getElementById('reqBtn').style.display='block';
+  updateReqBtn();
   _fbDb.ref("customer_profiles/"+FRIEND_UID).once("value").then(function(snap){
     var P=snap.val();
     if(!P){ document.getElementById('list').innerHTML='<div class="empty">❌ User nahi mila</div>'; return; }
