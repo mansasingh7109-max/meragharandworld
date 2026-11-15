@@ -122,6 +122,7 @@ function loadProfile(){
     if(phone) h+='<div class="ph">📞 '+esc(phone)+'</div>';
     h+='<div class="dt">'+esc(detail||"Is dost ne abhi koi detail nahi likha.")+'</div>';
     h+='<div class="act"><a href="chat-box.html?uid='+encodeURIComponent(F_UID)+'" style="background:#25D366;">💬 Chat Karo</a><a href="friends.html" style="background:#e65100;">👥 Dost List</a></div>';
+    h+='<div class="act"><a href="chat-box.html?uid='+encodeURIComponent(F_UID)+'" style="background:#25D366;">💬 Chat Karo</a><a href="timedatalist.html?uid='+encodeURIComponent(F_UID)+'&tab=m" style="background:#7b1fa2;">💬 Message Box</a><a href="friends.html" style="background:#e65100;">👥 Dost List</a></div>';
     box.innerHTML=h;
     setFriendLinks();
     removeUidEverywhere();
