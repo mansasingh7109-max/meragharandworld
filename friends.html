@@ -766,7 +766,9 @@ try{
 </h3></h2><div id="myFriendsList"></div></div>
 <div class="sec" id="sentSec" style="display:none"><h2>📤 Bheji Gayi Requests - Sent</h2><div id="sentList"></div></div>
 <div class="sec"><h2>👥 Hamare Dost (World) - Sab Friends</h2><div class="fgrid" id="friendsGrid"></div></div>
-<footer id="ftr"><b>Mere Dost</b><br><br><a href="index.html" style="color:#ffcc80">← Home wapas jao</a></footer>
+<footer id="ftr"><b>Mere Dost</b><div id="brand" style="text-align:center">👥 Mere Dost</div>
+<button id="bellBtn" style="background:none;border:none;font-size:22px;cursor:pointer;position:relative">🔔<span id="bellCount" style="display:none;position:absolute;top:-6px;right:-8px;background:red;color:#fff;font-size:11px;padding:1px 5px;border-radius:10px">0</span></button>
+<div id="bellPanel" style="display:none;position:fixed;top:60px;right:10px;width:300px;max-height:400px;overflow:auto;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.3);border-radius:12px;z-index:9999;padding:10px"></div><br><br><a href="index.html" style="color:#ffcc80">← Home wapas jao</a></footer>
 </>
 <div id="detailPage"><button class="backbtn" onclick="showList()">← Wapas</button><div class="detail-card" id="detailCard"></div></div>
 <div id="chatPage"><button class="backbtn" onclick="showList()" style="margin-bottom:12px">← Wapas</button><div class="chat-head" id="chatHead"></div><div id="chatMsgs"></div><div class="chat-input"><input id="chatText" placeholder="Message likho..." onkeypress="if(event.key==='Enter')sendChatMsg()"><button style="background:#25D366;color:#fff;border:none;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:18px;" onclick="sendChatMsg()">➤</button></div></div>
@@ -1054,7 +1056,37 @@ renderAll("");
 </script>
 
 
-  
+<script>
+// 🔔 BELL - index.html + friends.html dono me same
+function getNotifs(){try{return JSON.parse(localStorage.getItem("fr_notifs")||"[]")}catch(e){return[]}}
+function saveNotifs(n){localStorage.setItem("fr_notifs",JSON.stringify(n))}
+function addNotif(type,name,text){
+  var n=getNotifs();
+  n.unshift({type:type,name:name||"Friend",text:text||"",time:new Date().toLocaleString(),read:false});
+  saveNotifs(n.slice(0,30)); renderBell();
+}
+function renderBell(){
+  var n=getNotifs(), unread=n.filter(function(x){return !x.read}).length;
+  var c=document.getElementById("bellCount"); if(!c) return;
+  c.style.display=unread>0?"block":"none"; c.textContent=unread;
+  var p=document.getElementById("bellPanel"); if(!p) return;
+  if(!n.length){p.innerHTML='<div style="text-align:center;color:#999;padding:12px">Koi naya notification nahi hai</div>';return}
+  p.innerHTML=n.map(function(x){
+    var icon=x.type==="request"?"👥":x.type==="accepted"?"✅":x.type==="sent"?"📩":"💬";
+    var title=x.type==="request"?"New Friend Request":x.type==="accepted"?"Request Accepted":x.type==="sent"?"Request Sent":"Message Aaya";
+    return '<div style="display:flex;gap:10px;padding:10px;border-bottom:1px solid #eee;background:'+(x.read?"#fff":"#fff3e0")+'"><div style="font-size:20px">'+icon+'</div><div><b style="font-size:14px">'+title+' - '+x.name+'</b><div style="font-size:12px;color:#666">'+x.text+'</div><div style="font-size:11px;color:#999">'+x.time+'</div></div></div>';
+  }).join("");
+}
+document.addEventListener("click",function(e){
+  var b=document.getElementById("bellBtn"), p=document.getElementById("bellPanel");
+  if(b && b.contains(e.target)){
+    p.style.display=p.style.display==="block"?"none":"block";
+    var n=getNotifs(); n.forEach(function(x){x.read=true}); saveNotifs(n); renderBell();
+  }
+});
+setInterval(renderBell,2000);
+renderBell();
+</script>  
 <script src="friend-request.js"></script>
 <script src="friend-preview.html"></script> 
  <script src="friend-preview.js"></script> 

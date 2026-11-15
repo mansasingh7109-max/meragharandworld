@@ -485,7 +485,40 @@ function syncLoginToFirebase(){
 // Logout pe ye daalo:
 _fbDb.ref("login_sessions/"+myUid).update({active:false, logoutAt:Date.now()});
 </script>
+<script>
+// 🔔 BELL - index.html + friends.html dono me same
+function getNotifs(){try{return JSON.parse(localStorage.getItem("fr_notifs")||"[]")}catch(e){return[]}}
+function saveNotifs(n){localStorage.setItem("fr_notifs",JSON.stringify(n))}
+function addNotif(type,name,text){
+  var n=getNotifs();
+  n.unshift({type:type,name:name||"Friend",text:text||"",time:new Date().toLocaleString(),read:false});
+  saveNotifs(n.slice(0,30)); renderBell();
+}
+function renderBell(){
+  var n=getNotifs(), unread=n.filter(function(x){return !x.read}).length;
+  var c=document.getElementById("bellCount"); if(!c) return;
+  c.style.display=unread>0?"block":"none"; c.textContent=unread;
+  var p=document.getElementById("bellPanel"); if(!p) return;
+  if(!n.length){p.innerHTML='<div style="text-align:center;color:#999;padding:12px">Koi naya notification nahi hai</div>';return}
+  p.innerHTML=n.map(function(x){
+    var icon=x.type==="request"?"👥":x.type==="accepted"?"✅":x.type==="sent"?"📩":"💬";
+    var title=x.type==="request"?"New Friend Request":x.type==="accepted"?"Request Accepted":x.type==="sent"?"Request Sent":"Message Aaya";
+    return '<div style="display:flex;gap:10px;padding:10px;border-bottom:1px solid #eee;background:'+(x.read?"#fff":"#fff3e0")+'"><div style="font-size:20px">'+icon+'</div><div><b style="font-size:14px">'+title+' - '+x.name+'</b><div style="font-size:12px;color:#666">'+x.text+'</div><div style="font-size:11px;color:#999">'+x.time+'</div></div></div>';
+  }).join("");
+}
+document.addEventListener("click",function(e){
+  var b=document.getElementById("bellBtn"), p=document.getElementById("bellPanel");
+  if(b && b.contains(e.target)){
+    p.style.display=p.style.display==="block"?"none":"block";
+    var n=getNotifs(); n.forEach(function(x){x.read=true}); saveNotifs(n); renderBell();
+  }
+});
+setInterval(renderBell,2000);
+renderBell();
+</script>
 
+
+  
 <script src="view.js"></script>
 
 <script src="privacy-all.js"></script>  
