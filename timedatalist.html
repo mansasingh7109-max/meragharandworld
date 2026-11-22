@@ -368,5 +368,27 @@ showTab("m");
 <input id="commentPopupInput" class="input" placeholder="Comment likho..." style="width:100%;margin:10px 0;">
 <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn" onclick="pickPhoto()">📸 Photo</button><button class="btn" onclick="pickVideo()">🎥 Video</button><button class="btn" onclick="tagMsg()">🏷️ Tag</button><button class="btn orange" onclick="saveTimelineComment()">📤 Share</button></div>
 </div>
+
+
+<script>
+// TOP Comment Box hatao, Niche wala rakho
+(function(){
+  function hideTop(){
+    var all = document.querySelectorAll("div,section");
+    for(var i=0;i<all.length;i++){
+      var t = all[i].textContent || "";
+      if(t.indexOf("Comment Save Karo")!==-1){
+        // Agar ye box 2nd Grid ke andar hai to mat hatao, sirf upar wala hatao
+        if(all[i].closest("#tabMessages")) continue;
+        all[i].style.display="none";
+      }
+    }
+  }
+  setTimeout(hideTop,500);
+  setTimeout(hideTop,1500);
+  setInterval(hideTop,1000);
+})();
+</script>
+  
 </body>
 </html>
