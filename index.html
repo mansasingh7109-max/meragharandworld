@@ -1,8 +1,70 @@
 <!DOCTYPE html>
 <html lang="hi"><head>
+
+<script>
+/* ===== DATA LOCK - isko sabse upar rakho ===== */
+</script>
+
+
   
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="auth.js"></script>
+
+ <style>
+/* Visitor ho to Kaun dekhega wali patti kabhi nahi dikhegi */
+body.visitor-mode #profileBtns{ display:none !important; }
+</style>
+<script>
+/* FINAL VISITOR FIX - Kaun dekhega patti hamesha chhupi rahegi */
+(function(){
+  function isVisitor(){
+    // Visitor banner ya visitor-mode class se pehchano - ye screenshot me already aa raha hai
+    if(document.body && document.body.classList.contains("visitor-mode")) return true;
+    var vb = document.getElementById("visitorBar");
+    if(vb && vb.style.display !== "none" && vb.offsetParent !== null) return true;
+    if(vb && (vb.textContent||"").indexOf("Visitor view")!==-1) return true;
+    try{
+      var q = new URLSearchParams(location.search);
+      var my = localStorage.getItem("MY_OWN_UID") || localStorage.getItem("auth_uid") || q.get("login") || "";
+      var owner = q.get("uid") || q.get("cid") || sessionStorage.getItem("VIEW_OWNER_UID") || "";
+      if(my && owner && my !== owner) return true;
+    }catch(e){}
+    return false;
+  }
+  function hideKaun(){
+    if(!isVisitor()) return;
+    // 1. Kaun dekhega wali patti - text se dhoondho, class se nahi
+    var all = document.querySelectorAll("div, section, span");
+    for(var i=0;i<all.length;i++){
+      var t = all[i].textContent || "";
+      if(t.indexOf("Kaun dekhega")!==-1 && all[i].children.length < 10){
+        // Sabse upar wali patti ko chhupao
+        var p = all[i];
+        for(var k=0;k<4;k++){ if(!p) break; if(p.className && String(p.className).indexOf("msg-actions")!==-1) break; p = p.parentElement; }
+        if(p) p.style.display = "none";
+        all[i].style.display = "none";
+      }
+    }
+    // 2. Akela-akela button bhi
+    ["vPublic","vFriend","vPrivate","vCustom","visHint"].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.style.display = "none";
+    });
+    // 3. Profile ke upar wale privacy button
+    var pb = document.getElementById("profileBtns"); if(pb) pb.style.display = "none";
+    // 4. Visitor ho to setVis / setProfileVis kabhi na chale
+    window.setVis = function(){ alert("🔒 Sirf dekh sakte ho - Friend ki privacy badal nahi sakte"); };
+    window.setProfileVis = function(){ alert("🔒 Sirf dekh sakte ho - Friend ki privacy badal nahi sakte"); };
+  }
+  // Baar-baar check karo - kyunki timedatalist patti dobara banata hai
+  setInterval(hideKaun, 400);
+  // Page me kuch bhi badle to turant chhupao
+  var obs = new MutationObserver(function(){ hideKaun(); });
+  obs.observe(document.body, { childList:true, subtree:true });
+  setTimeout(hideKaun, 500);
+  setTimeout(hideKaun, 1500);
+  setTimeout(hideKaun, 3000);
+})();
+</script> 
   <style>
 @font-face {
   font-family: "Optimistic";
@@ -41,7 +103,7 @@ body{background:#FCE4EC !important;margin:0;padding:0;}
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
-</body>
+
 <script>
 // ===== FIREBASE CONFIG (apni keys yahan bharo) =====
 var FIREBASE_CONFIG = {
@@ -194,7 +256,13 @@ body{background:#fff8f0;color:#333}
 
 <h3>Profile
   <button data-privacy-key="profile" data-privacy-val="public">Public</button>
-  <button data-privacy-key="profile" data-privacy-val="private">Private</button>
+  <button data-privacy-key="profile" data-privacy-val="private">Private</button><button onclick="'+fnVis+'('+idx+',\'Custom\')">⚙️ Custom</button>
+
+
+
+<button onclick="'+fnVis+'('+idx+',\'Public\')">🌍 Public</button><button onclick="'+fnVis+'('+idx+',\'Friend\')">👥 Friend</button><button onclick="'+fnVis+'('+idx+',\'Private\')">🔒 Private</button><button onclick="'+fnVis+'('+idx+',\'Custom\')">⚙️ Custom</button>
+
+  
 </h3>
 
     
@@ -429,7 +497,8 @@ friend6Chat: "", // OPTION: dost 6 ka WhatsApp number (khali = chat button nahi)
 <script>
 function checkLogin(page){
 if(localStorage.getItem("auth_uid") || localStorage.getItem("customer_logged_in")==="1"){ location.href=page; return false; }
-alert("Pehle Login karo!");
+if(typeof myAlert==="function"){ myAlert("Pehle Login karo!"); }
+else{ alert("Pehle Login karo!"); }
 document.getElementById("loginCover").style.display="flex";
 return false;
 }
@@ -467,7 +536,8 @@ document.getElementById("loginCover").style.display="flex";
 <input id="frSearchNew" placeholder="🔍 Naam likho..." oninput="loadNewFriends(this.value)" style="width:100%;padding:13px;border:2px solid #e65100;border-radius:24px;outline:none">
 
 <!-- 2. WORLD FRIENDS - Sirf naye -->
-<h2 style="margin:14px 0 8px">🌍 World Friends</h2>
+<h2 style="margin:14px 0 8px" onclick="location.href='world.html'">🌍 World Friends <span style="font-size:13px;color:#e65100">Poora Dekho ›</span></h2>  
+
 <div id="worldGridNew" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
 
 <!-- 3. ACCEPTED - Neeche -->
@@ -480,7 +550,7 @@ document.getElementById("loginCover").style.display="flex";
 
 <h2 style="background:#2196F3;color:#fff;padding:10px;border-radius:12px 12px 0 0;margin-top:14px">📤 Sent Request</h2>
 <div id="sentListNew" style="background:#fff;padding:10px;border-radius:0 0 12px 12px"></div>
-</>
+</div>
 
 <script>
 function loadNewFriends(q){
@@ -493,9 +563,25 @@ Object.keys(r[1].val()||{}).forEach(function(k){if(!S[k]) S[k]="incoming"});
 Object.keys(r[2].val()||{}).forEach(function(k){if(!S[k]) S[k]="sent"});
 Object.keys(r[3].val()||{}).forEach(function(k){S[k]="blocked"});
 var val=r[4].val()||{}; var w="",a="",inc="",sent="";
+var seenName = {};  
 Object.keys(val).forEach(function(id){
 
-var P=val[id]||{}; var name=(P.profileName||P.name||"Friend"); var phone=(P.profilePhone||P.phone||""); if(id===uid) return;  if(phone===localStorage.getItem("customer_phone")) return;
+// FIX 1 - Khud ko + Duplicate hatao
+
+var P=val[id]||{}; var name=(P.profileName||P.name||"Friend");
+var phone=(P.profilePhone||P.phone||"");  
+if(id===uid) return;
+if(phone===localStorage.getItem("customer_phone")) return;
+if(name.toLowerCase()==="manisha" && phone==="") return; // bina photo wali duplicate Manisha
+// Apna naam kabhi Sent / World me mat dikhao
+try{
+  var myP = JSON.parse(localStorage.getItem("customer_profile")||"{}");
+  var myNm = (myP.profileName||myP.name||"").toLowerCase();
+  if(myNm && name.toLowerCase()===myNm) return;
+}catch(e){}
+if(seenName[name.toLowerCase()]) return; // same naam dobara mat dikhao  
+seenName[name.toLowerCase()] = 1;
+  
 if(q && name.toLowerCase().indexOf(q)===-1) return;
 var photo=P.profilePhoto||"👤";
 var ph='<div style="width:44px;height:44px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden">'+(photo!=="👤"?'<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover">':"👤")+'</div>';
@@ -548,40 +634,6 @@ function saveMyFriends(f){ localStorage.setItem("fr_myfriends", JSON.stringify(f
 
 // ===== REQUEST BHEJO =====
 
-function sendFbRequest(userKey, btn){
-  var myLogin = null;
-  try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
-  var myUid = ""; try{ myUid = localStorage.getItem("auth_uid")||""; }catch(e){}
-  if(!myLogin && !myUid){
-    alert("Pehle login karo!"); location.href="customerlogin.html"; return;
-  }
-  var myName = myLogin ? myLogin.name : (localStorage.getItem("customer_name")||myUid||"User");
-  // ... baki same
-}
-
-
-
-
-
-
-
-
-function sendFbRequest(userKey, btn){
-  var myLogin = null;
-  try{ myLogin = JSON.parse(localStorage.getItem("customer_login")||"null"); }catch(e){}
-  var myUid = ""; try{ myUid = localStorage.getItem("auth_uid")||""; }catch(e){}
-  if(!myLogin && !myUid){
-    alert("Pehle login karo!"); location.href="customerlogin.html"; return;
-  }
-  var myName = myLogin ? myLogin.name : (localStorage.getItem("customer_name")||myUid||"User");
-  // ... baki same
-}
-
-
-
-
-  
-  
 function sendRequest(i){
   var f = FRIENDS[i];
   if(!f) return;
@@ -935,7 +987,8 @@ try{localStorage.setItem("auth_uid",_cid2);}catch(e){}
 _d._uid=_cid2;_d.profileName=_nm;_d.profilePhone=_ph2;
 try{localStorage.setItem("customer_profile",JSON.stringify(_d));}catch(e){}
 if(window._fbDb){try{_fbDb.ref("customer_profiles/"+_cid2).set(_d);}catch(e){}}
-alert("Welcome, "+_nm+"! ✅");
+if(typeof myAlert==="function"){ myAlert("Welcome, "+_nm+"! ✅", function(){ location.reload(); }); }
+else{ alert("Welcome, "+_nm+"! ✅"); location.reload(); }
 location.reload();
 });},500);
 return;
@@ -1812,34 +1865,7 @@ function rejectFirebaseReq(fromUid){
 
 
   
-  var btnHtml = "";
-  if(isFriend){
-    btnHtml = '<button style="background:#25D366;color:#fff;border:none;padding:14px;font-size:16px;margin-top:10px;width:100%;border-radius:20px;font-weight:bold;cursor:pointer;" onclick="openChat(\''+f.name.replace(/'/g,"")+'\',\''+(f._uid||f.uid||"")+'\')">💬 Chat Karo</button>'
-      + '<div style="color:#4caf50;font-weight:bold;margin-top:10px;">✅ Ye aapka dost hai</div>';
-  } else if(hasReq){
-    btnHtml = '<div style="color:#ff9800;font-weight:bold;margin-top:10px;">⏳ Request bhej di hai!</div>';
-  } else {
-    btnHtml = '<button class="sendbtn" onclick="sendRequest('+i+')">📩 Friend Request Bhejo</button>''<button onclick="sendFbRequest(\''+userKey+'\',this)" style="background:#25D366;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-weight:bold;">➕ Request</button>';
-  }
-
-  var photoHtml = f.photo;
-  // Agar photo me img tag nahi hai to div me wrap karo
-  if(photoHtml.indexOf('<img') === -1){
-    photoHtml = '<div style="width:100px;height:100px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:56px;margin:0 auto;overflow:hidden;">'+photoHtml+'</div>';
-  } else {
-    photoHtml = '<div style="width:100px;height:100px;border-radius:50%;overflow:hidden;margin:0 auto;">'+photoHtml+'</div>';
-  }
-
-  document.getElementById('detailCard').innerHTML =
-    photoHtml
-    + '<h2 style="font-size:22px;margin:12px 0 4px;">'+f.name+'</h2>'
-    + '<div style="color:#e65100;font-weight:bold;margin-bottom:10px;">'+f.role+'</div>'
-    + '<div style="font-size:14px;color:#666;text-align:left;margin:12px 0;line-height:1.6;">'+f.detail+'</div>'
-    + btnHtml;
-
-  document.getElementById('detailPage').style.display = "block";
-  window.scrollTo(0,0);
-}
+  
 function closeDetail(){
   document.getElementById('detailPage').style.display = "none";
 }
@@ -1864,8 +1890,8 @@ function openFbProfile(userKey){
     + '<h2 style="font-size:22px;margin:12px 0 4px;">'+nm.replace(/</g,"&lt;")+'</h2>'
     + (ph ? '<div style="color:#e65100;font-weight:bold;margin-bottom:10px;">📞 '+ph.replace(/</g,"&lt;")+'</div>' : '')
     + '<div style="font-size:14px;color:#666;margin:12px 0;">'+(u.profileDetail||"").replace(/</g,"&lt;")+'</div>'
-    + '<button onclick="sendFbRequest(\''+userKey+'\',this)" style="background:#25D366;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;">➕ Friend Request Bhejo</button>';
-  + '<div style="margin-top:10px;"><button onclick="location.href=\'album.html?cid='+userKey+'\'" style="background:#9C27B0;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;width:100%;margin-bottom:8px;">📸 Album Dekho</button><button onclick="location.href=\'timedatalist.html?cid='+userKey+'\'" style="background:#2196F3;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;width:100%;">📅 Timeline Dekho</button></div>'
+     + '<div id="stMsg" style="padding:20px;color:#999;">⌛ Status check ho raha hai...</div><div id="stBtn"></div>'';
+  + '<div style="margin-top:10px;"><button onclick="location.href=\'album.html?cid='+userKey+'\'" style="background:#9C27B0;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;width:100%;margin-bottom:8px;">📸 Album Dekho</button><button onclick="location.href=\'timedatalist.html?cid='+userKey+'\'" style="background:#2196F3;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;width:100%;">📅 Timeline Dekho</button></div>';
 
   document.getElementById('detailPage').style.display = "block";
   window.scrollTo(0,0);
@@ -1883,10 +1909,16 @@ function renderMyFriends(){
   if(myF.length === 0){ if(sec) sec.style.display = "none"; return; }
   if(sec) sec.style.display = "block";
   var html = "";
+
+
+  // FIX 2 - Nakli dost hatao
+myF = myF.filter(function(n){
+  var l = (n||"").toLowerCase();
+  return l!=="rahul" && l!=="priya" && l!=="amit" && l!=="ramesh" && l!=="naam likho" && l!=="manisha";
+});
+if(myF.length===0){ if(sec) sec.style.display="none"; return; }
   myF.forEach(function(name){
-    html += var uid2 = f._uid || f.uid || "";
-html += '<div class="fcard"><div onclick="openDetail('+i+')"><div class="fp">'+f.photo+'</div><div class="fn">'+f.name+'</div><div class="tap">Tap karo 👆</div></div><button onclick="event.stopPropagation(); sendFbRequest(\''+uid2+'\',this)" style="background:#25D366;color:#fff;border:none;padding:6px 12px;border-radius:16px;font-weight:bold;font-size:12px;margin-top:6px;width:100%;">➕ Request</button></div>'
-      '<div style="background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;">'
+    html += '<div style="background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;">'
       + '<div style="width:52px;height:52px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;cursor:pointer;" onclick="openDetailByName(\''+name.replace(/'/g,"")+'\')">👤</div>'
       + '<div style="flex:1;cursor:pointer;" onclick="openDetailByName(\''+name.replace(/'/g,"")+'\')"><div style="font-weight:bold;font-size:15px;">'+name+'</div><div style="font-size:12px;color:#4caf50;">✅ Dost</div></div>'
       + '<button onclick="openChat(\''+name.replace(/'/g,"")+'\')" style="background:#25D366;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px;">💬 Chat</button>'
@@ -1904,27 +1936,20 @@ html += '<div class="fcard"><div onclick="openDetail('+i+')"><div class="fp">'+f
 
 
 
-// STATUS nikalo har friend ka
-var status = FRIEND_STATUS[phone] || "none"; 
-// status = accepted, sent, incoming, blocked, rejected, none
-
- if(status === "accepted") -> sirf Mere Dost grid me dalo
-else if(status === "incoming") -> Request Aayi grid me
-else if(status === "sent") -> Sent grid me
-else if(status === "blocked") -> Block grid me
-else if(status === "rejected") -> Reject grid me
-else -> World / Hamare Dost grid me 
 
 
 
-  
-
-function logoutNow(){
-if(!confirm("Logout karein?"))return;
-try{localStorage.removeItem("customer_logged_in");}catch(e){}
-alert("Logout ho gaya! 👋");
-location.reload();
+  function logoutNow(){
+myConfirm("Logout karein?", function(ok){
+  if(!ok) return;
+  try{localStorage.removeItem("customer_logged_in");}catch(e){}
+  if(typeof myAlert==="function"){ myAlert("Logout ho gaya! 👋", function(){ location.reload(); }); }
+else{ alert("Logout ho gaya! 👋"); location.reload(); }
+  location.reload();
+});
 }
+
+
   
   
 </script>
@@ -2033,35 +2058,35 @@ el.style.color=tc;
 
 
 <script>
-document.getElementById('googleLoginBtn').addEventListener('click', function(){
-  var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider).then(function(result){
-    var user = result.user;
-    try{
-      localStorage.setItem("auth_uid", user.uid);
-      localStorage.setItem("customer_logged_in", "1");
-      localStorage.setItem("customer_profile", JSON.stringify({
+var _gBtn = document.getElementById('googleLoginBtn');
+if(_gBtn){
+  _gBtn.addEventListener('click', function(){
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).then(function(result){
+      var user = result.user;
+      try{
+        localStorage.setItem("auth_uid", user.uid);
+        localStorage.setItem("customer_logged_in", "1");
+        localStorage.setItem("customer_profile", JSON.stringify({
+          profileName: user.displayName || "User",
+          profilePhone: user.phoneNumber || "",
+          profilePhoto: user.photoURL || "👩",
+          email: user.email || ""
+        }));
+      }catch(e){}
+      if(window._fbDb){ try{ window._fbDb.ref("customer_profiles/"+user.uid).set({
         profileName: user.displayName || "User",
-        profilePhone: user.phoneNumber || "",
-        profilePhoto: user.photoURL || "👩",
+        profilePhoto: user.photoURL || "",
         email: user.email || ""
-      }));
-    }catch(e){}
-    if(window._fbDb){ try{ window._fbDb.ref("customer_profiles/"+user.uid).set({
-      profileName: user.displayName || "User",
-      profilePhoto: user.photoURL || "",
-      email: user.email || ""
-    }); }catch(e){} }
-    alert("Welcome, "+(user.displayName||"")+"! ✅");
-    location.reload();
-  }).catch(function(err){ alert("Error: "+err.message); });
-});
-
-
-
-
-
-  
+      }); }catch(e){} }
+      var _show = (typeof myAlert === "function" ? myAlert : function(m,cb){ alert(m); if(cb) cb(); });
+      _show("Welcome, "+(user.displayName||"")+"! ✅", function(){ location.reload(); });
+    }).catch(function(err){
+      var _show2 = (typeof myAlert === "function" ? myAlert : function(m,cb){ alert(m); if(cb) cb(); });
+      _show2("Error: "+err.message);
+    });
+  });
+}
 </script>
   
 
@@ -2561,10 +2586,129 @@ document.addEventListener("click",function(e){
 setInterval(renderBell,2000);
 renderBell();
 </script>
+
+
+
+<script>
+// ==== Date-Time - Sab File Ke Liye - Ek Hi Block ====
+function fmtDT(ts){
+  try{
+    var d = new Date(ts || Date.now());
+    var dd = String(d.getDate()).padStart(2,"0");
+    var mm = String(d.getMonth()+1).padStart(2,"0");
+    var yy = d.getFullYear();
+    var hh = String(d.getHours()).padStart(2,"0");
+    var mi = String(d.getMinutes()).padStart(2,"0");
+    return dd+"-"+mm+"-"+yy+"  "+hh+":"+mi;
+  }catch(e){ return ""; }
+}
+function showDT(m){
+  if(!m) return "";
+  var t = m.time || m.createdAt || m.created || Date.now();
+  var u = m.updatedAt || m.updated || m.editTime;
+  if(u && u != t){ return "📅 "+fmtDT(t)+"  •  ✏️ Updated: "+fmtDT(u); }
+  return "📅 "+fmtDT(t);
+}
+function dtHTML(m){ return "<span style='font-size:11px;color:#888;'>"+showDT(m)+"</span><br>"; }
+function setNewTime(m){ m.time = Date.now(); m.updatedAt = Date.now(); return m; }
+function setUpdateTime(m){ m.updatedAt = Date.now(); return m; }
+</scrip>
+<script src="confirm-popup.js"></script>
+
+<script src="datetime-all.js"></script>
   
+ <script src="upload-photo.js"></script> 
 <script src="friend-request.js"></script>
 <script src="friend-preview.js"></script>  
 <script src="privacy-all.js"></script>  
+
+
+<script src="timeline-restore.js"></script>
+
+
+<script>
+/* ===== INDEX LOCK - Login se pehle kisi ka data nahi, Login ke baad sirf apna ===== */
+(function(){
+  "use strict";
+
+  // 1. Kaun LOGIN hai? - Index pe sirf Login se pata chalega
+  function getLogin(){
+    var u = new URLSearchParams(window.location.search);
+    var v = u.get("login") || u.get("me") || "";
+    if(v) return v;
+    return localStorage.getItem("auth_uid") || localStorage.getItem("my_uid") || "";
+  }
+
+  var LOGIN = getLogin();
+  var IS_LOGGED_IN = (LOGIN !== "");
+
+  // 2. Data wali chabiyan - Index pe inko lock karo
+  function isDataKey(k){
+    if(!k) return false;
+    if(k === "auth_uid" || k === "my_uid" || k === "my_name" || k === "my_profile") return false;
+    if(k.indexOf("customer_details") === 0) return true;
+    if(k.indexOf("customer_thinkings") === 0) return true;
+    if(k.indexOf("group_msgs") === 0) return true;
+    if(k.indexOf("group_comments") === 0) return true;
+    if(k.indexOf("profile_msgs") === 0) return true;
+    if(k.indexOf("recycle_bin") === 0) return true;
+    if(k.indexOf("recycle") === 0) return true;
+    if(k.indexOf("messages") === 0) return true;
+    if(k.indexOf("friends") === 0) return true;
+    if(k.indexOf("friend_list") === 0) return true;
+    if(k === "customer_details") return true;
+    if(k === "profile_msgs") return true;
+    if(k === "messages") return true;
+    if(k === "recycle_bin") return true;
+    if(k === "friends") return true;
+    return false;
+  }
+
+  var _oldGet = localStorage.getItem.bind(localStorage);
+  localStorage.getItem = function(key){
+    // A. Login hi nahi hua - kisi ka data mat dikhao
+    // Manisha logout karke gayi, Santosh ne index khola to Manisha ka data nahi dikhna chahiye
+    if(!IS_LOGGED_IN && isDataKey(key)){
+      return "[]";
+    }
+
+    // B. Login hua hai - sirf apni chabi kholo, dusre ki mat kholo
+    // Example: LOGIN = MANISHA_ID hai, to "friends_SANTOSH_ID" mat kholo
+    if(IS_LOGGED_IN && isDataKey(key)){
+      // Purani chabi (bina ID ke) jaise "friends" - ye pichhle user ki ho sakti hai, isko mat kholo
+      if(key.indexOf("_") === -1 && key !== "friends"){
+        return "[]";
+      }
+      // Dusre ki chabi hai to mat kholo
+      if(key.indexOf(LOGIN) === -1 && key.indexOf("_") !== -1){
+        return "[]";
+      }
+    }
+    return _oldGet(key);
+  };
+
+  // 3. Index pe Manisha ka Photo Code / naam / UID galti se bhi mat dikhao
+  function hideLeak(){
+    if(IS_LOGGED_IN) return;
+    var all = document.querySelectorAll("div, p, span");
+    all.forEach(function(el){
+      if(el.children.length > 0) return;
+      var t = el.textContent || "";
+      if(t.length > 500){
+        el.textContent = "📸 Photo";
+      }
+      if(t.length > 20 && /^[A-Za-z0-9_-]{20,}$/.test(t.trim())){
+        el.textContent = "";
+      }
+    });
+  }
+  setInterval(hideLeak, 1000);
+
+  window.INDEX_LOCK = { LOGIN: LOGIN, IS_LOGGED_IN: IS_LOGGED_IN };
+  console.log("INDEX LOCK ON | Login:", LOGIN, "| Logged In?", IS_LOGGED_IN);
+})();
+</script>
+  
 </body>
 </html>
   
