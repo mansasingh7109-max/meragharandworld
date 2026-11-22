@@ -360,6 +360,7 @@ showTab("m");
 <script src="friend-timeline-rules.js"></script>
 <script src="2nd-grid-name-fix.js"></script>
 <script src="1st-grid-owner-only.js"></script>
+<script src="photo-video-upload.js"></script>  
 <script src="2nd-grid-comment-permission.js"></script>  
   
 <script>(function(){ function isV(){ try{ var q=new URLSearchParams(location.search); var l=q.get("login")||""; var u=q.get("uid")||q.get("cid")||""; if(l&&u&&l!==u) return true; }catch(e){} return document.body.classList.contains("visitor-mode"); } function hideK(){ if(!isV()) return; ["kaunDekhegaCard","profileBtns"].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display="none"; }); } setInterval(hideK, 500); setTimeout(hideK, 500); })();</script>
@@ -370,25 +371,98 @@ showTab("m");
 </div>
 
 
+
 <script>
-// TOP Comment Box hatao, Niche wala rakho
+// FIX: Comment Box wale commentPhotoFile / commentVideoFile ko V5 se jodo
 (function(){
-  function hideTop(){
-    var all = document.querySelectorAll("div,section");
-    for(var i=0;i<all.length;i++){
-      var t = all[i].textContent || "";
-      if(t.indexOf("Comment Save Karo")!==-1){
-        // Agar ye box 2nd Grid ke andar hai to mat hatao, sirf upar wala hatao
-        if(all[i].closest("#tabMessages")) continue;
-        all[i].style.display="none";
-      }
-    }
+  function findCI(){ return document.getElementById("commentInput"); }
+  var cpf = document.getElementById("commentPhotoFile");
+  if(cpf){
+    cpf.setAttribute("multiple","multiple");
+    cpf.onchange = function(){
+      var files = Array.prototype.slice.call(cpf.files || []);
+      if(!files.length) return;
+      var left = files.length;
+      files.forEach(function(f){
+        var r = new FileReader();
+        r.onload = function(e){ window._pickedPhotos.push(e.target.result); left--; if(left===0){ var inp=findCI(); if(inp){ var d=document.createElement("div"); d.className="inbox-photo-preview"; d.innerHTML='<div style="font-weight:bold;color:#2e7d32;">✅ Upload Done - '+window._pickedPhotos.length+' Photo</div>'; inp.parentElement.appendChild(d); } } };
+        r.readAsDataURL(f);
+      });
+      cpf.value = "";
+    };
   }
-  setTimeout(hideTop,500);
-  setTimeout(hideTop,1500);
-  setInterval(hideTop,1000);
+  var cvf = document.getElementById("commentVideoFile");
+  if(cvf){
+    cvf.setAttribute("multiple","multiple");
+    cvf.onchange = function(){
+      var files = Array.prototype.slice.call(cvf.files || []);
+      if(!files.length) return;
+      var left = files.length;
+      files.forEach(function(f){
+        var r = new FileReader();
+        r.onload = function(e){ window._pickedVideos.push(e.target.result); left--; if(left===0){} };
+        r.readAsDataURL(f);
+      });
+      cvf.value = "";
+    };
+  }
+  // Purana sendComment badlo - photo ke saath save karo
+  window.sendComment = function(){
+    var inp = findCI();
+    var txt = inp ? inp.value.trim() : "";
+    var hasMedia = (window._pickedPhotos && window._pickedPhotos.length>0) || (window._pickedVideos && window._pickedVideos.length>0);
+    if(!txt && !hasMedia){ alert("Pehle Comment ya Photo/Video chuno"); return; }
+    var finalText = txt || "📸 Photo";
+    var arr = [];
+    try{ arr = JSON.parse(localStorage.getItem("group_comments_"+msgOwner())||"[]"); }catch(e){ arr=[]; }
+    // getComments() wala purana tareeka bhi try karo
+    try{ if(typeof getComments==="function"){ var g=getComments(); if(g && g.length) arr=g; } }catch(e){}
+    var m = { text: finalText, photo: (window._pickedPhotos&&window._pickedPhotos[0])||"", video: (window._pickedVideos&&window._pickedVideos[0])||"", photos: (window._pickedPhotos||[]).slice(), videos: (window._pickedVideos||[]).slice(), senderUid: getMyUid(), senderName: getMyName(), who: getMyName(), time: Date.now(), date: new Date().toISOString().slice(0,10), privacy:"Public", boxOwner: msgOwner(), owner: msgOwner(), type:"group_comment" };
+    arr.push(m);
+    try{ localStorage.setItem("group_comments_"+msgOwner(), JSON.stringify(arr)); }catch(e){}
+    try{ if(typeof saveComments==="function") saveComments(arr); }catch(e){}
+    try{ if(window._fbDb && msgOwner()) window._fbDb.ref("group_comments/"+msgOwner()+"/messages").set(arr); }catch(e){}
+    window._pickedPhotos=[]; window._pickedVideos=[];
+    document.querySelectorAll(".inbox-photo-preview").forEach(function(el){ el.remove(); });
+    if(inp) inp.value="";
+    try{ if(typeof showComments==="function") showComments(); }catch(e){}
+    try{ if(typeof renderMessages==="function") renderMessages(); }catch(e){}
+  };
 })();
 </script>
+
+
+
+<script src="photo-video-upload.js"></script>
+<script>
+// KEEPER: 2nd Grid ka photo wala sendComment kabhi hatne mat do
+(function(){
+  function isDummy(fn){ try{ return fn && fn.toString().indexOf("neeche wale")!==-1; }catch(e){ return false; } }
+  // V6 wale sendComment ko yaad rakho
+  var realSend = window.sendComment;
+  setInterval(function(){
+    // Agar kisi ne purana dummy sendComment wapis laga diya to fir se asli wala lagao
+    if(isDummy(window.sendComment) && realSend){
+      window.sendComment = realSend;
+      window.saveTimelineComment = realSend;
+      window.sendCommentPopup = realSend;
+    }
+    // Agar photo chuni hui hai par preview gayab ho gayi to dobara dikhao
+    if(window._pickedPhotos && window._pickedPhotos.length>0){
+      var inp = document.getElementById("commentInput") || document.querySelector('input[placeholder*="2nd Grid"]');
+      if(inp && !document.querySelector(".inbox-photo-preview")){
+        var d = document.createElement("div");
+        d.className = "inbox-photo-preview";
+        d.style.cssText = "margin-top:8px;padding:8px;background:#f1f8e9;border:1px solid #aed581;border-radius:10px;";
+        d.innerHTML = '<div style="font-weight:bold;color:#2e7d32;">✅ Upload Done - '+window._pickedPhotos.length+' Photo - Ab Comment dabao</div>';
+        inp.parentElement.appendChild(d);
+      }
+    }
+  }, 800);
+})();
+</script>
+</body>
+
   
 </body>
 </html>
