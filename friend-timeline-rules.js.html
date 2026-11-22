@@ -1,0 +1,215 @@
+// =====================================================
+// FRIEND-TIMELINE-RULES.JS - 1 FILE, SAB RULE ISI ME
+// Connect - HAR FILE ke <head> me sabse pehle 1 line:
+// <script src="friend-timeline-rules.js"></script>
+//
+// RULES:
+// 1. Friend ki Timeline me sirf usi Friend ke save wale message dikhenge.
+// 2. Comment Box USER ke liye rahega - Photo / Video / Tag ke saath.
+// 3. EDIT - sirf jisne likha (sender) kar sakta hai. Owner Edit NAHI kar sakta.
+// 4. HIDE / DELETE - Save ke baad SIRF jiski Timeline hai (owner) kar sakta hai. Dusra koi nahi.
+// 5. DELETE / HIDE -> Recycle Bin, Recycle Bin SIRF Login ID wale ko dikhega.
+// 6. Login ID user ne jo save kiya, wo hamesha save - Website + Firebase.
+// =====================================================
+(function(){
+"use strict";
+function getMyUid(){
+  try{
+    var q = new URLSearchParams(location.search);
+    var lg = q.get("login") || q.get("me") || q.get("myUid") || "";
+    if(lg){ try{ localStorage.setItem("MY_OWN_UID", lg); }catch(e){} return lg; }
+    return localStorage.getItem("MY_OWN_UID") || localStorage.getItem("auth_uid") || "";
+  }catch(e){ return ""; }
+}
+function getOwnerUid(){
+  try{
+    var q = new URLSearchParams(location.search);
+    var u = q.get("uid") || q.get("cid") || q.get("owner") || q.get("id") || q.get("page") || "";
+    if(u){ try{ sessionStorage.setItem("VIEW_OWNER_UID", u); }catch(e){} return u; }
+    try{ return sessionStorage.getItem("VIEW_OWNER_UID") || ""; }catch(e){ return ""; }
+  }catch(e){ return ""; }
+}
+function isVisitor(){ var m=getMyUid(), o=getOwnerUid(); return !!(m && o && m!==o); }
+function isOwner(){ var m=getMyUid(), o=getOwnerUid(); if(!o) return true; if(!m) return false; return m===o; }
+function myName(){
+  try{ var p=JSON.parse(localStorage.getItem("my_profile")||"{}"); if(p.profileName||p.name) return p.profileName||p.name; }catch(e){}
+  try{ return localStorage.getItem("my_name_"+getMyUid()) || "Friend"; }catch(e){ return "Friend"; }
+}
+function msgsKey(owner){ return "group_msgs_" + (owner || getOwnerUid() || getMyUid() || "me"); }
+function getMsgs(owner){ try{ return JSON.parse(localStorage.getItem(msgsKey(owner))||"[]"); }catch(e){ return []; } }
+function saveMsgs(owner, arr){ try{ localStorage.setItem(msgsKey(owner), JSON.stringify(arr)); }catch(e){} }
+function saveMessageToAll(text, photo, video, tag){
+  var me = getMyUid(), owner = getOwnerUid() || me;
+  if(!text && !photo && !video){ return null; }
+  var item = { id:"m_"+Date.now()+"_"+Math.floor(Math.random()*1000), text:text||"", photo:photo||"", video:video||"", tag:tag||"",
+    senderUid:me, senderName:myName(), owner:owner, ownerUid:owner, savedBy:me, savedByName:myName(),
+    time:Date.now(), updatedAt:Date.now(), hidden:false, deleted:false, isComment:true };
+  var arr = getMsgs(owner); arr.push(item); saveMsgs(owner, arr);
+  if(owner !== me){ var mine = getMsgs(me); mine.push(item); saveMsgs(me, mine); }
+  try{ if(window._fbDb){ window._fbDb.ref("group_msgs/"+owner+"/messages").set(arr); window._fbDb.ref("timeline_msgs/"+owner).push(item); } }catch(e){}
+  return item;
+}
+function recycleKey(){ return "recycle_bin_" + getMyUid(); }
+function getRecycle(){ try{ return JSON.parse(localStorage.getItem(recycleKey())||"[]"); }catch(e){ return []; } }
+function moveToRecycle(item, reason){
+  var me = getMyUid(); var rec = getRecycle();
+  var copy = JSON.parse(JSON.stringify(item||{}));
+  copy.movedBy = me; copy.movedByName = myName(); copy.reason = reason || "delete"; copy.movedAt = Date.now();
+  rec.push(copy);
+  try{ localStorage.setItem(recycleKey(), JSON.stringify(rec)); }catch(e){}
+  try{ if(window._fbDb) window._fbDb.ref("recycle_bin/"+me+"/messages").set(rec); }catch(e){}
+  return copy;
+}
+function showMyRecycle(){
+  var rec = getRecycle();
+  if(!rec.length){ alert("♻️ Recycle Bin khaali hai"); return; }
+  var txt = "♻️ Recycle Bin - sirf tumhara ("+rec.length+"):\n\n";
+  rec.forEach(function(r,i){ txt += (i+1)+". "+(r.text||"[photo]")+"  ["+(r.reason||"")+" - "+(r.senderName||"")+"]\n"; });
+  if(confirm(txt + "\nKoi message wapis lana hai? OK dabao, phir number likho.")){
+    var n = prompt("Kaunsa number wapis lana hai? (1 se "+rec.length+")");
+    var idx = parseInt(n||"0",10)-1;
+    if(idx>=0 && idx<rec.length){
+      var back = rec.splice(idx,1)[0]; back.hidden=false; back.deleted=false;
+      var owner = back.owner || getOwnerUid() || getMyUid();
+      var arr = getMsgs(owner); arr.push(back); saveMsgs(owner, arr);
+      try{ localStorage.setItem(recycleKey(), JSON.stringify(rec)); }catch(e){}
+      try{ if(window._fbDb){ window._fbDb.ref("group_msgs/"+owner+"/messages").set(arr); window._fbDb.ref("recycle_bin/"+getMyUid()+"/messages").set(rec); } }catch(e){}
+      alert("✅ Wapis aa gaya!"); if(window.location) location.reload();
+    }
+  }
+}
+function canEdit(item){ return !!(item && item.senderUid && item.senderUid === getMyUid()); }
+function canHideDelete(item){
+  // NAYA RULE: Save ke baad Hide/Delete SIRF jiski Timeline hai wo kar sakta hai. Dusra koi nahi.
+  var me = getMyUid();
+  if(item && (item.owner===me || item.ownerUid===me)) return true;
+  if(!item || !item.owner) return isOwner();
+  return false;
+}
+function itemFromEl(el){
+  var id = el.getAttribute("data-id") || el.getAttribute("data-key") || "";
+  var sender = el.getAttribute("data-sender") || el.getAttribute("data-senderuid") || "";
+  var owner = el.getAttribute("data-owner") || getOwnerUid() || getMyUid();
+  var textEl = el.querySelector(".tx, .tl-line, .msg-text, p");
+  var text = textEl ? textEl.textContent : el.textContent;
+  var found = null; var arr = getMsgs(owner);
+  for(var i=0;i<arr.length;i++){ if(id && arr[i].id===id){ found=arr[i]; break; } if(!id && arr[i].text && text && text.indexOf(arr[i].text)!==-1){ found=arr[i]; break; } }
+  if(found) return found;
+  return { id:id, text:text||"", senderUid:sender, senderName:"", owner:owner, ownerUid:owner };
+}
+function doEdit(el){
+  var item = itemFromEl(el);
+  if(!canEdit(item)){ alert("🔒 Edit sirf jisne likha wahi kar sakta hai"); return; }
+  var nt = prompt("Message edit karo:", item.text||""); if(nt===null) return;
+  var owner = item.owner || getOwnerUid() || getMyUid(); var arr = getMsgs(owner);
+  for(var i=0;i<arr.length;i++){ if(arr[i].id===item.id || (!item.id && arr[i].text===item.text)){ arr[i].text=nt; arr[i].updatedAt=Date.now(); break; } }
+  saveMsgs(owner, arr);
+  try{ if(window._fbDb) window._fbDb.ref("group_msgs/"+owner+"/messages").set(arr); }catch(e){}
+  var tEl = el.querySelector(".tx, .tl-line, .msg-text, p"); if(tEl) tEl.textContent = nt;
+  alert("✅ Edit ho gaya");
+}
+function doHide(el, item){
+  item = item || itemFromEl(el);
+  if(!canHideDelete(item)){ alert("🔒 Hide sirf jiski Timeline hai wahi kar sakta hai"); return; }
+  if(!confirm("Hide karein? Ye Recycle Bin me chala jayega.")) return;
+  var owner = item.owner || getOwnerUid() || getMyUid(); var arr = getMsgs(owner); var left = [];
+  for(var i=0;i<arr.length;i++){ if(arr[i].id===item.id || (!item.id && arr[i].text===item.text)){ moveToRecycle(arr[i], "hide"); } else left.push(arr[i]); }
+  saveMsgs(owner, left);
+  try{ if(window._fbDb) window._fbDb.ref("group_msgs/"+owner+"/messages").set(left); }catch(e){}
+  el.style.display = "none";
+}
+function doDelete(el, item){
+  item = item || itemFromEl(el);
+  if(!canHideDelete(item)){ alert("🔒 Delete sirf jiski Timeline hai wahi kar sakta hai"); return; }
+  if(!confirm("Delete karein? Ye Recycle Bin me chala jayega.")) return;
+  var owner = item.owner || getOwnerUid() || getMyUid(); var arr = getMsgs(owner); var left = [];
+  for(var i=0;i<arr.length;i++){ if(arr[i].id===item.id || (!item.id && arr[i].text===item.text)){ moveToRecycle(arr[i], "delete"); } else left.push(arr[i]); }
+  saveMsgs(owner, left);
+  try{ if(window._fbDb) window._fbDb.ref("group_msgs/"+owner+"/messages").set(left); }catch(e){}
+  el.style.display = "none";
+}
+function applyRules(){
+  try{
+    var cb = document.getElementById("commentBox") || document.getElementById("msgInputBox") || document.getElementById("commentInputBox");
+    if(cb) cb.style.display = "";
+    var cards = document.querySelectorAll(".entry, .tl-card, .msg, .post, .message-card");
+    cards.forEach(function(card){
+      var it = itemFromEl(card); var owner = getOwnerUid();
+      if(owner && it.owner && it.owner !== owner && it.owner !== getMyUid()){ if(card.getAttribute("data-owner")){ card.style.display = "none"; return; } }
+      if(card.getAttribute("data-ftr-done")) return;
+      card.setAttribute("data-ftr-done", "1");
+      var row = card.querySelector(".tl-btn-row, .msg-actions, .btn-row");
+      if(!row){ row = document.createElement("div"); row.className = "tl-btn-row"; card.appendChild(row); }
+      if(canEdit(it)){ var eb=document.createElement("button"); eb.textContent="✏️ Edit"; eb.onclick=function(){ doEdit(card); }; row.appendChild(eb); }
+      if(canHideDelete(it)){
+        var hb=document.createElement("button"); hb.textContent="🙈 Hide"; hb.onclick=function(){ doHide(card); }; row.appendChild(hb);
+        var db=document.createElement("button"); db.textContent="🗑️ Delete"; db.onclick=function(){ doDelete(card); }; row.appendChild(db);
+      }
+      var rb=document.createElement("button"); rb.textContent="💬 Comment"; rb.onclick=function(){ var c=prompt("Comment likho:"); if(c) saveMessageToAll(c); }; row.appendChild(rb);
+    });
+  }catch(e){}
+}
+/* ---------- COMMENT BOX - Photo / Video / Tag ---------- */
+function getTagFriends(){
+  var out=[];
+  try{ ["fr_myfriends","my_friends","friends_list","myFriends"].forEach(function(k){ var arr=JSON.parse(localStorage.getItem(k)||"[]"); arr.forEach(function(f){ var nm=typeof f==="string"?f:(f.name||f.profileName||""); if(nm && out.indexOf(nm)===-1) out.push(nm); }); }); }catch(e){}
+  try{ var profs=JSON.parse(localStorage.getItem("all_profiles")||"[]"); profs.forEach(function(p){ var nm=p.profileName||p.name||""; if(nm && out.indexOf(nm)===-1) out.push(nm); }); }catch(e){}
+  return out;
+}
+function buildCommentBox(){
+  try{
+    if(document.getElementById("ftrCommentBox")) return;
+    var anchor = document.getElementById("list") || document.getElementById("timelineList") || document.body;
+    var box = document.createElement("div"); box.id = "ftrCommentBox";
+    box.style.cssText = "background:#fff;border-radius:14px;padding:12px;margin:10px 8px;box-shadow:0 2px 8px rgba(0,0,0,.08);";
+    var tagOpt = '<option value="">🏷️ Tag - kisi ko tag karo (optional)</option>';
+    getTagFriends().forEach(function(n){ tagOpt += '<option value="'+String(n).replace(/"/g,"")+'">'+n+'</option>'; });
+    box.innerHTML =
+      '<b style="font-size:14px;">💬 Comment Box</b>'
+      + '<div style="font-size:12px;color:#888;margin:2px 0 8px;">Photo / Video / Tag ke saath comment karo - Save hote hi Timeline wale ke paas jayega</div>'
+      + '<textarea id="ftrCommentText" placeholder="Comment likho..." rows="2" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:12px;outline:none;font-size:14px;box-sizing:border-box;"></textarea>'
+      + '<div id="ftrPreview" style="margin-top:8px;"></div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">'
+      + '<label style="flex:1;background:#eee;border:1px solid #ddd;border-radius:20px;padding:9px;text-align:center;font-size:13px;cursor:pointer;">📸 Photo<input id="ftrPhoto" type="file" accept="image/*" style="display:none;"></label>'
+      + '<label style="flex:1;background:#eee;border:1px solid #ddd;border-radius:20px;padding:9px;text-align:center;font-size:13px;cursor:pointer;">🎥 Video<input id="ftrVideo" type="file" accept="video/*" style="display:none;"></label>'
+      + '<select id="ftrTag" style="flex:1;padding:9px;border:1px solid #ddd;border-radius:20px;font-size:13px;background:#fff;">'+tagOpt+'</select>'
+      + '</div>'
+      + '<button id="ftrSend" style="width:100%;background:#e65100;color:#fff;border:none;border-radius:20px;padding:12px;font-weight:bold;font-size:15px;margin-top:10px;cursor:pointer;">📩 Comment Save Karo</button>'
+      + '<div style="font-size:12px;color:#666;text-align:center;margin-top:6px;">Save ke baad Hide/Delete sirf Timeline wala kar payega</div>';
+    if(anchor===document.body) document.body.insertBefore(box, document.body.firstChild);
+    else anchor.parentNode.insertBefore(box, anchor);
+    var pendingPhoto="", pendingVideo="";
+    document.getElementById("ftrPhoto").addEventListener("change", function(){
+      var f=this.files && this.files[0]; if(!f) return; var rd=new FileReader();
+      rd.onload=function(){ pendingPhoto=rd.result; document.getElementById("ftrPreview").innerHTML='<img src="'+pendingPhoto+'" style="width:100%;border-radius:10px;">'; }; rd.readAsDataURL(f);
+    });
+    document.getElementById("ftrVideo").addEventListener("change", function(){
+      var f=this.files && this.files[0]; if(!f) return; var rd=new FileReader();
+      rd.onload=function(){ pendingVideo=rd.result; document.getElementById("ftrPreview").innerHTML='<video src="'+pendingVideo+'" controls style="width:100%;border-radius:10px;"></video>'; }; rd.readAsDataURL(f);
+    });
+    document.getElementById("ftrSend").addEventListener("click", function(){
+      var t=document.getElementById("ftrCommentText").value.trim();
+      var tag=document.getElementById("ftrTag").value||"";
+      if(!t && !pendingPhoto && !pendingVideo){ alert("Pehle Comment / Photo / Video kuch to likho"); return; }
+      var fullText = t + (tag ? "  🏷️ @"+tag : "");
+      saveMessageToAll(fullText, pendingPhoto, pendingVideo, tag);
+      document.getElementById("ftrCommentText").value=""; document.getElementById("ftrPreview").innerHTML=""; document.getElementById("ftrTag").value="";
+      document.getElementById("ftrPhoto").value=""; document.getElementById("ftrVideo").value=""; pendingPhoto=""; pendingVideo="";
+      alert("✅ Comment save ho gaya - ab isko Hide/Delete sirf Timeline wala kar sakta hai");
+      setTimeout(applyRules, 400);
+    });
+  }catch(e){}
+}
+function bindCommentBox(){ buildCommentBox(); }
+window.FTRULES = { getMyUid:getMyUid, getOwnerUid:getOwnerUid, isVisitor:isVisitor, isOwner:isOwner,
+  saveMessage:saveMessageToAll, getMsgs:getMsgs, moveToRecycle:moveToRecycle,
+  showRecycle:showMyRecycle, canEdit:canEdit, canHideDelete:canHideDelete,
+  doEdit:doEdit, doHide:doHide, doDelete:doDelete, apply:applyRules };
+window.saveFriendMessage = saveMessageToAll;
+window.showMyRecycle = showMyRecycle;
+window.ftrEdit = doEdit; window.ftrHide = doHide; window.ftrDelete = doDelete;
+document.addEventListener("DOMContentLoaded", function(){ applyRules(); bindCommentBox(); });
+setInterval(function(){ applyRules(); bindCommentBox(); }, 800);
+setTimeout(function(){ applyRules(); bindCommentBox(); }, 1500);
+console.log("✅ friend-timeline-rules.js v2 loaded | MY:", getMyUid(), "OWNER:", getOwnerUid(), "VISITOR:", isVisitor());
+})();

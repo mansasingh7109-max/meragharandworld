@@ -1,396 +1,257 @@
 // =====================================================
-// PRIVACY.JS v3 - 7 alag Private/Public buttons
-// Har page par APNA button!
-//
-// v2 se UPDATE: 2 naye button (Profile, Timeline) +
-// har page par button lagane wale functions
-//
-// CONNECT: har page me </body> se PEHLE:
+// PRIVACY.JS v5 - FINAL FIX
+// File naam: privacy.js - wahi rahega
 // <script src="privacy.js"></script>
-//
-// Phir us page ka button:
-// album.html:        PRIV_placeBtn("albumPublic","hdr")
-// timedatalist.html: PRIV_placeBtn("timelinePublic","hdr")
-// friends.html:      PRIV_placeBtn("friendsPublic","hdr");PRIV_placeBtn("showInSearch","hdr")
-// profile.html:      PRIV_bar("hdr",["profilePublic","detailPublic","msgPublic"])
-//
-// RULE: OFF wali cheez sirf FRIEND ko dikhegi
+// 
+// RULE: Friend ki Timeline me privacy button kabhi
+// dabane wala nahi hoga - sirf badge dikhega.
+// Koi bhi user kisi aur ki privacy change nahi kar sakta.
 // =====================================================
 (function(){
 "use strict";
+/* ========== 0. KAUN HAI? - Owner vs Visitor ========== */
+function getMyOwnUid(){
+  try{
+    var q = new URLSearchParams(location.search);
+    var lg = q.get("login") || q.get("me") || q.get("myUid") || "";
+    if(lg){ try{ localStorage.setItem("MY_OWN_UID", lg); }catch(e){} return lg; }
+    return localStorage.getItem("MY_OWN_UID") || localStorage.getItem("auth_uid") || "";
+  }catch(e){ return ""; }
+}
+function getPageOwnerUid(){
+  try{
+    var q = new URLSearchParams(location.search);
+    var u = q.get("uid") || q.get("cid") || q.get("owner") || q.get("id") || q.get("page") || "";
+    if(u){ try{ sessionStorage.setItem("VIEW_OWNER_UID", u); }catch(e){} return u; }
+    try{ return sessionStorage.getItem("VIEW_OWNER_UID") || ""; }catch(e){ return ""; }
+  }catch(e){ return ""; }
+}
+function isVisitorNow(){
+  var mine = getMyOwnUid(), owner = getPageOwnerUid();
+  if(mine && owner && mine !== owner) return true;
+  return false;
+}
+function isOwnerNow(){
+  var mine = getMyOwnUid(), owner = getPageOwnerUid();
+  if(!owner) return true;
+  if(!mine) return false;
+  return mine === owner;
+}
+window.getMyOwnUid = getMyOwnUid;
+window.getMyUid = getMyOwnUid;
+window._isVisitorMode = isVisitorNow;
+window.isVisitorNow = isVisitorNow;
+window.isOwnerNow = isOwnerNow;
 
-/* ===== v3 NEW: 7 SETTINGS (2 naye: profilePublic, timelinePublic) ===== */
-var DEFS = {
-  profilePublic: "on",   // v3 NEW
-  detailPublic: "on",
-  albumPublic: "on",
-  timelinePublic: "on",  // v3 NEW
-  msgPublic: "on",
-  friendsPublic: "on",
-  showInSearch: "on"
-};
-var LABELS = [
-  {k:"profilePublic",  t:"👤 Profile",         d:"OFF = profile sirf friend ko dikhega"},  // v3 NEW
-  {k:"detailPublic",   t:"📝 Personal Detail",  d:"OFF = detail sirf friend ko dikhega"},
-  {k:"albumPublic",    t:"📸 Album",            d:"OFF = photos sirf friend ko dikhengi"},
-  {k:"timelinePublic", t:"🕐 Timeline",         d:"OFF = timeline sirf friend ko dikhega"}, // v3 NEW
-  {k:"msgPublic",      t:"💬 Message",          d:"OFF = message sirf friend ko dikhega"},
-  {k:"friendsPublic",  t:"👥 Friends List",     d:"OFF = dost list sirf friend ko dikhegi"},
-  {k:"showInSearch",   t:"🔍 Search me ID",      d:"OFF = koi search me nahi dhoondh payega"}
-];
-function labelOf(k){
-  for(var i=0;i<LABELS.length;i++){ if(LABELS[i].k===k) return LABELS[i]; }
-  return {k:k, t:k, d:""};
+/* ========== 1. Kaun dekhega? - Public / Friend / Private / Custom ========== */
+function visKey(){ var o = getPageOwnerUid() || getMyOwnUid() || "me"; return "timeline_privacy_" + o; }
+function customKey(){ var o = getPageOwnerUid() || getMyOwnUid() || "me"; return "timeline_privacy_custom_" + o; }
+function getVis(){
+  try{
+    var v = localStorage.getItem(visKey());
+    if(v) return v;
+    return localStorage.getItem("timeline_privacy") || "Public";
+  }catch(e){ return "Public"; }
+}
+function setVis(v){
+  // *** SABSE BADA FIX - Visitor yahan se wapis jayega ***
+  if(isVisitorNow()){ alert("🔒 Sirf dekh sakte ho - Friend ki privacy badal nahi sakte"); return; }
+  try{ localStorage.setItem(visKey(), v); localStorage.setItem("timeline_privacy", v); }catch(e){}
+  try{
+    var h = document.getElementById("visHint"); if(h) h.textContent = "Abhi: " + v;
+    var b = document.getElementById("pVisBadge"); if(b) b.textContent = (v==="Public"?"🌍 Public":v==="Friend"?"👥 Friend":v==="Private"?"🔒 Private":"⚙️ Custom");
+    ["vPublic","vFriend","vPrivate","vCustom"].forEach(function(id){
+      var el = document.getElementById(id); if(!el) return;
+      var isOn = (id==="vPublic"&&v==="Public")||(id==="vFriend"&&v==="Friend")||(id==="vPrivate"&&v==="Private")||(id==="vCustom"&&v==="Custom");
+      el.classList.toggle("on", isOn);
+    });
+  }catch(e){}
+  if(v==="Custom") openCustomPicker();
+  applyVisitor();
+}
+function getFriends(){
+  var out = [];
+  try{
+    ["fr_myfriends","my_friends","friends_list","myFriends"].forEach(function(k){
+      var arr = JSON.parse(localStorage.getItem(k)||"[]");
+      arr.forEach(function(f){ var nm = typeof f==="string" ? f : (f.name||f.profileName||f.uid||""); if(nm && out.indexOf(nm)===-1) out.push(nm); });
+    });
+  }catch(e){}
+  try{
+    var profs = JSON.parse(localStorage.getItem("all_profiles")||"[]");
+    profs.forEach(function(p){ var nm=p.profileName||p.name||""; if(nm && out.indexOf(nm)===-1) out.push(nm); });
+  }catch(e){}
+  try{
+    var fb = JSON.parse(localStorage.getItem("my_profile")||"{}");
+    if(fb.friendsList && fb.friendsList.length) fb.friendsList.forEach(function(n){ if(out.indexOf(n)===-1) out.push(n); });
+  }catch(e){}
+  return out;
+}
+function getCustom(){ try{ return JSON.parse(localStorage.getItem(customKey())||"[]"); }catch(e){ return []; } }
+function saveCustom(list){ try{ localStorage.setItem(customKey(), JSON.stringify(list)); }catch(e){} }
+function openCustomPicker(){
+  if(isVisitorNow()){ alert("🔒 Sirf dekh sakte ho - Custom badal nahi sakte"); return; }
+  var old = document.getElementById("customPicker");
+  if(old){ old.style.display="flex"; renderCustomList(""); return; }
+  var wrap = document.createElement("div"); wrap.id = "customPicker";
+  wrap.style.cssText = "display:flex;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;";
+  wrap.innerHTML = '<div style="background:#fff;width:92%;max-width:420px;border-radius:16px;padding:16px;max-height:80vh;overflow:auto;">'
+    + '<b style="font-size:18px;">⚙️ Custom - Kisko Dikhana Hai?</b>'
+    + '<div style="font-size:12px;color:#666;margin:6px 0;">Tick karo, jisko tick karoge sirf wahi dekhega - naam type nahi karna</div>'
+    + '<input id="customSearch" oninput="filterCustomFriends()" placeholder="Friend dhoondo..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:20px;outline:none;margin-bottom:10px;">'
+    + '<div id="customFriendList"></div>'
+    + '<div style="display:flex;gap:8px;margin-top:12px;"><button onclick="saveCustomPicker()" style="flex:1;background:#e65100;color:#fff;border:none;border-radius:20px;padding:11px;font-weight:bold;">✅ Done</button><button onclick="closeCustomPicker()" style="background:#eee;border:1px solid #ddd;border-radius:20px;padding:11px 14px;">✖️</button></div>'
+    + '<div id="customSelectedCount" style="font-size:12px;color:#e65100;margin-top:8px;font-weight:bold;"></div></div>';
+  document.body.appendChild(wrap); renderCustomList("");
+}
+function renderCustomList(q){
+  var box = document.getElementById("customFriendList"); if(!box) return;
+  var sel = getCustom(); var all = getFriends(); var html = "";
+  all.forEach(function(n){
+    if(q && String(n).toLowerCase().indexOf(String(q).toLowerCase())===-1) return;
+    var ck = sel.indexOf(n)!==-1 ? " checked" : "";
+    html += '<label style="display:flex;gap:10px;align-items:center;background:#fff8f0;border-radius:10px;padding:10px;margin-bottom:6px;cursor:pointer;"><input type="checkbox" class="customCk" value="'+String(n).replace(/"/g,"")+'"'+ck+' style="width:20px;height:20px;">'+n+'</label>';
+  });
+  box.innerHTML = html || '<div style="color:#999;padding:10px;">Koi friend nahi mila - pehle Friend banao</div>';
+  var c = document.getElementById("customSelectedCount"); if(c) c.textContent = "✅ Selected: " + sel.length + " friend";
+}
+function filterCustomFriends(){ var s=document.getElementById("customSearch"); renderCustomList(s?s.value:""); }
+function saveCustomPicker(){
+  var list=[]; document.querySelectorAll(".customCk:checked").forEach(function(c){ list.push(c.value); });
+  saveCustom(list); closeCustomPicker(); alert("✅ Custom save ho gaya - sirf "+list.length+" friend dekhenge");
+}
+function closeCustomPicker(){ var p=document.getElementById("customPicker"); if(p) p.style.display="none"; }
+function renderBar(){
+  var box = document.getElementById("privacyBar"); if(!box) return;
+  var v = getVis(); var owner = !isVisitorNow();
+  if(owner){
+    box.innerHTML = '<div class="msg-actions"><span style="font-size:13px;font-weight:bold;padding:8px 2px;">👁️ Kaun dekhega?</span>'
+      + '<button id="vPublic" class="'+(v==="Public"?"on":"")+'" onclick="setVis(\'Public\')">🌍 Public</button>'
+      + '<button id="vFriend" class="'+(v==="Friend"?"on":"")+'" onclick="setVis(\'Friend\')">👥 Friend</button>'
+      + '<button id="vPrivate" class="'+(v==="Private"?"on":"")+'" onclick="setVis(\'Private\')">🔒 Private</button>'
+      + '<button id="vCustom" class="'+(v==="Custom"?"on":"")+'" onclick="setVis(\'Custom\')">⚙️ Custom</button>'
+      + '<span id="visHint" style="font-size:12px;color:#666;padding:8px 2px;">Abhi: '+v+'</span></div>';
+  } else {
+    var label = v==="Public"?"🌍 Public":v==="Friend"?"👥 Friend":v==="Private"?"🔒 Private":"⚙️ Custom - Sirf chune hue friends";
+    box.innerHTML = '<div class="msg-actions"><span style="font-size:13px;font-weight:bold;padding:8px 2px;">👁️ Kaun dekhega?</span>'
+      + '<span class="pill" id="pVisBadge" style="background:#e8f5e9;padding:7px 12px;border-radius:20px;">'+label+'</span>'
+      + '<span style="font-size:12px;color:#888;">🔒 Sirf dekh sakte ho - badal nahi sakte</span></div>';
+  }
+}
+function canSee(viewerName){
+  var v = getVis();
+  if(v==="Public") return true;
+  if(v==="Private") return false;
+  if(v==="Friend"){ try{ var f=JSON.parse(localStorage.getItem("fr_myfriends")||"[]"); return f.indexOf(viewerName)!==-1; }catch(e){ return false; } }
+  if(v==="Custom"){ return getCustom().indexOf(viewerName)!==-1; }
+  return true;
 }
 
-/* ---------- MERI SETTINGS (v2 jaisa + auto-migrate) ---------- */
+/* ========== 2. VISITOR ENFORCER - har 500ms me wapis chhupayega ========== */
+function applyVisitor(){
+  try{
+    var v = isVisitorNow();
+    if(document.body){ if(v) document.body.classList.add("visitor-mode"); else document.body.classList.remove("visitor-mode"); }
+    if(v){
+      // Profile ke upar wale privacy button - Profile Edit wali patti
+      var pb = document.getElementById("profileBtns"); if(pb) pb.style.display = "none";
+      // Kaun dekhega wali patti - timedatalist wali purani patti
+      var allMsg = document.querySelectorAll(".msg-actions");
+      for(var i=0;i<allMsg.length;i++){
+        var txt = allMsg[i].textContent || "";
+        if(txt.indexOf("Kaun dekhega")!==-1){ allMsg[i].style.display = "none"; }
+      }
+      // Akela-akela button bhi - agar kahin bach gaya to
+      ["vPublic","vFriend","vPrivate","vCustom"].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.style.display = "none";
+      });
+      var kd = document.getElementById("kaunDekhegaCard"); if(kd) kd.style.display = "none";
+      // Badge wapis dikhao - taaki pata chale Friend ne kya rakha hai
+      var badge = document.getElementById("pVisBadge");
+      if(badge){ badge.style.display = ""; badge.textContent = getVis()==="Public"?"🌍 Public":getVis()==="Friend"?"👥 Friend":getVis()==="Private"?"🔒 Private":"⚙️ Custom"; }
+    }
+    renderBar();
+  }catch(e){}
+}
+/* timedatalist ka apna setVis / setProfileVis isko daba deta hai,
+   isliye 1.5 sec baad dobara apna wala laga do - Visitor guard ke saath */
+function forceGuard(){
+  window.setVis = setVis;
+  window.setPrivacy = setVis;
+  window.setProfileVis = function(v){
+    if(isVisitorNow()){ alert("🔒 Sirf dekh sakte ho - Friend ki privacy badal nahi sakte"); return; }
+    if(v==="Custom"){ openCustomPicker(); return; }
+    try{ localStorage.setItem(visKey(), v); localStorage.setItem("timeline_privacy", v); }catch(e){}
+    applyVisitor();
+  };
+  window.setProfilePrivacy = window.setProfileVis;
+  window.openCustomPicker = openCustomPicker;
+  window.closeCustomPicker = closeCustomPicker;
+  window.saveCustomPicker = saveCustomPicker;
+  window.filterCustomFriends = filterCustomFriends;
+  window.PRIVACY = { get: getVis, set: setVis, canSee: canSee, isOwner: function(){ return !isVisitorNow(); }, getCustom: getCustom, render: renderBar };
+  window._applyVisitorMode = applyVisitor;
+}
+window.setVis = setVis; window.setPrivacy = setVis;
+forceGuard();
+document.addEventListener("DOMContentLoaded", function(){ renderBar(); applyVisitor(); forceGuard(); });
+setTimeout(function(){ renderBar(); applyVisitor(); forceGuard(); }, 500);
+setTimeout(function(){ renderBar(); applyVisitor(); forceGuard(); }, 1500);
+setTimeout(function(){ renderBar(); applyVisitor(); forceGuard(); }, 3000);
+setInterval(function(){ if(isVisitorNow()) applyVisitor(); }, 500);
+
+/* ========== 3. OLD (v2) - 5 alag ON/OFF - bachaya hua ========== */
+var DEFS = { showInSearch:"on", albumPublic:"on", msgPublic:"on", detailPublic:"on", friendsPublic:"on" };
+var LABELS = [
+  {k:"showInSearch", t:"🔍 Search me ID dikhe", d:"OFF = koi search me tumhe nahi dhoondh payega"},
+  {k:"albumPublic",  t:"📸 Photos sabko dikhe", d:"OFF = sirf friend banne par dikhengi"},
+  {k:"msgPublic",    t:"💬 Messages sabko dikhe", d:"OFF = sirf friend banne par dikhenge"},
+  {k:"detailPublic", t:"📝 Detail/Thinking sabko dikhe", d:"OFF = sirf friend banne par dikhega"},
+  {k:"friendsPublic",t:"👥 Friends list sabko dikhe", d:"OFF = sirf friend banne par dikhegi"}
+];
 function myPrivacy(){
-  var out = {}, k;
-  for(k in DEFS) out[k] = DEFS[k];
-  try{
-    var s = JSON.parse(localStorage.getItem("my_privacy") || "null");
-    if(s) for(k in out){ if(s[k]==="on"||s[k]==="off") out[k]=s[k]; }
-  }catch(e){}
-  try{
-    var lp = JSON.parse(localStorage.getItem("customer_profile") || "{}");
-    if(lp.privacy) for(k in out){ if(lp.privacy[k]==="on"||lp.privacy[k]==="off") out[k]=lp.privacy[k]; }
-    else if(lp.profilePublic === "off"){ for(k in out) out[k]="off"; } // v1 migrate
-  }catch(e){}
+  var out={},k; for(k in DEFS) out[k]=DEFS[k];
+  try{ var s=JSON.parse(localStorage.getItem("my_privacy")||"null"); if(s) for(k in out){ if(s[k]==="on"||s[k]==="off") out[k]=s[k]; } }catch(e){}
+  try{ var lp=JSON.parse(localStorage.getItem("customer_profile")||"{}"); if(lp.privacy) for(k in out){ if(lp.privacy[k]==="on"||lp.privacy[k]==="off") out[k]=lp.privacy[k]; } else if(lp.profilePublic==="off"){ for(k in out) out[k]="off"; } }catch(e){}
   return out;
 }
 function savePrivacy(p){
   try{ localStorage.setItem("my_privacy", JSON.stringify(p)); }catch(e){}
+  try{ var lp=JSON.parse(localStorage.getItem("customer_profile")||"{}"); lp.privacy=p; lp.profilePublic=p.showInSearch; try{ localStorage.setItem("customer_profile", JSON.stringify(lp)); }catch(e){} }catch(e){}
+  setTimeout(function(){ try{ if(window._fbDb){ var cid = getMyOwnUid() || "customer1"; window._fbDb.ref("customer_profiles/"+cid+"/privacy").set(p); window._fbDb.ref("customer_profiles/"+cid+"/profilePublic").set(p.showInSearch); } }catch(e){} },1000);
+}
+function effCid(){ try{ return getMyOwnUid() || localStorage.getItem("auth_uid") || "customer1"; }catch(e){ return "customer1"; } }
+window.PRIV_bar = function(boxId, keys){
   try{
-    var lp = JSON.parse(localStorage.getItem("customer_profile") || "{}");
-    lp.privacy = p;
-    lp.profilePublic = p.profilePublic; // v3: ab asli profile setting
-    try{ localStorage.setItem("customer_profile", JSON.stringify(lp)); }catch(e){}
+    var box = document.getElementById(boxId) || document.body;
+    if(!box || document.getElementById("privBarBox")) return;
+    var cur = myPrivacy();
+    var div = document.createElement("div"); div.id = "privBarBox";
+    div.style.cssText = "background:#f3e5f5;border:2px solid #7b1fa2;border-radius:12px;padding:10px;margin:8px 0;font-size:13px;";
+    var h = '<b>🔒 Privacy — ON = sabko dikhega, OFF = sirf Friend ko</b><br>';
+    LABELS.forEach(function(L){ var on = cur[L.k]==="on"; h += '<label style="display:flex;gap:8px;align-items:center;background:#fff;border-radius:8px;padding:8px;margin-top:6px;cursor:pointer;"><input type="checkbox" class="privBarCk" data-k="'+L.k+'"'+(on?" checked":"")+' style="width:20px;height:20px;">'+L.t+'</label>'; });
+    h += '<button id="privBarSave" style="background:#7b1fa2;color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;margin-top:8px;cursor:pointer;">💾 Privacy Save Karo</button>';
+    div.innerHTML = h; box.appendChild(div);
+    document.getElementById("privBarSave").onclick = function(){
+      var np={}; for(var k in DEFS) np[k]="on";
+      var cks=document.querySelectorAll(".privBarCk"); for(var i=0;i<cks.length;i++) np[cks[i].getAttribute("data-k")] = cks[i].checked ? "on" : "off";
+      savePrivacy(np); alert("✅ Privacy save ho gayi!");
+    };
   }catch(e){}
-  setTimeout(function(){
-    try{
-      if(window._fbDb){
-        var cid = (window.OPT && window.OPT.customerId) || "customer1";
-        window._fbDb.ref("customer_profiles/" + cid + "/privacy").set(p);
-        window._fbDb.ref("customer_profiles/" + cid + "/profilePublic").set(p.profilePublic);
-      }
-    }catch(e){}
-  }, 1000);
-}
-function effCid(){
-  try{ return (window.OPT && window.OPT.customerId) || "customer1"; }
-  catch(e){ return "customer1"; }
-}
-
-/* ---------- GLOBAL HELPERS ---------- */
+};
+window.PRIV_placeBtn = function(key, boxId){ try{ window.PRIV_bar(boxId,[key]); }catch(e){} };
 window.PRIV_get = function(u){
-  var out = {}, k;
-  for(k in DEFS) out[k] = DEFS[k];
-  try{
-    var p = (u && u.privacy) || {};
-    for(k in out){ if(p[k]==="on"||p[k]==="off") out[k]=p[k]; }
-    if(u && !u.privacy && u.profilePublic === "off"){ for(k in out) out[k]="off"; } // v1 migrate
-  }catch(e){}
+  var out={},k; for(k in DEFS) out[k]=DEFS[k];
+  try{ var p=(u&&u.privacy)||{}; for(k in out){ if(p[k]==="on"||p[k]==="off") out[k]=p[k]; } if(u && u.profilePublic==="off" && !u.privacy){ for(k in out) out[k]="off"; } }catch(e){}
   return out;
 };
-window.PRIV_isFriend = function(name){
-  try{
-    var mf = JSON.parse(localStorage.getItem("fr_myfriends") || "[]");
-    return mf.indexOf(name) !== -1;
-  }catch(e){ return false; }
-};
+window.PRIV_isFriend = function(name){ try{ var mf=JSON.parse(localStorage.getItem("fr_myfriends")||"[]"); return mf.indexOf(name)!==-1; }catch(e){ return false; } };
 window.PRIV_my = myPrivacy;
-/* ===== v3 NEW: kya me is user ka ye section dekh sakta hoon? ===== */
-window.PRIV_canSee = function(u, key){
-  try{
-    var priv = window.PRIV_get(u);
-    if(priv[key] === "on") return true;
-    var nm = u.profileName || u.name || "";
-    return window.PRIV_isFriend(nm);
-  }catch(e){ return true; }
-};
-
-/* ===== v3 NEW: halka toast message (alert ki jagah) ===== */
-function toast(msg){
-  try{
-    var t = document.getElementById("privToast");
-    if(!t){
-      t = document.createElement("div");
-      t.id = "privToast";
-      t.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 20px;border-radius:24px;font-size:14px;font-weight:bold;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,.3);";
-      document.body.appendChild(t);
-    }
-    t.textContent = msg;
-    t.style.display = "block";
-    clearTimeout(t._tm);
-    t._tm = setTimeout(function(){ t.style.display = "none"; }, 2200);
-  }catch(e){}
-}
-
-/* ===== v3 NEW: PAGE PAR BUTTON LAGAO ===== */
-function paintBtn(b, key){
-  var cur = myPrivacy();
-  var on = cur[key] === "on";
-  var L = labelOf(key);
-  b.innerHTML = (on ? "🌍 " : "🔒 ") + L.t;
-  b.style.background = on ? "#25D366" : "#999";
-  b.title = L.d + " (dabao badalne ke liye)";
-}
-/* Ek page par ek button: PRIV_placeBtn("albumPublic","hdr") */
-window.PRIV_placeBtn = function(key, hostId){
-  var tries = 0;
-  function go(){
-    tries++;
-    var host = document.getElementById(hostId);
-    if(!host){ if(tries < 20) setTimeout(go, 300); return; }
-    if(document.getElementById("privBtn_" + key)) return;
-    var L = labelOf(key);
-    var b = document.createElement("button");
-    b.id = "privBtn_" + key;
-    b.type = "button";
-    b.style.cssText = "border:none;border-radius:20px;padding:8px 14px;font-weight:bold;font-size:13px;cursor:pointer;color:#fff;margin-left:8px;flex-shrink:0;white-space:nowrap;";
-    b.onclick = function(){
-      var cur = myPrivacy();
-      cur[key] = (cur[key] === "on") ? "off" : "on";
-      savePrivacy(cur);
-      paintBtn(b, key);
-      toast(L.t + ": " + (cur[key]==="on" ? "Public 🌍" : "Private 🔒"));
-    };
-    paintBtn(b, key);
-    host.appendChild(b);
-  }
-  go();
-};
-/* Ek saath kai buttons: PRIV_bar("hdr",["profilePublic","detailPublic","msgPublic"]) */
-window.PRIV_bar = function(hostId, keys){
-  var tries = 0;
-  function go(){
-    tries++;
-    var host = document.getElementById(hostId);
-    if(!host){ if(tries < 20) setTimeout(go, 300); return; }
-    if(document.getElementById("privBar")) return;
-    var bar = document.createElement("div");
-    bar.id = "privBar";
-    bar.style.cssText = "display:flex;gap:8px;overflow-x:auto;padding:10px 16px;background:#f3e5f5;border-bottom:2px solid #7b1fa2;";
-    keys.forEach(function(key){
-      var L = labelOf(key);
-      var b = document.createElement("button");
-      b.type = "button";
-      b.id = "privBtn_" + key;
-      b.style.cssText = "border:none;border-radius:20px;padding:8px 14px;font-weight:bold;font-size:13px;cursor:pointer;color:#fff;flex-shrink:0;white-space:nowrap;";
-      b.onclick = function(){
-        var cur = myPrivacy();
-        cur[key] = (cur[key] === "on") ? "off" : "on";
-        savePrivacy(cur);
-        paintBtn(b, key);
-        toast(L.t + ": " + (cur[key]==="on" ? "Public 🌍" : "Private 🔒"));
-      };
-      paintBtn(b, key);
-      bar.appendChild(b);
-    });
-    host.parentNode.insertBefore(bar, host.nextSibling);
-  }
-  go();
-};
-
-/* ---------- 1. SEARCH ME PRIVATE ID CHHUPAO (v2 jaisa) ---------- */
-if(window.searchFbFriends && !window.searchFbFriends._privDone){
-  (function(){
-    var orig = window.searchFbFriends;
-    window.searchFbFriends = function(q){
-      try{
-        if(window._fbUsers && window._fbUsers.length){
-          var mine = effCid();
-          window._fbUsers = window._fbUsers.filter(function(u){
-            if(!u) return false;
-            if(window.PRIV_get(u).showInSearch !== "off") return true;
-            return u._key === mine;
-          });
-        }
-      }catch(e){}
-      return orig(q);
-    };
-    window.searchFbFriends._privDone = true;
-  })();
-}
-
-/* ---------- 2. renderFriends CRASH FIX (v2 jaisa) ---------- */
-if(!window.renderFriends){
-  window.renderFriends = function(){};
-}
-
-/* ---------- 3. FRIENDS GRID ME PRIVATE ID CHHUPAO (v2 jaisa) ---------- */
 setTimeout(function(){
-  try{
-    if(!window._fbDb || !window.FRIENDS) return;
-    window._fbDb.ref("customer_profiles").once("value", function(snap){
-      var hideNames = {};
-      snap.forEach(function(ch){
-        var u = ch.val();
-        if(u && window.PRIV_get(u).showInSearch === "off"){
-          var nm = u.profileName || u.name || "";
-          if(nm) hideNames[String(nm).toLowerCase()] = true;
-        }
-      });
-      var demos = {};
-      (window.DEMO_FRIENDS || []).forEach(function(d){
-        demos[String(d.name).toLowerCase()] = true;
-      });
-      var myLogin = null;
-      try{ myLogin = JSON.parse(localStorage.getItem("customer_login") || "null"); }catch(e){}
-      var myName = (myLogin && myLogin.name || "").toLowerCase();
-      window.FRIENDS = (window.FRIENDS || []).filter(function(f){
-        var n = String(f.name).toLowerCase();
-        if(demos[n]) return true;
-        if(n && n === myName) return false;
-        return !hideNames[n];
-      });
-      if(window.renderMyFriends) window.renderMyFriends();
-    });
-  }catch(e){}
-}, 3500);
-
-/* ---------- 4. PROFILE DETAIL PAGE - PRIVACY KE SAATH (v3: profile+timeline lock jude) ---------- */
-window.openFbProfile = function(userKey){
-  var u = null, i;
-  try{
-    for(i=0; i<window._fbUsers.length; i++){
-      if(window._fbUsers[i]._key === userKey){ u = window._fbUsers[i]; break; }
-    }
-  }catch(e){}
-  if(!u) return;
-  var priv = window.PRIV_get(u);
-  var nm = u.profileName || u.name || "Naam nahi";
-  var isFr = window.PRIV_isFriend(nm);
-  var esc = function(s){ return String(s == null ? "" : s).replace(/</g,"&lt;"); };
-  var lockBox = function(t){
-    return '<div style="background:#f5f5f5;border:1px dashed #bbb;border-radius:10px;padding:12px;margin:12px 0;color:#999;font-size:13px;">🔒 ' + t + '<br>Friend bano, phir dikhega!</div>';
-  };
-
-  var photo = u.profilePhoto || "";
-  var pHtml = (photo.indexOf("http")===0 || photo.indexOf("data:")===0)
-    ? '<img src="'+photo+'" style="width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto;display:block;">'
-    : '<div style="width:100px;height:100px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:56px;margin:0 auto;">'+esc(photo || "👤")+'</div>';
-
-  var h = "";
-  /* ===== v3 NEW: poora profile private ho to lock ===== */
-  if(priv.profilePublic === "off" && !isFr){
-    h = pHtml
-      + '<h2 style="font-size:22px;margin:12px 0 4px;">'+esc(nm)+'</h2>'
-      + lockBox("Ye profile private hai")
-      + '<button onclick="sendFbRequest(\''+String(userKey).replace(/'/g,"")+'\',this)" style="background:#25D366;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;">➕ Friend Request Bhejo</button>';
-    document.getElementById("detailCard").innerHTML = h;
-    document.getElementById("detailPage").style.display = "block";
-    window.scrollTo(0,0);
-    return;
-  }
-
-  h = pHtml
-    + '<h2 style="font-size:22px;margin:12px 0 4px;">'+esc(nm)+'</h2>'
-    + ((u.profilePhone||u.phone) ? '<div style="color:#e65100;font-weight:bold;margin-bottom:10px;">📞 '+esc(u.profilePhone||u.phone)+'</div>' : '');
-
-  if(priv.detailPublic === "on" || isFr){
-    if(u.profileDetail) h += '<div style="font-size:14px;color:#666;margin:12px 0;text-align:left;line-height:1.6;">'+esc(u.profileDetail)+'</div>';
-    if(u.profileThinking) h += '<div style="font-size:14px;color:#666;margin:12px 0;text-align:left;line-height:1.6;background:#fffbe6;border-left:4px solid #ffc107;padding:10px;border-radius:0 10px 10px 0;">💭 '+esc(u.profileThinking)+'</div>';
-  } else {
-    h += lockBox("Detail private hai");
-  }
-
-  var xp = [], q;
-  for(q=2; q<=15; q++){ var v = u["profilePhoto"+q]; if(v) xp.push(v); }
-  if(u.profilePhoto && xp.indexOf(u.profilePhoto) < 0) xp.unshift(u.profilePhoto);
-  if(xp.length > 0){
-    if(priv.albumPublic === "on" || isFr){
-      h += '<div style="text-align:left;margin:12px 0;"><b style="color:#e65100;">📸 Photos ('+xp.length+')</b><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px;">';
-      for(q=0; q<Math.min(xp.length,9); q++){
-        var p = xp[q];
-        if(p.indexOf("http")===0 || p.indexOf("data:")===0)
-          h += '<img src="'+p+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;">';
-        else
-          h += '<div style="width:100%;aspect-ratio:1;background:#ffe0b2;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;">'+esc(p)+'</div>';
-      }
-      h += '</div></div>';
-    } else {
-      h += lockBox("Photos private hain (" + xp.length + ")");
-    }
-  }
-
-  /* ===== v3 NEW: timeline lock ===== */
-  h += '<div id="privTlBox" style="margin:12px 0;"></div>';
-  h += '<div id="privMsgBox" style="margin:12px 0;"></div>';
-
-  h += '<button onclick="sendFbRequest(\''+String(userKey).replace(/'/g,"")+'\',this)" style="background:#25D366;color:#fff;border:none;padding:12px 24px;border-radius:24px;font-weight:bold;font-size:15px;">➕ Friend Request Bhejo</button>';
-
-  document.getElementById("detailCard").innerHTML = h;
-  document.getElementById("detailPage").style.display = "block";
-  window.scrollTo(0,0);
-
-  (function(){
-    var tlb = document.getElementById("privTlBox");
-    if(tlb){
-      if(priv.timelinePublic === "on" || isFr){
-        tlb.innerHTML = '<div style="font-size:13px;color:#1565c0;background:#e3f2fd;border-radius:10px;padding:10px;">🕐 <a href="timedatalist.html" style="color:#1565c0;font-weight:bold;">Timeline dekho</a></div>';
-      } else {
-        tlb.innerHTML = lockBox("Timeline private hai");
-      }
-    }
-    var box = document.getElementById("privMsgBox");
-    if(!box) return;
-    if(priv.msgPublic === "on" || isFr){
-      if(window._fbDb){
-        window._fbDb.ref("profile_messages/" + userKey).once("value", function(snap){
-          var n = 0; snap.forEach(function(){ n++; });
-          var b2 = document.getElementById("privMsgBox");
-          if(b2) b2.innerHTML = n > 0
-            ? '<div style="font-size:13px;color:#7b1fa2;background:#f3e5f5;border-radius:10px;padding:10px;">💬 ' + n + ' messages hain</div>'
-            : '';
-        });
-      }
-    } else {
-      box.innerHTML = lockBox("Messages private hain");
-    }
-  })();
-};
-
-/* ---------- 5. EDIT PANEL ME 7 PRIVACY BUTTONS (v2 me 5 the) ---------- */
-setTimeout(function(){
-  var b = document.getElementById("custEditBtn");
-  if(b){
-    b.addEventListener("click", function(){
-      setTimeout(function(){
-        if(document.getElementById("cePrivSec")) return;
-        var nameInput = document.getElementById("ceName");
-        if(!nameInput || !nameInput.parentNode) return;
-        var cur = myPrivacy();
-        var sec = document.createElement("div");
-        sec.id = "cePrivSec";
-        sec.style.cssText = "background:#f3e5f5;border:2px solid #7b1fa2;border-radius:12px;padding:12px;margin:6px 0 12px;";
-        var h = '<b style="color:#7b1fa2;font-size:15px;">🔒 Privacy Settings</b>'
-          + '<div style="font-size:12px;color:#666;margin:4px 0 10px;">Har cheez ka alag button — OFF wali cheez sirf <b>friend</b> banne par dikhegi</div>';
-        LABELS.forEach(function(L){
-          var on = cur[L.k] === "on";
-          h += '<label style="display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;">'
-            + '<input type="checkbox" class="cePrivCk" data-k="'+L.k+'"' + (on ? " checked" : "") + ' style="width:22px;height:22px;flex-shrink:0;">'
-            + '<div><b style="font-size:14px;color:#333;">'+L.t+'</b>'
-            + '<div style="font-size:12px;color:#888;">'+L.d+'</div></div></label>';
-        });
-        sec.innerHTML = h;
-        nameInput.parentNode.insertBefore(sec, nameInput);
-      }, 400);
-    });
-  }
-  var sv = document.getElementById("ceSave");
-  if(sv){
-    sv.addEventListener("click", function(){
-      var p = {}, k;
-      for(k in DEFS) p[k] = "on";
-      var cks = document.querySelectorAll(".cePrivCk");
-      for(var i=0; i<cks.length; i++){
-        p[cks[i].getAttribute("data-k")] = cks[i].checked ? "on" : "off";
-      }
-      savePrivacy(p);
-    });
-  }
-}, 1200);
-
-console.log("🔒 privacy.js v3 loaded (7 buttons)");
+  var b=document.getElementById("custEditBtn");
+  if(b){ b.addEventListener("click", function(){ setTimeout(function(){ if(document.getElementById("cePrivSec")) return; var nameInput=document.getElementById("ceName"); if(!nameInput||!nameInput.parentNode) return; var cur=myPrivacy(); var sec=document.createElement("div"); sec.id="cePrivSec"; sec.style.cssText="background:#f3e5f5;border:2px solid #7b1fa2;border-radius:12px;padding:12px;margin:6px 0 12px;"; var h='<b style="color:#7b1fa2;font-size:15px;">🔒 Privacy Settings</b>'+'<div style="font-size:12px;color:#666;margin:4px 0 10px;">Har cheez ka alag button — OFF wali cheez sirf <b>friend</b> banne par dikhegi</div>'; LABELS.forEach(function(L){ var on=cur[L.k]==="on"; h+='<label style="display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;">'+'<input type="checkbox" class="cePrivCk" data-k="'+L.k+'"'+(on?" checked":"")+' style="width:22px;height:22px;flex-shrink:0;">'+'<div><b style="font-size:14px;color:#333;">'+L.t+'</b>'+'<div style="font-size:12px;color:#888;">'+L.d+'</div></div></label>'; }); sec.innerHTML=h; nameInput.parentNode.insertBefore(sec, nameInput); },400); }); }
+  var sv=document.getElementById("ceSave");
+  if(sv){ sv.addEventListener("click", function(){ var p={},k; for(k in DEFS) p[k]="on"; var cks=document.querySelectorAll(".cePrivCk"); for(var i=0;i<cks.length;i++){ p[cks[i].getAttribute("data-k")]=cks[i].checked?"on":"off"; } savePrivacy(p); }); }
+},1200);
+console.log("🔒 privacy.js v5 loaded | MY:", getMyOwnUid(), "OWNER:", getPageOwnerUid(), "VISITOR:", isVisitorNow());
 })();
