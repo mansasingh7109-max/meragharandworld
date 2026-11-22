@@ -1,610 +1,372 @@
-<!DOCTYPE html>
-<html lang="hi"><head><style>
-@font-face {
-  font-family: "Optimistic";
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Optimistic Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
-}
-:where(html) {
-  font-family: "Optimistic", system-ui, sans-serif;
-}
-:where(code, pre, kbd, samp) {
-  font-family: "Optimistic Mono", ui-monospace, monospace;
-}
-</style>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Timeline - mera ghar and world</title>
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Timeline</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#fff8f0;color:#333}
-#hdr{background:#e65100;color:#fff;padding:14px 16px;display:flex;align-items:center;position:sticky;top:0;z-index:10}
-#hdr button{background:#fff;color:#e65100;border:none;min-width:36px;height:36px;border-radius:50%;font-size:18px;font-weight:bold;margin-right:12px;cursor:pointer}
-#hdr b{font-size:18px;flex:1}
-#tabs{display:flex;background:#fff;position:sticky;top:64px;z-index:9;box-shadow:0 2px 4px rgba(0,0,0,.1)}
-#tabs button{flex:1;background:none;border:none;padding:14px;font-size:15px;font-weight:bold;color:#888;border-bottom:3px solid transparent;cursor:pointer}
-#tabs button.on{color:#e65100;border-bottom:3px solid #e65100}
-#list{padding:16px;max-width:600px;margin:0 auto}
-.entry{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.entry .dt{font-size:13px;color:#e65100;font-weight:bold;margin-bottom:8px}
-.entry .tx{font-size:15px;color:#333;line-height:1.7;margin-bottom:8px;white-space:pre-wrap}
-/* Photo - Poori Fit, No Cut */
-.entry img, #msgList img{
-  width:200px !important; max-width:65% !important;
-  height:auto !important; max-height:320px !important;
-  object-fit:contain !important; background:#F48FB1;
-  display:block; margin:8px auto !important;
-  border-radius:10px; cursor:zoom-in;
-}
-.entry video, #msgList video{
-  width:230px !important; max-width:70% !important;
-  height:auto !important; max-height:320px !important;
-  object-fit:contain !important; background:#F48FB1;
-  display:block; margin:8px auto !important;
-  border-radius:10px;
-}
-.entry video{width:100%;border-radius:10px;margin-top:8px}
-.empty{text-align:center;color:#aaa;padding:40px 20px;font-size:15px}
-.sec-h{font-size:16px;font-weight:bold;color:#e65100;margin:16px 0 10px}
-.pbtn{display:block;width:calc(100% - 32px);margin:12px 16px;padding:12px;border:none;border-radius:24px;font-weight:bold;font-size:14px;color:#fff;cursor:pointer;text-decoration:none;text-align:center;box-sizing:border-box}
-</style><script src="friend-data.js"></script>
-  <script src="clean.js"></script>
-</body>
-<script>
-var FIREBASE_CONFIG = {
-apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
-  authDomain: "santramarketshoppingmall.firebaseapp.com",
-  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
-  projectId: "santramarketshoppingmall",
-  storageBucket: "santramarketshoppingmall.firebasestorage.app",
-  messagingSenderId: "398490252924",
-  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
-  measurementId: "G-M3YK28NTT0"
-};
-var _fbDb=null; try{ firebase.initializeApp(FIREBASE_CONFIG); _fbDb=firebase.database(); }catch(e){}
-function getUid(){ var m=location.search.match(/[?&]uid=([^&]+)/); if(m) return decodeURIComponent(m[1]); m=location.search.match(/[?&]cid=([^&]+)/); return m?decodeURIComponent(m[1]):""; }
-function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-</script>
-</head><body>
-<div id="hdr"><button onclick="history.back()">←</button><b id="ttl">📅 Timeline</b></div>
-<div id="tabs">
-<button id="tD" onclick="show('d')">📝 Detail</button>
-<button id="tT" onclick="show('t')">💭 Thinking</button>
-<button id="tM" onclick="show('m')">💬 Messages</button>
-</div>
-<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;padding:6px;background:#fff;font-size:12px;">
-<span>Detail:</span><button data-privacy-key="detail" data-privacy-val="public">Public</button><button data-privacy-key="detail" data-privacy-val="friend">👥 Friend</button><button data-privacy-key="detail" data-privacy-val="private">Private</button>
-<span>Thinking:</span><button data-privacy-key="thinking" data-privacy-val="public">Public</button><button data-privacy-key="thinking" data-privacy-val="friend">👥 Friend</button><button data-privacy-key="thinking" data-privacy-val="private">Private</button>
-<span>Message:</span><button data-privacy-key="message" data-privacy-val="public">Public</button><button data-privacy-key="message" data-privacy-val="friend">👥 Friend</button><button data-privacy-key="message" data-privacy-val="private">Private</button>
-</div>
-<div id="msgTabBox" style="display:none;">
-  <input id="msgInput" placeholder="Message likho...">
-  <button onclick="sendMsg()">💬 Message</button>
-  <button onclick="sendMsg()">💭 Comment</button>
-  <button onclick="tagMsg()">🏷️ Tag</button>
-  <button onclick="document.getElementById('photoFile').click()">📸 Photo</button>
-  <button onclick="document.getElementById('videoFile').click()">🎥 Video</button>
-  <input type="file" id="photoFile" accept="image/*" multiple style="display:none">
-  <input type="file" id="videoFile" accept="video/*" multiple multiple style="display:none">
-  <div id="msgList"></div>
-</div>
-<div id="typing" style="display:none; font-size:12px; color:#888; margin:6px;">✍️ Manisha likh rahi hai...</div>
-<script>
-// ==== Date-Time - Sab File Ke Liye - Ek Hi Block - UPAR WALA (pehle se ban jaye isliye) ====
-function fmtDT(ts){
-  try{
-    var d = new Date(ts || Date.now());
-    var dd = String(d.getDate()).padStart(2,"0");
-    var mm = String(d.getMonth()+1).padStart(2,"0");
-    var yy = d.getFullYear();
-    var hh = String(d.getHours()).padStart(2,"0");
-    var mi = String(d.getMinutes()).padStart(2,"0");
-    return dd+"-"+mm+"-"+yy+"  "+hh+":"+mi;
-  }catch(e){ return ""; }
-}
-function showDT(m){
-  if(!m) return "";
-  var t = m.time || m.createdAt || m.created || Date.now();
-  var u = m.updatedAt || m.updated || m.editTime;
-  if(u && u != t){ return "📅 "+fmtDT(t)+"  •  ✏️ Updated: "+fmtDT(u); }
-  return "📅 "+fmtDT(t);
-}
-function dtHTML(m){ return "<span style='font-size:11px;color:#888;'>"+showDT(m)+"</span><br>"; }
-function setNewTime(m){ m.time = Date.now(); m.updatedAt = Date.now(); return m; }
-function setUpdateTime(m){ m.updatedAt = Date.now(); return m; }
-</script>
-<script>
-var _mi = document.getElementById("msgInput");
-if(_mi){
-  _mi.addEventListener("input", function(){
-    var ty = document.getElementById("typing");
-    if(ty) ty.style.display = "block";
-    clearTimeout(window._t);
-    window._t = setTimeout(function(){
-      if(ty) ty.style.display = "none";
-    }, 2000);
-  });
-}
-</script>
-<script>
-function getGroupMsgs(){ try{ return JSON.parse(localStorage.getItem("group_msgs")||"[]"); }catch(e){ return []; } }
-function saveGroupMsgs(a){
-  localStorage.setItem("group_msgs", JSON.stringify(a));
-  // Firebase me bhi save
-  try{
-    var u = localStorage.getItem("auth_uid") || "Manisha";
-    if(_fbDb) _fbDb.ref("group_msgs/"+u).set(a);
-  }catch(e){}
-}
-function showGroupMsgs(){
-  // Cancel / Save ke baad atka hua Edit mode reset - warna agli Single Photo bhi Edit wali samajh ke gayab ho jayegi
-  // NOTE: Edit khula ho tab ye call nahi hota, isliye pending safe hai
-  _appendTo = -1; _pendingFor = -1; _pendingPhotos = [];
-  var arr = getGroupMsgs();
-  var badla = false;
-  arr.forEach(function(m){
-    if(!m.time){ m.time = Date.now(); m.updatedAt = Date.now(); badla = true; }
-  });
-  if(badla) saveGroupMsgs(arr);
-  var box = document.getElementById("msgList");
-  if(!box) return;
-  if(!arr.length){ box.innerHTML = '<div style="color:#999;text-align:center">Koi message nahi</div>'; return; }
-  box.innerHTML = "";
-  // Naya upar, Purana neeche - Date-Time ke hisaab se
-  var _sorted = arr.map(function(m,idx){ return {m:m, idx:idx}; });
-  _sorted.sort(function(a,b){ return (b.m.time||0)-(a.m.time||0); });
-  _sorted.forEach(function(_o){
-    var m = _o.m; var i = _o.idx;
-    var div = document.createElement("div");
-    div.style = "background:#fff;padding:10px;border-radius:10px;margin:6px;";
-    div.setAttribute("data-idx", i);
-    var dt = "<span style='font-size:11px;color:#888;'>"+showDT(m)+"</span><br>";
-    if(m.who === "Manisha"){
-      div.innerHTML = (m.untitled ? "" : "<b>"+m.who+":</b> ") + "<span>"+m.text+"</span><br>" + dt +
-        "<button onclick='editGroupMsg("+i+")'>✏️ Edit</button> " +
-        "<button onclick='delGroupMsg("+i+")'>🗑️ Delete</button><br>" +
-        "<button onclick='commentGroupMsg("+i+")'>💭 Comment</button> " +
-        "<button onclick='tagFriendMsg("+i+")'>🏷️ Tag</button> " +
-        "<button onclick='photoForMsg("+i+")'>📸 Photo</button> " +
-        "<button onclick='videoForMsg("+i+")'>🎥 Video</button>";
-    } else {
-      var likes = m.likes || 0;
-      div.innerHTML = (m.untitled ? "" : "<b>"+m.who+":</b> ") + "<span>"+m.text+"</span><br>" + dt +
-        "<button onclick='likeGroupMsg("+i+")'>❤️ Like ("+likes+")</button> " +
-        "<button onclick='commentGroupMsg("+i+")'>💭 Comment</button> " +
-        "<button onclick='tagFriendMsg("+i+")'>🏷️ Tag</button> " +
-        "<button onclick='photoForMsg("+i+")'>📸 Photo</button> " +
-        "<button onclick='videoForMsg("+i+")'>🎥 Video</button><br>" +
-        "<button onclick='hideGroupMsg("+i+")'>🙈 Hide</button> " +
-        "<button onclick='hideGroupMsg("+i+")'>👎 Dislike</button>";
-    }
-    box.appendChild(div);
-  });
-}
-function likeGroupMsg(i){
-  var arr = getGroupMsgs();
-  arr[i].likes = (arr[i].likes || 0) + 1;
-  arr[i].updatedAt = Date.now();
-  saveGroupMsgs(arr); showGroupMsgs();
-}
-function commentGroupMsg(i){
-  var arr = getGroupMsgs();
-  var t = prompt("Is Message pe Comment likho:", "");
-  if(!t) return;
-  var obj = setNewTime({who:"Manisha", text:"💭 @"+arr[i].who+" - "+t, type:"group_msg"});
-  arr.push(obj); saveGroupMsgs(arr); showGroupMsgs();
-}
-function tagFriendMsg(i){
-  var arr = getGroupMsgs();
-  var name = prompt("Kisko Tag karna hai?", arr[i].who);
-  if(!name) return;
-  var t = prompt("Tag ke saath Message likho:", "");
-  if(!t) return;
-  var obj = setNewTime({who:"Manisha", text:"🏷️ @"+name+" - "+t, type:"group_msg", tag:name});
-  arr.push(obj); saveGroupMsgs(arr); showGroupMsgs();
-}
-var _replyTo = -1;
-var _appendTo = -1;
-var _pendingPhotos = [];
-var _pendingFor = -1;
-function photoForMsg(i){ _replyTo = i; _appendTo = -1; _pendingFor = -1; _pendingPhotos = []; document.getElementById("photoFile").click(); }
-function videoForMsg(i){ _replyTo = i; _appendTo = -1; _pendingFor = -1; _pendingPhotos = []; document.getElementById("videoFile").click(); }
-function photoForEdit(i){ _appendTo = i; _replyTo = -1; document.getElementById("photoFile").click(); }
-function videoForEdit(i){ _appendTo = i; _replyTo = -1; document.getElementById("videoFile").click(); }
-function sendMsg(){
-  var inp = document.getElementById("msgInput");
-  if(!inp) return;
-  var t = inp.value.trim();
-  if(!t) return;
-  var arr = getGroupMsgs();
-  var obj = setNewTime({who:"Manisha", text:t, type:"group_msg"});
-  arr.push(obj);
-  saveGroupMsgs(arr);
-  inp.value = "";
-  var box = document.getElementById("msgTabBox");
-  if(box) box.style.display = "block";
-  var list = document.getElementById("msgList");
-  if(list) list.style.display = "block";
-  var ty = document.getElementById("typing");
-  if(ty) ty.style.display = "none";
-  showGroupMsgs();
-}
-function tagMsg(){
-  var inp = document.getElementById("msgInput");
-  if(!inp) return;
-  var t = inp.value.trim();
-  if(!t){ alert("Pehle Message likho, fir Tag dabao!"); inp.focus(); return; }
-  var name = prompt("Kisko Tag karna hai? Friend ka naam likho:", "Karishma");
-  if(name === null) return;
-  if(!name.trim()) name = "Friend";
-  var arr = getGroupMsgs();
-  var obj = setNewTime({who:"Manisha", text:"🏷️ @"+name.trim()+" - "+t, type:"group_msg", tag:name.trim()});
-  arr.push(obj);
-  saveGroupMsgs(arr);
-  inp.value = "";
-  var box = document.getElementById("msgTabBox");
-  if(box) box.style.display = "block";
-  showGroupMsgs();
-}
-function editGroupMsg(i){
-  var arr = getGroupMsgs();
-  var box = document.getElementById("msgList").querySelector('[data-idx="'+i+'"]');
-  if(!box) return;
-  if(box.querySelector("input")) return;
-  // Photo / Video wala hai to code mat dikhao - par Caption + More Photo jod sakte ho
-  if(arr[i].text && (arr[i].text.indexOf("<img")>=0 || arr[i].text.indexOf("<video")>=0)){
-    box.innerHTML = "<b>"+arr[i].who+":</b><br>" + arr[i].text + "<br>" +
-    "<label style='font-size:13px;'><input type='checkbox' id='untitledChk"+i+"' "+(arr[i].untitled?"checked":"")+"> Untitled - bina naam / bina title ke dikhao</label><br>" +
-    "<div id='pendingBox"+i+"' style='margin:6px 0;'></div>" +
-    "<span style='font-size:12px;color:#888;'>📸 Is Photo pe Message / Aur Photo jodo</span><br>" +
-    '<input id="editCaption'+i+'" placeholder="Is photo pe message likho..." style="width:70%;padding:6px;"> ' +
-    '<button onclick="savePhotoCaption('+i+')">✅ Save</button> ' +
-    '<button onclick="showGroupMsgs()">❌ Cancel</button><br>' +
-    "<button onclick='delGroupMsg("+i+")'>🗑️ Delete</button> " +
-    "<button onclick='commentGroupMsg("+i+")'>💭 Comment</button> " +
-    "<button onclick='tagFriendMsg("+i+")'>🏷️ Tag</button> " +
-    "<button onclick='photoForEdit("+i+")'>📸 + Photo</button> " +
-    "<button onclick='videoForEdit("+i+")'>🎥 + Video</button> ";
-    return;
-  }
-  box.innerHTML = "<b>"+arr[i].who+":</b><br>" +
-    "<label style='font-size:13px;'><input type='checkbox' id='untitledChk"+i+"' "+(arr[i].untitled?"checked":"")+"> Untitled - bina naam / bina title ke dikhao</label><br>" +
-    "<div id='pendingBox"+i+"' style='margin:6px 0;'></div>" +
-    '<input id="editInput'+i+'" value="'+arr[i].text+'" style="width:70%;padding:6px;"> ' +
-    '<button onclick="saveEditMsg('+i+')">✅ Save</button> ' +
-    '<button onclick="showGroupMsgs()">❌ Cancel</button><br>' +
-    '<button onclick="commentGroupMsg('+i+')">💭 Comment</button> ' +
-    '<button onclick="tagFriendMsg('+i+')">🏷️ Tag</button> ' +
-    '<button onclick="photoForEdit('+i+')">📸 + Photo</button> ' +
-    '<button onclick="videoForEdit('+i+')">🎥 + Video</button>';
-}
-function savePhotoCaption(i){
-  var arr = getGroupMsgs();
-  var el = document.getElementById("editCaption"+i);
-  var v = el ? el.value.trim() : "";
-  var _has = false;
-  var _uc = document.getElementById("untitledChk"+i);
-  if(_uc){ if(arr[i].untitled !== !!_uc.checked){ arr[i].untitled = _uc.checked; _has = true; } }
-  if(v){ arr[i].text = arr[i].text + "<br><span>"+v+"</span>"; _has = true; }
-  if(_pendingFor === i && _pendingPhotos.length){
-    _pendingPhotos.forEach(function(u){ if(String(u).indexOf("VIDEO::")==0){ arr[i].text = arr[i].text + '<br><video src="'+u.slice(7)+'" controls style="width:260px;max-width:70%;border-radius:10px;"></video>'; } else { arr[i].text = arr[i].text + '<br><img src="'+u+'" style="width:200px;max-width:60%;border-radius:10px;">'; } });
-    _has = true;
-  }
-  if(_has){ setUpdateTime(arr[i]); saveGroupMsgs(arr); }
-  _pendingPhotos = []; _pendingFor = -1; _appendTo = -1;
-  showGroupMsgs();
-}
-function saveEditMsg(i){
-  var arr = getGroupMsgs();
-  var el = document.getElementById("editInput"+i);
-  if(!el) return;
-  var v = el.value.trim();
-  var _has2 = false;
-  var _uc2 = document.getElementById("untitledChk"+i);
-  if(_uc2){ arr[i].untitled = _uc2.checked; _has2 = true; }
-  if(v){ arr[i].text = v; if(!arr[i].time) arr[i].time = Date.now(); _has2 = true; }
-  if(_pendingFor === i && _pendingPhotos.length){
-    _pendingPhotos.forEach(function(u){ if(String(u).indexOf("VIDEO::")==0){ arr[i].text = arr[i].text + '<br><video src="'+u.slice(7)+'" controls style="width:260px;max-width:70%;border-radius:10px;"></video>'; } else { arr[i].text = arr[i].text + '<br><img src="'+u+'" style="width:200px;max-width:60%;border-radius:10px;">'; } });
-    _has2 = true;
-  }
-  if(_has2){ setUpdateTime(arr[i]); saveGroupMsgs(arr); }
-  _pendingPhotos = []; _pendingFor = -1; _appendTo = -1;
-  showGroupMsgs();
-}
-function hideGroupMsg(i){
-  var arr = getGroupMsgs();
-  var gaya = arr.splice(i,1)[0];
-  if(!gaya) return;
-  var rb = []; try{ rb = JSON.parse(localStorage.getItem("recycle_bin")||"[]"); }catch(e){}
-  rb.push({type:"group_msg", data:gaya, time:Date.now()});
-  localStorage.setItem("recycle_bin", JSON.stringify(rb));
-  saveGroupMsgs(arr); showGroupMsgs();
-}
-function delGroupMsg(i){ hideGroupMsg(i); }
-var _pf = document.getElementById("photoFile");
-if(_pf){
-  _pf.addEventListener("change", function(e){
-    var files = e.target.files;
-    if(!files || !files.length) return;
-    // Edit wale + Photo - pehle Edit box me dikhao, Save pe pakka save hoga
-    if(_appendTo >= 0 && document.getElementById("pendingBox"+_appendTo)){
-      var _idx = _appendTo;
-      if(_pendingFor !== _idx){ _pendingPhotos = []; }
-      _pendingFor = _idx;
-      Array.prototype.forEach.call(files, function(f){
-        var r = new FileReader();
-        r.onload = function(){
-          _pendingPhotos.push(r.result);
-          var _pb = document.getElementById("pendingBox"+_idx);
-          if(_pb){ _pb.innerHTML = _pendingPhotos.map(function(u){ return '<img src="'+u+'" style="width:100px;height:100px;object-fit:cover;border-radius:8px;margin:3px;">'; }).join("") + "<br><span style='font-size:11px;color:green;'>✅ "+_pendingPhotos.length+" photo select hui - Save dabao</span>"; }
-        };
-        r.readAsDataURL(f);
-      });
-      e.target.value = "";
-      return;
-    }
-    var _replyWho = "";
-    if(_replyTo >= 0){
-      var _a = getGroupMsgs();
-      _replyWho = _a[_replyTo] ? _a[_replyTo].who : "";
-      if(_replyWho === "Manisha") _replyWho = "";
-    }
-    Array.prototype.forEach.call(files, function(f){
-      var r = new FileReader();
-      r.onload = function(){
-        var arr = getGroupMsgs();
-        var txt = '<img src="'+r.result+'" style="width:200px;max-width:60%;border-radius:10px;">';
-        if(_replyWho){ txt = "📸 @"+_replyWho+" - " + txt; }
-        arr.push({who:"Manisha", text:txt, time:Date.now(), updatedAt:Date.now(), type:"group_msg"});
-        saveGroupMsgs(arr); showGroupMsgs();
-      };
-      r.readAsDataURL(f);
-    });
-    _replyTo = -1;
-    e.target.value = "";
-  });
-}
-var _vf = document.getElementById("videoFile");
-if(_vf){
-  _vf.addEventListener("change", function(e){
-    var files = e.target.files; if(!files || !files.length) return;
-    if(_appendTo >= 0 && document.getElementById("pendingBox"+_appendTo)){
-      var _idxV = _appendTo; if(_pendingFor !== _idxV){ _pendingPhotos = []; } _pendingFor = _idxV;
-      Array.prototype.forEach.call(files, function(f){
-        var r = new FileReader();
-        r.onload = function(){
-          _pendingPhotos.push("VIDEO::"+r.result);
-          var pb = document.getElementById("pendingBox"+_idxV);
-          if(pb){ pb.innerHTML = "<span style='font-size:11px;color:green;'>✅ "+_pendingPhotos.length+" video select hui - Save dabao</span><br>" + _pendingPhotos.map(function(u){ return '<video src="'+u.slice(7)+'" controls style="width:120px;border-radius:8px;margin:3px;"></video>'; }).join(""); }
-        };
-        r.readAsDataURL(f);
-      });
-      e.target.value = ""; return;
-    }
-    Array.prototype.forEach.call(files, function(f){
-      var r = new FileReader();
-      r.onload = function(){
-        var arr = getGroupMsgs();
-        var txtV = '<video src="'+r.result+'" controls style="width:260px;max-width:70%;border-radius:10px;"></video>';
-        if(_replyTo >= 0){ var arr3 = getGroupMsgs(); var _w2 = arr3[_replyTo] ? arr3[_replyTo].who : "Friend"; if(_w2 !== "Manisha"){ txtV = "🎥 @"+_w2+" - " + txtV; } _replyTo = -1; }
-        arr.push({who:"Manisha", text:txtV, time:Date.now(), updatedAt:Date.now(), type:"group_msg"});
-        saveGroupMsgs(arr); showGroupMsgs();
-      };
-      r.readAsDataURL(f);
-    });
-    e.target.value = "";
-  });
-}
-// Page khulte hi Firebase se lao
-try{
-  var u2 = localStorage.getItem("auth_uid") || "Manisha";
-  if(_fbDb) _fbDb.ref("group_msgs/"+u2).once("value").then(function(s){
-    var v = s.val();
-    if(v && v.length) { localStorage.setItem("group_msgs", JSON.stringify(v)); showGroupMsgs(); }
-  });
-}catch(e){}
-showGroupMsgs();
-</script>
-</div>
-<button class="pbtn" id="reqBtn" style="display:none;background:#25D366;" onclick="sendReq()">📩 Friend Request Bhejo</button>
-<div id="list"><div class="empty">⏳ Loading...</div></div>
-<script>
-var _mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-function _fd(d){try{var p=d.split("-");return p[2].replace(/^0/,"")+" "+_mn[parseInt(p[1])-1]+" "+p[0];}catch(e){return d;}}
-function _today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0');}
-function _tag(dt){var t=_today();return dt<t?'📌 Past':dt===t?'🟢 Aaj':'🔮 Future';}
-function _sort(arr){arr.sort(function(a,b){var x=(a.date||'')+''+(a.time||'');var y=(b.date||'')+''+(b.time||'');return x>y?-1:x<y?1:0;});return arr;}
-function _load(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):[];}catch(e){return[];}}
-var FRIEND_DATA=null;
-var FRIEND_UID=getUid();
-var CUR_TAB='d';
-function renderList(which){
-  CUR_TAB=which;
-  document.getElementById('tD').className=which==='d'?'on':'';
-  document.getElementById('tT').className=which==='t'?'on':'';
-  document.getElementById('tM').className=which==='m'?'on':'';
-  var box=document.getElementById('list'); var h='';
-  if(FRIEND_UID && FRIEND_DATA){
-    var name=esc(FRIEND_DATA.profileName||FRIEND_DATA.name||"Friend");
-    if(which==='d'){
-      var arr=_sort((FRIEND_DATA.details||[]).slice());
-      h='<div class="sec-h">📝 Detail Timeline - '+name+' ki ('+arr.length+')</div>';
-      if(arr.length===0) h+='<div class="empty">Koi detail entry nahi<br>'+name+' ne abhi detail add nahi ki</div>';
-      for(var i=0;i<arr.length;i++){var e=arr[i]; h+='<div class="entry"><div class="dt">'+_tag(e.date)+' 📅 '+_fd(e.date)+'</div>'; if(e.text) h+='<div class="tx">'+esc(e.text)+'</div>'; if(e.photo) h+='<img src="'+e.photo+'">'; if(e.video) h+='<video src="'+e.video+'" controls></video>'; h+='</div>';}
-    } else if(which==='t'){
-      var arr2=_sort((FRIEND_DATA.thinkings||[]).slice());
-      h='<div class="sec-h">💭 Thinking - '+name+' ki ('+arr2.length+')</div>';
-      if(arr2.length===0) h+='<div class="empty">Koi thinking entry nahi</div>';
-      for(var j=0;j<arr2.length;j++){var e2=arr2[j]; h+='<div class="entry" style="border-left:4px solid #ffc107;"><div class="dt" style="color:#f57f00;">'+_tag(e2.date)+' 📅 '+_fd(e2.date)+'</div>'; if(e2.text) h+='<div class="tx">'+esc(e2.text)+'</div>'; if(e2.photo) h+='<img src="'+e2.photo+'">'; if(e2.video) h+='<video src="'+e2.video+'" controls></video>'; h+='</div>';}
-    } else {
-      var arr3=_sort((FRIEND_DATA.messages||FRIEND_DATA.msgs||[]).slice());
-      h='<div class="sec-h">💬 Messages - '+name+' ki ('+arr3.length+')</div>';
-      if(arr3.length===0) h+='<div class="empty">Koi message nahi</div>';
-      for(var k=0;k<arr3.length;k++){var e3=arr3[k]; h+='<div class="entry" style="border-left:4px solid #7b1fa2;"><div class="dt" style="color:#7b1fa2;">'+_tag(e3.date)+' 📅 '+_fd(e3.date)+'</div>'; if(e3.text) h+='<div class="tx">'+esc(e3.text)+'</div>'; if(e3.photo) h+='<img src="'+e3.photo+'">'; h+='</div>';}
-    }
-    box.innerHTML=h;
-    return;
-  }
-  if(which==='d'){
-    var arr=_sort(_load("customer_details"));
-    h='<div class="sec-h">📝 Detail Timeline - Mera ('+arr.length+')</div>';
-    if(arr.length===0) h+='<div class="empty">Koi detail entry nahi</div>';
-    for(var i=0;i<arr.length;i++){var e=arr[i]; h+='<div class="entry"><div class="dt">'+_tag(e.date)+' 📅 '+_fd(e.date)+'</div>'; if(e.text) h+='<div class="tx">'+esc(e.text)+'</div>'; if(e.photo) h+='<img src="'+e.photo+'">'; if(e.video) h+='<video src="'+e.video+'" controls></video>'; h+='</div>';}
-  } else if(which==='t'){
-    var arr2=_sort(_load("customer_thinkings"));
-    h='<div class="sec-h">💭 Thinking Timeline - Mera ('+arr2.length+')</div>';
-    if(arr2.length===0) h+='<div class="empty">Koi thinking entry nahi</div>';
-    for(var j=0;j<arr2.length;j++){var e2=arr2[j]; h+='<div class="entry" style="border-left:4px solid #ffc107;"><div class="dt" style="color:#f57f00;">'+_tag(e2.date)+' 📅 '+_fd(e2.date)+'</div>'; if(e2.text) h+='<div class="tx">'+esc(e2.text)+'</div>'; if(e2.photo) h+='<img src="'+e2.photo+'">'; h+='</div>';}
-  } else {
-    var arr3=_sort(_load("profile_msgs"));
-    h='<div class="sec-h">💬 Messages - Mera ('+arr3.length+')</div>';
-    if(arr3.length===0) h+='<div class="empty">Koi message nahi</div>';
-    for(var k=0;k<arr3.length;k++){var e3=arr3[k]; h+='<div class="entry" style="border-left:4px solid #7b1fa2;"><div class="dt" style="color:#7b1fa2;">'+_tag(e3.date)+' 📅 '+_fd(e3.date)+'</div>'; if(e3.text) h+='<div class="tx">'+esc(e3.text)+'</div>'; h+='</div>';}
-  }
-  box.innerHTML=h;
-}
-function show(which){
-  var list = document.getElementById("list");
-  var msgBox = document.getElementById("msgTabBox");
-  if(which === 'm'){
-    if(list) list.style.display = "none";
-    if(msgBox) msgBox.style.display = "block";
-  } else {
-    if(list) list.style.display = "block";
-    if(msgBox) msgBox.style.display = "none";
-  }
-  renderList(which);
-  updateReqBtn();
-}
-function sendReq(){
-  var uid=FRIEND_UID; var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
-  if(!myUid){alert("Pehle login karo!"); location.href="customerlogin.html"; return;}
-  _fbDb.ref("friend_requests/"+uid).push({fromUid:myUid,time:Date.now(),status:"pending"},function(){ alert("✅ Request bhej di!"); });
-}
 
-// FIX: Friend add hai to Request button mat dikhao, Messages tab me bhi mat dikhao
-function updateReqBtn(){
-  var b = document.getElementById('reqBtn'); if(!b) return;
-  if(!FRIEND_UID || CUR_TAB==='m'){ b.style.display='none'; return; }
-  var myUid=""; try{ myUid=localStorage.getItem("auth_uid")||""; }catch(e){}
-  if(!myUid || FRIEND_UID===myUid){ b.style.display='none'; return; }
-  if(!_fbDb){ b.style.display='none'; return; }
-  _fbDb.ref("friends/"+myUid+"/"+FRIEND_UID).once("value").then(function(s){
-    if(s.val()){ b.style.display='none'; return; }
-    _fbDb.ref("friend_requests_sent/"+myUid+"/"+FRIEND_UID).once("value").then(function(s2){
-      if(s2.val()){ b.textContent="⏳ Request Bheji Gayi - Wait Karo"; b.style.display='block'; b.onclick=function(){}; }
-      else { b.textContent="📩 Friend Request Bhejo"; b.style.display='block'; b.onclick=function(){ sendReq(); }; }
-    });
-  });
-}  
-if(FRIEND_UID){
-  document.getElementById('ttl').textContent='📅 Friend ki Timeline';
-  updateReqBtn();
-  _fbDb.ref("customer_profiles/"+FRIEND_UID).once("value").then(function(snap){
-    var P=snap.val();
-    if(!P){ document.getElementById('list').innerHTML='<div class="empty">❌ User nahi mila</div>'; return; }
-    var isPublic=true; try{ if(P.privacy_timeline==="private" || (P.privacy && P.privacy.timelinePublic===false)) isPublic=false; }catch(e){}
-    if(!isPublic){ document.getElementById('list').innerHTML='<div class="empty">🔒 Timeline private hai<br>'+esc(P.profileName||P.name||"User")+' ne public nahi kiya</div>'; return; }
-    FRIEND_DATA=P;
-    document.getElementById('ttl').textContent='📅 '+(P.profileName||P.name||"Friend")+' ki Timeline (Friend ki)';
-    return _fbDb.ref("customer_details/"+FRIEND_UID).once("value").then(function(s2){
-      var extra=[]; s2.forEach(function(ch){ extra.push(ch.val()); });
-      if(extra.length>0) FRIEND_DATA.details=extra;
-      return _fbDb.ref("customer_thinkings/"+FRIEND_UID).once("value").then(function(s3){
-        var extra2=[]; s3.forEach(function(ch){ extra2.push(ch.val()); });
-        if(extra2.length>0) FRIEND_DATA.thinkings=extra2;
-        renderList('d');
-      });
-    });
-  }).catch(function(err){ document.getElementById('list').innerHTML='<div class="empty">❌ Error: '+esc(err.message)+'</div>'; });
-} else {
-  document.getElementById('ttl').textContent='📅 Mera Timeline';
-  var myUid=""; try{myUid=localStorage.getItem("auth_uid")||"";}catch(e){}
-  if(myUid && _fbDb){
-    _fbDb.ref("customer_profiles/"+myUid).once("value").then(function(snap){
-      var P=snap.val()||{};
-      FRIEND_DATA=P;
-      FRIEND_UID=myUid;
-      (function(){var nm="";try{var PP=JSON.parse(localStorage.getItem("my_profile")||"{}");nm=PP.profileName||PP.name||localStorage.getItem("customer_name")||"";}catch(e){}var _u="";try{_u=localStorage.getItem("auth_uid")||"";}catch(e){}function sN(n){if(!n)return;document.getElementById('ttl').textContent='📅 '+n+' ki Timeline';}if(nm)sN(nm);if(_fbDb&&_u){_fbDb.ref("customer_profiles/"+_u).once("value").then(function(s){var P2=s.val()||{};var n2=P2.profileName||P2.name||P2.customer_name||nm;if(n2)sN(n2);});}})();
-      _fbDb.ref("customer_details/"+myUid).once("value").then(function(s2){
-        var extra=[]; s2.forEach(function(ch){ extra.push(ch.val()); });
-        if(extra.length>0) FRIEND_DATA.details=extra;
-        _fbDb.ref("customer_thinkings/"+myUid).once("value").then(function(s3){
-          var extra2=[]; s3.forEach(function(ch){ extra2.push(ch.val()); });
-          if(extra2.length>0) FRIEND_DATA.thinkings=extra2;
-          renderList('d');
-        });
-      });
-    });
-  } else {
-    renderList('d');
+/* UPDATE - Friend Timeline 1st Grid: Edit / Hide / Photo / Video Hide */
+body.visitor-mode button[onclick*="editMsg"],
+body.visitor-mode button[onclick*="hideMsg"]{ display:none !important; }
+body.visitor-mode #tabMessages > .card:first-child button[onclick*="pickPhoto"],
+body.visitor-mode #tabMessages > .card:first-child button[onclick*="pickVideo"],
+body.visitor-mode #tabMessages > .card:first-child button[onclick*="tagMsg"]{ display:none !important; }
+
+
+
+
+
+  
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+body { background: #fff8f0; color: #333; }
+#hdr { background: #e65100; color: #fff; padding: 14px 16px; display: flex; align-items: center; position: sticky; top: 0; z-index: 10; }
+#hdr button { background: #fff; color: #e65100; border: none; min-width: 36px; height: 36px; border-radius: 50%; font-size: 18px; font-weight: bold; margin-right: 12px; cursor: pointer; }
+#hdr b { font-size: 18px; flex: 1; }
+#hdr .pill { background: #00c853; color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+#tabs { display: flex; background: #fff; position: sticky; top: 64px; z-index: 9; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+#tabs button { flex: 1; background: #eee; border: none; padding: 14px; font-size: 15px; font-weight: bold; color: #888; border-radius: 10px; margin: 6px; cursor: pointer; }
+#tabs button.on { background: #fff; color: #e65100; border-bottom: 3px solid #e65100; }
+.wrap { max-width: 600px; margin: 0 auto; padding: 12px; }
+.card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+.profile-name { font-size: 20px; font-weight: bold; }
+.profile-line { font-size: 14px; color: #555; margin: 3px 0; }
+.pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; background: #e8f5e9; color: #2e7d32; }
+.btn { border: 1px solid #ddd; background: #f5f5f5; padding: 7px 12px; border-radius: 20px; font-size: 13px; margin: 3px 2px; cursor: pointer; }
+.btn.orange { background: #e65100; color: #fff; border-color: #e65100; }
+.btn.green { background: #f57c00; color: #fff; border-color: #f57c00; }
+.row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.input { flex: 1; min-width: 140px; padding: 10px 12px; border: 1px solid #eee; border-radius: 20px; font-size: 14px; }
+.avatar { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; font-weight: bold; flex-shrink: 0; }
+.avatar.o { background: #ff8f00; }
+.avatar.p { background: #7b1fa2; }
+.msg-name { font-size: 16px; font-weight: bold; }
+.msg-date { font-size: 13px; color: #e65100; font-weight: bold; margin: 4px 0; }
+.msg-text { font-size: 15px; line-height: 1.6; margin: 6px 0; white-space: pre-wrap; }
+.msg-text img, .card img.photo { width: 100%; max-width: 100%; height: auto; max-height: 420px; object-fit: contain; border-radius: 10px; display: block; margin: 8px auto; }
+.sec { font-size: 16px; font-weight: bold; color: #e65100; margin: 16px 0 10px; }
+.hint { font-size: 12px; color: #666; margin: 6px 0; }
+.empty { text-align: center; color: #aaa; padding: 30px; }
+#photoPreview { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 9999; text-align: center; }
+#photoPreview img { max-width: 95%; max-height: 90%; margin-top: 20px; border-radius: 10px; }
+body.visitor-mode .msg-actions, body.visitor-mode #msgActions, body.visitor-mode #selectAllBar, body.visitor-mode #selectAllBar2, body.visitor-mode .add-bar, body.visitor-mode #profileBtns { display: none !important; }
+body.visitor-mode #profileBox .row, body.visitor-mode #kaunDekhegaCard { display: none !important; }
+body.visitor-mode #commentPopup { display: none !important; }
+body.visitor-mode .privacy-row { display: none !important; }
+/* UPDATE - Friend ki Timeline me Edit / Hide kabhi nahi dikhega */
+body.visitor-mode button[onclick*="editMsg"], body.visitor-mode button[onclick*="hideMsg"] { display: none !important; }
+</style>
+
+  
+<script>
+/* UPDATE - UDSAVE: hamesha OWNER ki key me save, Website + Firebase dono me */
+window.UDSAVE = (function(){
+  function q(k){ try{ return new URLSearchParams(location.search).get(k)||""; }catch(e){ return ""; } }
+  function myUid(){ return q("login")||q("me")||localStorage.getItem("auth_uid")||localStorage.getItem("MY_OWN_UID")||""; }
+  function ownerUid(){ return q("uid")||q("cid")||q("owner")||q("id")||q("page")||sessionStorage.getItem("VIEW_OWNER_UID")||myUid(); }
+  function key(b){ return b + "_" + (ownerUid()||"me"); }
+  function save(base, arr){ try{ localStorage.setItem(key(base), JSON.stringify(arr)); }catch(e){} try{ if(window._fbDb && ownerUid()) window._fbDb.ref(base+"/"+ownerUid()).set(arr); }catch(e){} return arr; }
+  function load(base){ try{ var v=localStorage.getItem(key(base)); if(v) return JSON.parse(v); }catch(e){} return []; }
+  function saveComment(text, photo, video, tag){
+    var arr = load("group_comments");
+    arr.unshift({ text:text||"", photo:photo||"", video:video||"", tag:tag||"", senderUid:myUid(), senderName:"", who:"", time:Date.now(), date:new Date().toISOString().slice(0,10), privacy:"Public", boxOwner:ownerUid() });
+    save("group_comments", arr);
+    try{ if(window._fbDb && ownerUid()) window._fbDb.ref("group_comments/"+ownerUid()+"/messages").set(arr); }catch(e){}
+    return arr;
+  }
+  return { myUid:myUid, ownerUid:ownerUid, key:key, save:save, load:load, saveComment:saveComment };
+})();
+</script>
+</head>
+<body>
+<div id="hdr"><button onclick="history.back()">←</button><b id="ttl">📅 Manisha ki Timeline</b><span class="pill">🕐 Timeline</span></div>
+<div id="tabs"><button id="tD" onclick="showTab('d')">Detail</button><button id="tT" onclick="showTab('t')">Thinking</button><button id="tM" onclick="showTab('m')">Messages</button></div>
+<div class="wrap">
+<div class="card" id="profileBox">
+<div style="display: flex; gap: 10px"><span style="font-size: 24px">👤</span><div><div class="profile-name" id="pName">Manisha</div><div class="profile-line" id="pEmail">✉️ -</div><div class="profile-line" id="pMobile">📱 -</div><div><span class="pill">🌍 Public</span></div></div></div>
+<div class="row" id="profileBtns" style="margin-top: 10px"><button class="btn" onclick="editProfile()">✏️ Profile Edit</button><button class="btn" onclick="setProfilePrivacy('Public')">🌍 Public</button><button class="btn" onclick="setProfilePrivacy('Friend')">👥 Friend</button><button class="btn" onclick="setProfilePrivacy('Private')">🔒 Private</button><button class="btn" onclick="setProfilePrivacy('Custom')">⚙️ Custom</button></div>
+</div>
+<div class="card" id="kaunDekhegaCard"><div class="row"><b>👁️ Kaun dekhega?</b><button class="btn orange" onclick="setPrivacy('Public')">🌍 Public</button><button class="btn" onclick="setPrivacy('Friend')">👥 Friend</button><button class="btn" onclick="setPrivacy('Private')">🔒 Private</button><button class="btn" onclick="setPrivacy('Custom')">⚙️ Custom</button></div></div>
+<div id="tabDetail"></div>
+<div id="tabThinking"></div>
+<div id="tabMessages"></div>
+</div>
+<div id="photoPreview" onclick="this.style.display = 'none'"><img id="photoPreviewImg" /><div style="color: #fff; margin-top: 10px">❌ Band karne ke liye photo pe tap karo</div></div>
+<input type="file" id="photoFile" accept="image/*" multiple style="display: none" />
+<input type="file" id="videoFile" accept="video/*" multiple style="display: none" />
+<script>
+var FIREBASE_CONFIG = { apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA", authDomain: "santramarketshoppingmall.firebaseapp.com", databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com", projectId: "santramarketshoppingmall", storageBucket: "santramarketshoppingmall.firebasestorage.app", messagingSenderId: "398490252924", appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9", measurementId: "G-M3YK28NTT0" };
+var _fbDb = null;
+try { firebase.initializeApp(FIREBASE_CONFIG); _fbDb = firebase.database(); } catch (e) {}
+function getLoginUid() { var m = location.search.match(/[?&]login=([^&]+)/); return m ? decodeURIComponent(m[1]) : ""; }
+function getUid() { var m = location.search.match(/[?&]uid=([^&]+)/); if (m) return decodeURIComponent(m[1]); m = location.search.match(/[?&]cid=([^&]+)/); return m ? decodeURIComponent(m[1]) : ""; }
+function getMyUid() { try { var lg = getLoginUid(); if (lg) { try { if (localStorage.getItem("auth_uid") !== lg) localStorage.setItem("auth_uid", lg); } catch (e) {} return lg; } return localStorage.getItem("auth_uid") || ""; } catch (e) { return ""; } }
+function msgOwner() { var f = getUid(); if (f) return f; return getMyUid(); }
+function _isVisitorMode() { try { var q = new URLSearchParams(window.location.search); var l = q.get("login") || ""; var u = q.get("uid") || q.get("cid") || ""; if (l && u && l !== u) return true; } catch (e) {} return !_isOwnerNow(); }
+function _applyVisitorMode() { try { var v = _isVisitorMode(); var b = document.body; if (b) { if (v) b.classList.add("visitor-mode"); else b.classList.remove("visitor-mode"); } var pb = document.getElementById("profileBtns"); if (pb) pb.style.display = v ? "none" : _isOwnerNow() ? "flex" : "none"; var vn = document.getElementById("viewOnlyNote"); if (vn) vn.style.display = v ? "block" : "none"; var sa = document.getElementById("selectAllBar"); if (sa) sa.style.display = v ? "none" : "flex"; var ma = document.getElementById("msgActions"); if (ma) ma.style.display = v ? "none" : "flex"; var kaun = document.querySelector(".msg-actions"); if (kaun && kaun.id !== "msgActions") kaun.style.display = v ? "none" : "flex"; var kd = document.getElementById("kaunDekhegaCard"); if (kd) kd.style.display = v ? "none" : "block"; } catch (e) {} }
+function isOwnerNow() { try { return !!(getMyUid() && msgOwner() && getMyUid() === msgOwner()); } catch (e) { return false; } }
+function isUidLike(s) { s = String(s || "").trim(); if (!s || s === "-") return false; if (s.indexOf("@") !== -1) return false; if (s.indexOf(" ") !== -1) return false; if (/^[A-Za-z0-9_-]{20,}$/.test(s) && /[0-9]/.test(s) && /[A-Za-z]/.test(s)) return true; return false; }
+function esc(t) { return String(t || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function fmtDT(ts) { try { var d = new Date(ts || Date.now()); return String(d.getDate()).padStart(2, "0") + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + d.getFullYear() + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); } catch (e) { return ""; } }
+function tagOf(dateStr) { try { var d = new Date(); var t = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); if (!dateStr) return "📌 Past"; if (dateStr < t) return "📌 Past"; if (dateStr === t) return "🟢 Aaj / Present"; return "🔮 Future"; } catch (e) { return "📌 Past"; } }
+function fmtDate(dateStr) { try { var mn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; var p = String(dateStr || "").split("-"); return p[2].replace(/^0/, "") + " " + mn[parseInt(p[1]) - 1] + " " + p[0]; } catch (e) { return dateStr; } }
+function getMyName() { try { var PP = JSON.parse(localStorage.getItem("my_profile") || "{}"); var n = PP.profileName || PP.name || ""; if (n && !isUidLike(n)) return n; } catch (e) {} try { var n2 = localStorage.getItem("customer_name") || localStorage.getItem("my_name") || ""; if (n2 && !isUidLike(n2)) return n2; } catch (e) {} return ""; }
+function getMyEmail() { try { var PP = JSON.parse(localStorage.getItem("my_profile") || "{}"); var e = PP.email || ""; if (e && !isUidLike(e)) return e; } catch (e) {} return ""; }
+function getMyMobile() { try { var PP = JSON.parse(localStorage.getItem("my_profile") || "{}"); var m = PP.mobile || PP.phone || ""; if (m && !isUidLike(m)) return m; } catch (e) {} return ""; }
+function loadLocal(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : []; } catch (e) { return []; } }
+var FRIEND_DATA = null, DETAILS = [], THINKINGS = [], MSGS = [], COMMENTS = [];
+function ownerKey(base) { return base + "_" + (msgOwner() || "me"); }
+function collect(arr) { var out = []; (arr || []).forEach(function (m) { if (m && m.text) out.push(m); }); return out; }
+function loadAll() {
+  var owner = msgOwner();
+  DETAILS = collect(loadLocal(ownerKey("customer_details")));
+  THINKINGS = collect(loadLocal(ownerKey("customer_thinkings")));
+  MSGS = collect(loadLocal(ownerKey("group_msgs"))).concat(collect(loadLocal(ownerKey("profile_msgs"))));
+  COMMENTS = collect(loadLocal(ownerKey("group_comments")));
+  ["group_msgs_" + owner, "group_msgs_me_" + owner].forEach(function (k) { MSGS = MSGS.concat(collect(loadLocal(k))); });
+  var _seen = {}; MSGS = MSGS.filter(function(m){ var k = (m.text||"") + "|" + (m.time||""); if(_seen[k]) return false; _seen[k] = 1; return true; });
+  renderProfile(); renderAll();
+  if (_fbDb && owner) {
+    _fbDb.ref("customer_profiles/" + owner).once("value").then(function (s) { var P = s.val() || {}; FRIEND_DATA = P; renderProfile(); }).catch(function () {});
+    _fbDb.ref("customer_details/" + owner).once("value").then(function (s) { var a = []; s.forEach(function (c) { a.push(c.val()); }); if (a.length) { DETAILS = a; renderAll(); } }).catch(function () {});
+    _fbDb.ref("customer_thinkings/" + owner).once("value").then(function (s) { var a = []; s.forEach(function (c) { a.push(c.val()); }); if (a.length) { THINKINGS = a; renderAll(); } }).catch(function () {});
+    _fbDb.ref("group_msgs/" + owner + "/messages").once("value").then(function (s) { var a = []; s.forEach(function (c) { a.push(c.val()); }); if (a.length) { var _s2 = {}; MSGS = a.filter(function(m){ var k = (m.text||"") + "|" + (m.time||""); if(_s2[k]) return false; _s2[k] = 1; return true; }); renderAll(); } }).catch(function () {});
+    _fbDb.ref("group_comments/" + owner + "/messages").once("value").then(function (s) { var a = []; s.forEach(function (c) { a.push(c.val()); }); if (a.length) { COMMENTS = a; renderAll(); } }).catch(function () {});
   }
 }
-function syncLoginToFirebase(){
-  if(!_fbDb || !myUid) return;
-  _fbDb.ref("login_sessions/"+myUid).set({uid:myUid, active:true, loginAt:Date.now()});
-  _fbDb.ref("login_sessions/"+myUid+"/active").on("value", function(s){
-    if(s.val()===false){ localStorage.removeItem("auth_uid"); location.href='customerlogin.html'; }
-  });
+function realNameFor(m) {
+  if (m && m.senderUid === msgOwner() && FRIEND_DATA && (FRIEND_DATA.profileName || FRIEND_DATA.name)) return FRIEND_DATA.profileName || FRIEND_DATA.name;
+  if (m && m.senderUid === getMyUid()) return getMyName();
+  if (m && m.senderName && m.senderName !== "Friend" && !isUidLike(m.senderName)) return m.senderName;
+  if (m && m.who && m.who !== "Friend" && !isUidLike(m.who)) return m.who;
+  if (m && m.name && m.name !== "Friend" && !isUidLike(m.name)) return m.name;
+  try { if (m && m.senderUid) { var pr = JSON.parse(localStorage.getItem("profile_detail_" + m.senderUid) || "{}"); if (pr.name && pr.name !== "Friend") return pr.name; if (pr.profileName && pr.profileName !== "Friend") return pr.profileName; } } catch (e) {}
+  if (FRIEND_DATA && (FRIEND_DATA.profileName || FRIEND_DATA.name)) return FRIEND_DATA.profileName || FRIEND_DATA.name;
+  return "";
 }
+function renderProfile() {
+  var owner = msgOwner(); var mine = isOwnerNow(); var nm = "", em = "", mo = "";
+  if (FRIEND_DATA) { nm = FRIEND_DATA.profileName || FRIEND_DATA.name || ""; em = FRIEND_DATA.email || ""; mo = FRIEND_DATA.mobile || FRIEND_DATA.phone || ""; }
+  if (!nm || isUidLike(nm)) { if (mine) nm = getMyName(); else { try { var _op = JSON.parse(localStorage.getItem("profile_detail_" + owner) || "{}"); if (_op.name && !isUidLike(_op.name)) nm = _op.name; else if (_op.profileName && !isUidLike(_op.profileName)) nm = _op.profileName; } catch (e) {} if (!nm) nm = ""; } }
+  if (!em || isUidLike(em)) em = mine ? getMyEmail() : "";
+  if (!mo || isUidLike(mo)) mo = mine ? getMyMobile() : "";
+  if (isUidLike(mo)) mo = ""; if (isUidLike(em)) em = ""; if (isUidLike(nm)) nm = "";
+  document.getElementById("pName").textContent = nm || "Loading...";
+  document.getElementById("pEmail").textContent = "✉️ " + (em || "-");
+  document.getElementById("pMobile").textContent = "📱 " + (mo || "-");
+  if (!nm && _fbDb && owner) { _fbDb.ref("customer_profiles/" + owner).once("value").then(function (s) { var P = s.val() || {}; if (P.profileName || P.name || P.email || P.mobile) { FRIEND_DATA = P; renderProfile(); } }); }
+  var hdrName = nm || (mine ? getMyName() : "Friend");
+  document.getElementById("ttl").textContent = "📅 " + hdrName + " ki Timeline";
+  if (!mine && !nm && _fbDb && owner) { _fbDb.ref("customer_profiles/" + owner).once("value").then(function (s) { var P = s.val() || {}; if (P.profileName || P.name) { FRIEND_DATA = P; renderProfile(); renderAll(); } }); }
+  _applyVisitorMode();
+}
+function privacyBtns() { return '<button class="btn" onclick="setPrivacy(\'Public\')">🌍 Public</button><button class="btn" onclick="setPrivacy(\'Friend\')">👥 Friend</button><button class="btn" onclick="setPrivacy(\'Private\')">🔒 Private</button><button class="btn" onclick="setPrivacy(\'Custom\')">⚙️ Custom</button>'; }
+function actionBtns(m, is2nd) {
+  var mine = false; try { mine = !!(m.senderUid && getMyUid() && m.senderUid === getMyUid()); } catch (e) {}
+  var owner = isOwnerNow(); var h = "";
+  if (is2nd) {
+    if (mine) h += '<button class="btn" onclick="editComment(this)">✏️ Edit</button><button class="btn" onclick="hideComment(this)">🗑️ Hide/Delete</button><button class="btn" onclick="replyComment(this)">💬 Reply</button><button class="btn" onclick="tagMsg()">🏷️ Tag</button><button class="btn" onclick="pickPhoto()">📸 Photo</button><button class="btn" onclick="pickVideo()">🎥 Video</button>';
+    else if (owner) h += '<button class="btn" onclick="hideComment(this)">🗑️ Hide/Delete</button><button class="btn" onclick="replyComment(this)">💬 Reply</button>';
+    else h += '<button class="btn" onclick="replyComment(this)">💬 Reply</button>';
+  } else {
+    /* UPDATE - 1st Grid: Edit/Hide sirf Owner ko, Friend ko sirf Comment */
+    if (owner) h += '<button class="btn" onclick="editMsg(this,'+(m.time||0)+')">✏️ Edit</button><button class="btn" onclick="hideMsg(this,' + (m.time||0) + ')">🗑️ Hide/Delete</button><button class="btn" onclick="commentMsg(this)">💬 Comment</button>';
+    else h += '<button class="btn" onclick="commentMsg(this)">💬 Comment</button>';
+  }
+  return h;
+}
+function actionBtns1st(m){ return actionBtns(m, false); }
+function cardHTML(m, is2nd) {
+  var nm = realNameFor(m) || (isOwnerNow() ? getMyName() : "");
+  var letter = (nm || "M").charAt(0).toUpperCase();
+  var dt = m.date || ""; var tm = m.time || m.createdAt || Date.now();
+  var dateLine = "📅 " + fmtDT(tm) + " • " + tagOf(dt);
+  var txt = String(m.text || ""); var photoHtml = ""; var cleanTxt = txt;
+  var bm = txt.match(/data:image\/[^;]+;base64,[A-Za-z0-9+\/=\\s]+/);
+  if (bm) { photoHtml = '<img class="photo" src="' + bm[0].replace(/\\s+/g, "") + '" onclick="openPreview(this.src)">'; cleanTxt = txt.replace(bm[0], "").trim(); }
+  else if (m.photo) { photoHtml = '<img class="photo" src="' + m.photo + '" onclick="openPreview(this.src)">'; }
+  var h = '<div class="card"><div style="display:flex;gap:12px"><div class="avatar ' + (is2nd ? "p" : "o") + '">' + esc(letter) + '</div><div style="flex:1;min-width:0">';
+  h += '<div><span class="msg-name">' + esc(nm) + ':</span> <span style="font-size:15px">' + esc(cleanTxt).split("<br>")[0] + '</span> <span class="pill">🌍 ' + (m.privacy || "Public") + "</span></div>";
+  h += '<div class="msg-date">' + dateLine + "</div>";
+  if (photoHtml) h += photoHtml;
+  h += '<div class="row" style="margin-top:8px">' + (is2nd ? actionBtns(m, true) : actionBtns1st(m)) + "</div>";
+  h += "</div></div></div>";
+  return h;
+}
+function renderDetail() {
+  var arr = DETAILS.slice().sort(function (a, b) { return (b.time || 0) - (a.time || 0); }); var h = "";
+  if (isOwnerNow()) { h += '<div class="card"><div class="row"><input class="input" id="detailInput" placeholder="Detail likho..."><button class="btn orange" onclick="addDetail()">+ Add</button><button class="btn" onclick="pickPhoto()">📸 Photo</button><button class="btn" onclick="pickVideo()">🎥 Video</button></div><div class="hint">📸 / 🎥 dabake photo/video chuno, phir + Add dabao - photo/video usi Detail ke saath save hogi</div></div>'; }
+  h += '<div class="sec">📝 Detail - ' + (FRIEND_DATA && FRIEND_DATA.profileName ? FRIEND_DATA.profileName : isOwnerNow() ? getMyName() : "Friend") + " ki (" + arr.length + ")</div>";
+  if (!arr.length) h += '<div class="empty">Koi detail entry nahi</div>';
+  arr.forEach(function (m) { h += cardHTML(m, false); });
+  document.getElementById("tabDetail").innerHTML = h;
+}
+function renderThinking() {
+  var arr = THINKINGS.slice().sort(function (a, b) { return (b.time || 0) - (a.time || 0); }); var h = "";
+  if (isOwnerNow()) { h += '<div class="card"><div class="row"><input class="input" id="thinkingInput" placeholder="Thinking likho..."><button class="btn orange" onclick="addThinking()">+ Add</button><button class="btn" onclick="pickPhoto()">📸 Photo</button><button class="btn" onclick="pickVideo()">🎥 Video</button></div><div class="hint">📸 / 🎥 dabake photo/video chuno, phir + Add dabao - photo/video usi Thinking ke saath save hogi</div></div>'; }
+  h += '<div class="sec">💭 Thinking - ' + (FRIEND_DATA && FRIEND_DATA.profileName ? FRIEND_DATA.profileName : isOwnerNow() ? getMyName() : "Friend") + " ki (" + arr.length + ")</div>";
+  if (!arr.length) h += '<div class="empty">Koi thinking entry nahi</div>';
+  arr.forEach(function (m) { h += cardHTML(m, false); });
+  document.getElementById("tabThinking").innerHTML = h;
+}
+function renderMessages() {
+  var arr = MSGS.filter(function(m){ return !m.boxOwner || String(m.boxOwner) === String(msgOwner()); }).slice().sort(function (a, b) { return (b.time || 0) - (a.time || 0); });
+
+  
+  /* UPDATE - Past + Aaj + Future sab */
+  var past = arr;
+
+  
+  /* UPDATE - Friend ki Timeline 1st Grid me Photo / Video / Tag nahi dikhega, sirf Send dikhega */
+/* UPDATE - 1st Grid Message Box sirf Owner ko dikhega, Friend ko nahi */
+var h = '';
+if(isOwnerNow()){
+  h = '<div class="card"><div class="row"><input class="input" id="msgInput" placeholder="Message likho..."><button class="btn orange" onclick="sendMsg1st()">💬 Send</button><button class="btn" onclick="tagMsg()">🏷️ Tag</button><button class="btn" onclick="pickPhoto()">📸 Photo</button><button class="btn" onclick="pickVideo()">🎥 Video</button></div></div>';
+}
+  
+  h += '<div class="sec">📌 1st Grid - Message (' + past.length + ')</div>';
+  if (!past.length) h += '<div class="empty">Koi message nahi</div>';
+  past.forEach(function (m) { h += cardHTML(m, false); });
+  var carr = COMMENTS.slice().sort(function (a, b) { return (b.time || 0) - (a.time || 0); });
+  h += '<div class="sec">💬 2nd Grid - Sab Friends ke Comments (' + carr.length + ")</div>";
+  if (!carr.length) h += '<div class="empty">Koi comment nahi</div>';
+  carr.forEach(function (m) { h += cardHTML(m, true); });
+  h += '<div class="card"><div class="row"><input class="input" id="commentInput" placeholder="2nd Grid me Comment likho..."><button class="btn orange" onclick="sendComment()">💬 Comment</button><button class="btn" onclick="tagMsg()">🏷️ Tag</button><button class="btn" onclick="pickPhoto()">📸 Photo</button><button class="btn" onclick="pickVideo()">🎥 Video</button></div></div>';
+  document.getElementById("tabMessages").innerHTML = h;
+}
+function renderAll() { renderDetail(); renderThinking(); renderMessages(); _applyVisitorMode(); }
+var CUR = "m";
+function showTab(w) { CUR = w; document.getElementById("tD").className = w === "d" ? "on" : ""; document.getElementById("tT").className = w === "t" ? "on" : ""; document.getElementById("tM").className = w === "m" ? "on" : ""; document.getElementById("tabDetail").style.display = w === "d" ? "block" : "none"; document.getElementById("tabThinking").style.display = w === "t" ? "block" : "none"; document.getElementById("tabMessages").style.display = w === "m" ? "block" : "none"; }
+function setPrivacy(v) { var el = document.getElementById("nowPrivacy"); if(el) el.textContent = v; try { localStorage.setItem("timeline_privacy", v); } catch (e) {} }
+function setProfilePrivacy(v) { setPrivacy(v); }
+function editProfile() {
+  if (!isOwnerNow()) { alert("Dusre ki Profile Edit nahi kar sakte. Sirf apni Profile Edit kar sakte ho."); return; }
+  var n = prompt("Naam:", getMyName()); if (n === null) return;
+  var e = prompt("Email:", getMyEmail()); if (e === null) return;
+  var mo = prompt("Mobile (10 digit, UID mat likhna):", getMyMobile()); if (mo === null) return;
+  if (isUidLike(mo)) { alert("Ye UID hai, mobile nahi. Sahi mobile likho."); return; }
+  var P = { profileName: n, email: e, mobile: mo };
+  try { localStorage.setItem("my_profile", JSON.stringify(P)); } catch (e) {}
+  if (_fbDb && getMyUid()) { _fbDb.ref("customer_profiles/" + getMyUid()).update({ profileName: n, email: e, mobile: mo }); }
+  renderProfile();
+}
+function pickPhoto() { document.getElementById("photoFile").click(); }
+function pickVideo() { document.getElementById("videoFile").click(); }
+function openPreview(src) { document.getElementById("photoPreviewImg").src = src; document.getElementById("photoPreview").style.display = "block"; }
+function sendMsg1st() {
+  var inp = document.getElementById("msgInput"); if (!inp || !inp.value.trim()) { alert("Pehle Message likho"); return; }
+  var P = {}; try { P = JSON.parse(localStorage.getItem("my_profile")||"{}"); } catch(e){}
+  var owner = msgOwner(); var loginUid = getMyUid();
+  var m = { text: inp.value.trim(), senderUid: loginUid, loginUid: loginUid, senderName: P.profileName || P.name || getMyName() || "", who: P.profileName || P.name || getMyName() || "", senderEmail: P.email || getMyEmail() || "", senderMobile: P.mobile || P.phone || getMyMobile() || "", profileDetail: P, time: Date.now(), updatedAt: Date.now(), date: new Date().toISOString().slice(0,10), privacy: "Public", boxOwner: owner, owner: owner, type: "group_msg" };
+  MSGS.unshift(m);
+  try { localStorage.setItem("group_msgs_" + owner, JSON.stringify(MSGS)); } catch (e) {}
+  if (_fbDb && owner) _fbDb.ref("group_msgs/" + owner + "/messages").set(MSGS);
+  inp.value = ""; renderMessages();
+}
+function sendMsg() { sendMsg1st(); }
+function saveTimelineMsg() { sendMsg1st(); }
+function sendComment() {
+  var popup = document.getElementById("commentPopupInput");
+  var bottom = document.getElementById("commentInput");
+  var inp = (popup && popup.value.trim()) ? popup : bottom;
+  if (!inp || !inp.value.trim()) { alert("Comment likhne ke liye neeche wale box me likho aur Comment dabao."); return; }
+  var P = {}; try { P = JSON.parse(localStorage.getItem("my_profile")||"{}"); } catch(e){}
+  var owner = msgOwner(); var loginUid = getMyUid();
+  var m = { text: inp.value.trim(), senderUid: loginUid, loginUid: loginUid, senderName: P.profileName || P.name || getMyName() || "", who: P.profileName || P.name || getMyName() || "", senderEmail: P.email || "", senderMobile: P.mobile || P.phone || "", profileDetail: P, time: Date.now(), updatedAt: Date.now(), date: new Date().toISOString().slice(0,10), privacy: "Public", boxOwner: owner, owner: owner, type: "comment" };
+  COMMENTS.unshift(m);
+  try { localStorage.setItem("group_comments_" + owner, JSON.stringify(COMMENTS)); } catch (e) {}
+  if (_fbDb && owner) _fbDb.ref("group_comments/" + owner + "/messages").set(COMMENTS);
+  inp.value = ""; if (popup) popup.value = ""; closeCommentPopup(); renderMessages();
+}
+function saveTimelineComment() { sendComment(); }
+function sendCommentPopup() { sendComment(); }
+function addDetail() {
+  var inp = document.getElementById("detailInput"); if (!inp || !inp.value.trim()) return;
+  DETAILS.unshift({ text: inp.value.trim(), senderUid: getMyUid(), senderName: getMyName(), who: getMyName(), time: Date.now(), date: new Date().toISOString().slice(0, 10), privacy: "Public" });
+  try { localStorage.setItem("customer_details_" + msgOwner(), JSON.stringify(DETAILS)); } catch (e) {}
+  if (_fbDb && msgOwner()) _fbDb.ref("customer_details/" + msgOwner()).set(DETAILS);
+  inp.value = ""; renderDetail();
+}
+function addThinking() {
+  var inp = document.getElementById("thinkingInput"); if (!inp || !inp.value.trim()) return;
+  THINKINGS.unshift({ text: inp.value.trim(), senderUid: getMyUid(), senderName: getMyName(), who: getMyName(), time: Date.now(), date: new Date().toISOString().slice(0, 10), privacy: "Public" });
+  try { localStorage.setItem("customer_thinkings_" + msgOwner(), JSON.stringify(THINKINGS)); } catch (e) {}
+  if (_fbDb && msgOwner()) _fbDb.ref("customer_thinkings/" + msgOwner()).set(THINKINGS);
+  inp.value = ""; renderThinking();
+}
+function tagMsg() { alert("Tag: @ likh ke dost ka naam chuno."); }
+/* UPDATE - 1st Grid Edit ab asli hai, alert nahi */
+function editMsg(el, t){
+  var idx = -1;
+  if(t){ for(var i=0;i<MSGS.length;i++){ if(String(MSGS[i].time)===String(t)){ idx=i; break; } } }
+  if(idx===-1 && el){
+    try{
+      var card = el.closest(".card");
+      var txt = card ? card.querySelector(".msg-name").parentNode.textContent : "";
+      for(var j=0;j<MSGS.length;j++){ if(txt.indexOf(MSGS[j].text)!==-1){ idx=j; break; } }
+    }catch(e){}
+  }
+  if(idx===-1){ alert("Ye message nahi mila, ek baar page reload karo"); return; }
+  var m = MSGS[idx];
+  if(m.senderUid && m.senderUid!==getMyUid() && !isOwnerNow()){ alert("🔒 Ye message tumne nahi likha, isliye Edit nahi kar sakte"); return; }
+  var nw = prompt("Message Edit karo:", m.text);
+  if(nw===null) return;
+  if(!nw.trim()){ alert("Khali message save nahi hoga"); return; }
+  m.text = nw.trim(); m.updatedAt = Date.now(); m.edited = true;
+  try{ localStorage.setItem("group_msgs_"+msgOwner(), JSON.stringify(MSGS)); }catch(e){}
+  if(window._fbDb && msgOwner()) window._fbDb.ref("group_msgs/"+msgOwner()+"/messages").set(MSGS);
+  renderMessages();
+  alert("✅ Edit ho gaya - 1st Grid me update dikhega");
+}
+function moveToRecycle(item, from) {
+  var key = "recycle_bin_" + msgOwner(); var arr = [];
+  try { arr = JSON.parse(localStorage.getItem(key) || "[]"); } catch (e) { arr = []; }
+  item._from = from; item._deletedAt = Date.now(); arr.unshift(item);
+  try { localStorage.setItem(key, JSON.stringify(arr)); } catch (e) {}
+  if (_fbDb && msgOwner()) _fbDb.ref("recycle_bin/" + msgOwner()).set(arr);
+}
+function hideMsg(el, t) {
+  if (!isOwnerNow()) { alert("🔒 Hide/Delete sirf jiski Timeline hai wahi kar sakta hai"); return; }
+  if (!confirm("Hide/Delete - Recycle Bin me jayega?")) return;
+  var idx = -1; for (var i = 0; i < MSGS.length; i++) { if (String(MSGS[i].time) === String(t)) { idx = i; break; } }
+  if (idx === -1) { alert("Ye message nahi mila, ek baar page reload karo"); return; }
+  var item = MSGS[idx]; moveToRecycle(item, "msg"); MSGS.splice(idx, 1);
+  try { localStorage.setItem("group_msgs_" + msgOwner(), JSON.stringify(MSGS)); } catch (e) {}
+  if (_fbDb && msgOwner()) _fbDb.ref("group_msgs/" + msgOwner() + "/messages").set(MSGS);
+  renderMessages();
+}
+function commentMsg(el) { var p = document.getElementById("commentPopup"); if (p) p.style.display = "block"; }
+function closeCommentPopup() { var p = document.getElementById("commentPopup"); if (p) p.style.display = "none"; }
+function sendCommentPopupOld() { sendComment(); }
+function editComment(el) { alert("Apna comment edit karo."); }
+function hideComment(el) {
+  if (!isOwnerNow()) { alert("🔒 Hide/Delete sirf jiski Timeline hai wahi kar sakta hai"); return; }
+  if (!confirm("Hide/Delete - Recycle Bin me jayega?")) return;
+  var card = el.closest(".card"); if (!card) return;
+  var item = COMMENTS[0];
+  if (item) { moveToRecycle(item, "comment"); COMMENTS.shift(); try { localStorage.setItem("group_comments_" + msgOwner(), JSON.stringify(COMMENTS)); } catch (e) {} if (_fbDb && msgOwner()) _fbDb.ref("group_comments/" + msgOwner() + "/messages").set(COMMENTS); }
+  renderMessages();
+}
+function replyComment(el) { alert("Reply likho."); }
+function toggleRecycle() { alert("Recycle Bin - Settings me Timeline Recycle se Restore / Pakka Delete karo."); }
+function openBtnBox() { var p = document.getElementById("btnBoxPopup"); if (p) p.style.display = "block"; }
+function closeBtnBox() { var p = document.getElementById("btnBoxPopup"); if (p) p.style.display = "none"; }
+loadAll();
+showTab("m");
 </script>
 <script src="privacy.js"></script>
-<script>try{PRIV_placeBtn("timelinePublic","hdr");}catch(e){}</script>
-<script src="datetime-all.js"></script>
-<script>
-// ==== Date-Time - Sab File Ke Liye - Ek Hi Block - NEECHE WALA (old code, rakha hua) ====
-function fmtDT(ts){
-  try{
-    var d = new Date(ts || Date.now());
-    var dd = String(d.getDate()).padStart(2,"0");
-    var mm = String(d.getMonth()+1).padStart(2,"0");
-    var yy = d.getFullYear();
-    var hh = String(d.getHours()).padStart(2,"0");
-    var mi = String(d.getMinutes()).padStart(2,"0");
-    return dd+"-"+mm+"-"+yy+"  "+hh+":"+mi;
-  }catch(e){ return ""; }
-}
-function showDT(m){
-  if(!m) return "";
-  var t = m.time || m.createdAt || m.created || Date.now();
-  var u = m.updatedAt || m.updated || m.editTime;
-  if(u && u != t){ return "📅 "+fmtDT(t)+"  •  ✏️ Updated: "+fmtDT(u); }
-  return "📅 "+fmtDT(t);
-}
-function dtHTML(m){ return "<span style='font-size:11px;color:#888;'>"+showDT(m)+"</span><br>"; }
-function setNewTime(m){ m.time = Date.now(); m.updatedAt = Date.now(); return m; }
-function setUpdateTime(m){ m.updatedAt = Date.now(); return m; }
-</script>
-<script src="mydata.js"></script>
-<script src="headername.js"></script>
-<script src="connect.js"></script>
-<script src="view.js"></script>
-<script src="privacy-all.js"></script>
-<div id="photoPreview" onclick="this.style.display='none'" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;text-align:center;">
-  <img id="photoPreviewImg" style="max-width:95%;max-height:90%;margin-top:20px;border-radius:10px;">
-  <div style="color:#fff;margin-top:10px;">❌ Band karne ke liye photo pe tap karo</div>
+<script src="friend-timeline-rules.js"></script>
+<script src="2nd-grid-name-fix.js"></script>
+<script src="1st-grid-owner-only.js"></script>
+<script src="2nd-grid-comment-permission.js"></script>  
+  
+<script>(function(){ function isV(){ try{ var q=new URLSearchParams(location.search); var l=q.get("login")||""; var u=q.get("uid")||q.get("cid")||""; if(l&&u&&l!==u) return true; }catch(e){} return document.body.classList.contains("visitor-mode"); } function hideK(){ if(!isV()) return; ["kaunDekhegaCard","profileBtns"].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display="none"; }); } setInterval(hideK, 500); setTimeout(hideK, 500); })();</script>
+<div id="commentPopup" style="display:none;position:fixed;left:12px;right:12px;bottom:20px;background:#fff;border-radius:16px;padding:14px;box-shadow:0 6px 24px rgba(0,0,0,.3);z-index:9999;">
+<div style="display:flex;justify-content:space-between;"><b>💬 Comment</b><button class="btn" onclick="closeCommentPopup()">✖️</button></div>
+<input id="commentPopupInput" class="input" placeholder="Comment likho..." style="width:100%;margin:10px 0;">
+<div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn" onclick="pickPhoto()">📸 Photo</button><button class="btn" onclick="pickVideo()">🎥 Video</button><button class="btn" onclick="tagMsg()">🏷️ Tag</button><button class="btn orange" onclick="saveTimelineComment()">📤 Share</button></div>
 </div>
-<script>
-document.addEventListener("click", function(e){
-  if(e.target.tagName==="IMG" && e.target.src){
-    var p=document.getElementById("photoPreview");
-    var pi=document.getElementById("photoPreviewImg");
-    if(p && pi){ pi.src=e.target.src; p.style.display="block"; }
-  }
-});
-</script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script>
-
-<script src="upload-photo.js"></script>
-
-</body></html>
+</body>
+</html>
