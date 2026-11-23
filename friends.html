@@ -1210,10 +1210,10 @@ function setUpdateTime(m){ m.updatedAt = Date.now(); return m; }
 (function(){
   var u = new URLSearchParams(window.location.search);
   var login = u.get("login") || localStorage.getItem("auth_uid") || localStorage.getItem("my_uid") || "KHAALI";
-  var owner = u.get("uid") || u.get("owner") || u.get("id") || "KHAALI";
+  var owner = u.get("uid") || u.get("owner") || u.get("id") || "";
   var box = document.createElement("div");
   box.style.cssText = "position:fixed;top:0;left:0;right:0;background:#000;color:#fff;padding:10px;font-size:13px;z-index:99999;text-align:center";
-  box.innerHTML = "LOGIN: " + login + " <br> OWNER: " + owner + " <br> URL: " + window.location.search;
+  box.innerHTML = "LOGIN: " + login + " <br>  " + owner + " <br>  " + window.location.search;
   document.addEventListener("DOMContentLoaded", function(){ document.body.appendChild(box); });
 })();
 </script>
