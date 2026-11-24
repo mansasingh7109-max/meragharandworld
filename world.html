@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>World Friends</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</head><body style="background:#FCE4EC;margin:0;font-family:Arial">
+
+<div style="background:#e65100;color:#fff;padding:14px;text-align:center;position:sticky;top:0;z-index:99">
+<button onclick="history.back()" style="float:left;background:#fff;color:#e65100;border:none;padding:6px 12px;border-radius:16px;font-weight:bold">← Wapas</button>
+<b style="font-size:18px">🌍 World Friends</b>
+<div id="worldTotal" style="font-size:12px;margin-top:4px">Load ho raha hai...</div>
+</div>
+
+<input id="worldSearch" placeholder="🔍 Naam likho..." oninput="loadWorld(this.value)" style="width:calc(100% - 32px);margin:12px 16px;padding:13px;border:2px solid #e65100;border-radius:24px;outline:none;box-sizing:border-box">
+
+<div id="worldList" style="padding:0 12px 20px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px"></div>
+
+<script>
+var FIREBASE_CONFIG = {
+apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  databaseURL: "https://santramarketshoppingmall-default-rtdb.firebaseio.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:4b6f73b48d28e1c23b7bf9",
+  measurementId: "G-M3YK28NTT0"  
+};
+try{ firebase.initializeApp(FIREBASE_CONFIG); }catch(e){}
+var _fbDb = firebase.database();
+
+function loadWorld(q){
+q=(q||"").toLowerCase();
+var uid = localStorage.getItem("auth_uid")||"";
+_fbDb.ref("customer_profiles").once("value").then(function(snap){
+var val = snap.val()||{};
+document.getElementById('worldTotal').textContent = Object.keys(val).length + " log login kar chuke hain - Unlimited";
+var h = "";
+Object.keys(val).forEach(function(id){
+if(id===uid) return; // khud ko mat dikhao
+var P = val[id]||{};
+var name = P.profileName||P.name||"Friend";
+if(q && name.toLowerCase().indexOf(q)===-1) return;
+var photo = P.profilePhoto||"👤";
+var pic = (photo!=="👤" && (photo.indexOf("http")===0 || photo.indexOf("data:")===0)) ? '<img src="'+photo+'" style="width:100%;height:130px;object-fit:cover">' : '<div style="height:130px;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:50px">👤</div>';
+// Album ki pehli 3 photos - chhota preview
+var alb = "";
+for(var i=2;i<=4;i++){ var pp = P['profilePhoto'+i]; if(pp) alb += '<img src="'+pp+'" style="width:32px;height:32px;object-fit:cover;border-radius:50%;border:2px solid #fff;margin-left:-6px">'; }
+h += '<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)">'
++ pic
++ '<div style="padding:10px;text-align:center"><b>'+name+'</b><div style="font-size:11px;color:#999">📸 Album photos</div><div style="display:flex;justify-content:center;margin:4px 0">'+alb+'</div>'
++ '<button onclick="location.href=\'profile.html?uid='+id+'\'" style="background:#2196F3;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">👤 Profile Dekho</button>'
++ '<button onclick="location.href=\'album.html?uid='+id+'\'" style="background:#9C27B0;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">📸 Album Dekho</button>'
++ '<button onclick="location.href=\'timedatalist.html?uid='+id+'\'" style="background:#E91E63;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">📅 Timeline Dekho</button>'
++ '</div></div>';
+});
+document.getElementById('worldList').innerHTML = h || '<div style="grid-column:1/-1;text-align:center;color:#999;padding:20px">Abhi koi World Friend nahi hai</div>';
+});
+}
+loadWorld("");
+</script>
+</body></html>

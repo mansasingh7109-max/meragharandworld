@@ -92,6 +92,142 @@ body{background:#FCE4EC !important;margin:0;padding:0;}
 
 
 
+
+
+/* ACCEPTED - 1ST GREEN WALA LAYOUT - ONLY STYLE */
+.acc-green{
+  background:#4caf50;
+  margin:12px 0;
+  border-radius:28px;
+  overflow:hidden;
+  padding:12px;
+}
+.acc-green-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:4px 8px 10px 8px;
+}
+.acc-green-top b{
+  color:#fff;
+  font-size:19px;
+}
+.acc-green-body{
+  display:flex;
+  gap:10px;
+  align-items:stretch;
+}
+.acc-green-left{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  padding:0 10px;
+}
+.acc-green-left b{
+  color:#fff;
+  font-size:22px;
+  line-height:1.2;
+}
+.acc-green-left a{
+  color:#fff;
+  font-size:13px;
+  font-weight:bold;
+  text-decoration:none;
+  margin-top:10px;
+}
+.acc-white-box{
+  width:58%;
+  background:#fff;
+  border-radius:20px;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.acc-slide-wrap{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:8px 4px;
+}
+.acc-slide-btn{
+  background:#4caf50;
+  color:#fff;
+  border:none;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  font-size:18px;
+  flex-shrink:0;
+}
+#acceptedSlide{
+  display:grid !important;
+  grid-template-rows:repeat(3,auto) !important;
+  grid-auto-flow:column !important;
+  grid-auto-columns:100% !important;
+  gap:8px;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  padding:2px;
+  flex:1;
+  height:285px;
+  scroll-snap-type:x mandatory;
+}
+.acc-card{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-align:left;
+  cursor:pointer;
+  background:#fff;
+  border-bottom:1px solid #f0f0f0;
+  padding:6px 8px;
+}
+.acc-card img, .acc-card .acc-pic{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  object-fit:cover;
+  flex-shrink:0;
+}
+.acc-card .acc-pic{
+  background:#e8f5e9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+}
+.acc-card-name{
+  font-size:14px;
+  font-weight:bold;
+  color:#222;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.acc-card-status{
+  font-size:11px;
+  color:#2e7d32;
+  font-weight:bold;
+}
+.acc-chat-btn{
+  background:#25D366;
+  color:#fff;
+  border:none;
+  padding:4px 14px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:bold;
+  margin-top:2px;
+}
+
+    
+.priv-row{display:flex;align-items:center;gap:6px;background:#fff;border-radius:16px;padding:8px 10px;margin:6px 10px;box-shadow:0 2px 10px rgba(0,0,0,.08);flex-wrap:wrap}
+.priv-row button{border:1px solid #e5e5e5;background:#f6f6f6;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:bold;cursor:pointer}
+.priv-row button.active,.priv-row button.sel,.priv-row button.on{background:linear-gradient(135deg,#ff7043,#e65100);color:#fff;border-color:transparent;box-shadow:0 2px 6px rgba(230,81,0,.35)}
+
+
+
     
 </style><meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -205,7 +341,25 @@ body{background:#fff8f0;color:#333}
 .topTabs a:nth-child(3){background:#FF9800;}
 .topTabs a:nth-child(4){background:#9C27B0;}
 .topTabs a:nth-child(5){background:#E91E63;}  
-  
+
+
+
+.acc-green{ background:#4caf50; margin:12px 0; border-radius:22px; overflow:hidden; padding:8px; }
+.acc-green-top{ display:flex; justify-content:space-between; align-items:center; padding:2px 6px 2px 6px; }
+.acc-green-top b{ color:#fff; font-size:15px; }
+.acc-green-body{ display:flex; gap:4px; align-items:flex-start; }
+.acc-green-left{ flex:0 0 30%; max-width:30%; display:flex; flex-direction:column; justify-content:flex-start; align-items:flex-start; padding:2px 4px 0 4px; }
+.acc-green-left b{ color:#fff; font-size:17px; line-height:1.1; }
+.acc-green-left a{ color:#fff; font-size:11px; font-weight:bold; text-decoration:none; margin-top:6px; }
+.acc-white-box{ width:90%; background:#fff; border-radius:18px; overflow:hidden; flex-shrink:0; }
+/* SEARCH BOX - TUBELIGHT SHAPE */
+.acc-search-wrap{ padding:8px 8px 0 8px; background:#fff; }
+.acc-search{ width:100%; box-sizing:border-box; padding:9px 16px; border:2px solid #FF9800; border-radius:50px; outline:none; font-size:13px; background:#fff; box-shadow:0 0 12px rgba(255,152,0,.45); }
+.acc-search::placeholder{ color:#999; }
+.acc-slide-wrap{ display:flex; align-items:center; gap:4px; padding:6px 4px; }
+.acc-slide-btn{ background:#4caf50; color:#fff; border:none; width:28px; height:28px; border-radius:50%; font-size:16px; flex-shrink:0; }
+#acceptedSlide{ display:grid !important; grid-template-rows:repeat(3,auto) !important; grid-auto-flow:column !important; grid-auto-columns:100% !important; gap:6px; overflow-x:auto !important; overflow-y:hidden !important; padding:2px; flex:1; height:190px; scroll-snap-type:x mandatory; }
+
 </style></head>
   
 
@@ -236,8 +390,13 @@ body{background:#fff8f0;color:#333}
   
   
 <div class="sec" id="reqSec">
-<h2>📩 Meri Friend Requests</h2>
+<h2>📩 </h2>
 <div id="reqList"></div>
+<!-- ===== NOTIFICATIONS LIST - notifications.js isko khud bharega ===== -->
+<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:12px;padding:10px;margin:0 0 8px;">
+  <b style="color:#e65100;">🔔 Meri Friend Requests / Notifications</b>
+  <div id="notifList" style="margin-top:6px;"><div style="text-align:center;color:#999;padding:10px;font-size:13px;">⏳ Notifications load ho rahi hain...</div></div>
+</div>  
 </div>    
 
 
@@ -254,18 +413,126 @@ body{background:#fff8f0;color:#333}
 </div>
 </div>
 
-<h3>Profile
-  <button data-privacy-key="profile" data-privacy-val="public">Public</button>
-  <button data-privacy-key="profile" data-privacy-val="private">Private</button><button onclick="'+fnVis+'('+idx+',\'Custom\')">⚙️ Custom</button>
 
-
-
-<button onclick="'+fnVis+'('+idx+',\'Public\')">🌍 Public</button><button onclick="'+fnVis+'('+idx+',\'Friend\')">👥 Friend</button><button onclick="'+fnVis+'('+idx+',\'Private\')">🔒 Private</button><button onclick="'+fnVis+'('+idx+',\'Custom\')">⚙️ Custom</button>
 
   
-</h3>
 
+
+
+<!-- ===== PROFILE + FRIENDS PRIVACY - CLEAN ROWS ===== -->
+<style>
+.privBox{background:#fff;margin:12px 16px;padding:14px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.privRow{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.privRow:last-child{margin-bottom:0;}
+.privLabel{flex:1;font-weight:bold;font-size:15px;color:#333;min-width:70px;}
+.privBtn{flex:1;border:2px solid #eee;background:#fff;padding:10px 4px;border-radius:20px;font-weight:bold;font-size:13px;cursor:pointer;color:#555;}
+.privBtn.on{background:#e65100 !important;border-color:#e65100 !important;color:#fff !important;}
+.privBtn.on-blue{background:#2196F3 !important;border-color:#2196F3 !important;color:#fff !important;}
+
+
+/* Upar wali purani Profile/Friends line chhupao, neeche wali rakho */
+#privacyBox{ display:block !important; }
+
+
+.privLabel{font-weight:800 !important;font-size:14px !important;background:linear-gradient(90deg,#e65100,#ff7043) !important;color:#fff !important;padding:4px 10px !important;border-radius:20px !important;letter-spacing:.3px}
+  
+</style>
+  
+
+<div class="privBox" id="privacyBox">
+  <!-- Row 1 : Profile -->
+<div class="priv-row" style="background:#D6EAF8">
+  
     
+  <span class="privLabel" style="font-weight:800;font-size:14px;background:linear-gradient(90deg,#64B5F6,#64B5F6);color:#fff;padding:20px 10px;border-radius:20px">👤 Profile </span>
+    <button class="privBtn" data-privacy-key="profile" data-privacy-val="public" onclick="setPrivacyClean(this,'profile','public')">🌍 Public</button>
+    <button class="privBtn" data-privacy-key="profile" data-privacy-val="private" onclick="setPrivacyClean(this,'profile','private')">🔒 Private</button>
+    <button class="privBtn" data-privacy-key="profile" data-privacy-val="custom" onclick="setPrivacyClean(this,'profile','custom')">⚙️ Custom</button>
+  </div>
+  <!-- Row 2 : Friends -->
+  <div class="priv-row"style="background:#D6EAF8">
+    
+   <span class="privLabel" style="font-weight:800;font-size:14px;background:linear-gradient(90deg,#64B5F6,#64B5F6);color:#fff;padding:20px 10px;border-radius:20px">👥 Friends </span> 
+    <button class="privBtn" data-privacy-key="friends" data-privacy-val="public" onclick="setPrivacyClean(this,'friends','public')">🌍 Public</button>
+    <button class="privBtn" data-privacy-key="friends" data-privacy-val="friend" onclick="setPrivacyClean(this,'friends','friend')">👥 Friend</button>
+    <button class="privBtn" data-privacy-key="friends" data-privacy-val="private" onclick="setPrivacyClean(this,'friends','private')">🔒 Private</button>
+    <button class="privBtn" data-privacy-key="friends" data-privacy-val="custom" onclick="setPrivacyClean(this,'friends','custom')">⚙️ Custom</button>
+  </>
+  <div id="privMsg" style="font-size:12px;color:#2e7d32;text-align:center;margin-top:6px;display:none;">✅ Save ho gaya!</div>
+</div>
+
+<button onclick="location.href='customerlogin.html'" style="background:#7b1fa2;color:#fff;border:none;padding:14px 28px;border-radius:24px;font-weight:bold;font-size:15px;width:calc(100% - 32px);margin:0 16px 12px;display:block;cursor:pointer;">🔐 Customer Login</button>
+
+<script>
+/* ===== CLEAN PRIVACY - Profile / Friends ===== */
+function setPrivacyClean(btn, key, val){
+  // Visitor ho to mat badalne do
+  if(document.body && document.body.classList.contains("visitor-mode")){
+    alert("🔒 Sirf dekh sakte ho - Friend ki privacy badal nahi sakte");
+    return;
+  }
+  // 1. Is row ke saare button se ON hatao, sirf dabaye hue pe lagao
+  var row = btn.parentElement;
+  var all = row.querySelectorAll(".privBtn");
+  for(var i=0;i<all.length;i++){ all[i].classList.remove("on"); all[i].classList.remove("on-blue"); }
+  btn.classList.add("on");
+
+  // 2. Save karo - Login wale UID se
+  try{
+    var uid = localStorage.getItem("auth_uid") || localStorage.getItem("MY_OWN_UID") || "me";
+    var allPriv = JSON.parse(localStorage.getItem("privacy_" + uid) || "{}");
+    allPriv[key] = val;
+    localStorage.setItem("privacy_" + uid, JSON.stringify(allPriv));
+    // Purana system jo privacy.js / privacy-all.js padhta hai, uske liye bhi
+    localStorage.setItem("privacy_" + key, val);
+  }catch(e){}
+
+  // 3. Agar purana setVis / setProfileVis hai to usko bhi bulao - taaki purana kaam na toote
+  try{
+    if(key==="profile" && typeof window.setProfileVis==="function" && String(window.setProfileVis).indexOf("Sirf dekh") === -1){
+      window.setProfileVis(val);
+    }
+    if(typeof window.setVis==="function" && String(window.setVis).indexOf("Sirf dekh") === -1){
+      window.setVis(key, val);
+    }
+  }catch(e){}
+
+  // 4. Chhota sa Save message
+  var m = document.getElementById("privMsg");
+  if(m){ m.style.display="block"; m.textContent = "✅ " + (key==="profile"?"Profile":"Friends") + " : " + val + " save ho gaya!"; setTimeout(function(){ m.style.display="none"; }, 2000); }
+}
+
+// Page khulte hi purani setting pe ON lagao
+(function(){
+  try{
+    var uid = localStorage.getItem("auth_uid") || localStorage.getItem("MY_OWN_UID") || "me";
+    var allPriv = JSON.parse(localStorage.getItem("privacy_" + uid) || "{}");
+    ["profile","friends"].forEach(function(k){
+      var v = allPriv[k] || localStorage.getItem("privacy_" + k) || "";
+      if(!v) return;
+      var b = document.querySelector('[data-privacy-key="'+k+'"][data-privacy-val="'+v+'"]');
+      if(b) b.classList.add("on");
+    });
+  }catch(e){}
+})();
+</script>
+<!-- ===== PRIVACY CLEAN END ===== -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 <script>
 var OPT = {
 nameAlign: "left",
@@ -511,21 +778,107 @@ document.getElementById("loginCover").style.display="flex";
 <section id="hero"><div id="heroIn">
 
 
-<h1 id="siteTitleHead" style="background:#B3E5FC;color:#F48FB1;border:none;padding:10px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">Make Friends And Chat And Share Your Thinking !........ Mera Ghar And World</h1>
+<h1 id="siteTitleHead" style="background:linear-gradient(90deg,#B3E5FC,#E1F5FE);color:#AD1457;border:2px solid #4FC3F7;padding:20px 18px;border-radius:30px;font-weight:800;font-size:22px;width:90%;margin-left:auto;margin-right:0;text-align:right;box-shadow:0 4px 12px rgba(0,0,0,0.15)">Make Friends And Chat And Share Your Thinking !........ Mera Ghar And World</h1>
   
-<h1 id="siteTitleHead2" style="background:#C8E6C9;color:#F48F;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">Make Friends Connect With Friends</h1>
-<h1 id="helloHead" style="background:#F8BBD0;color:#4A148C;border:none;padding:50px 28px;border-radius:24px;font-weight:bold;font-size:25px;width:100%;text-align:right;">WELCOME</h1>
-<a id="ordBtn" class="btn2" href="#" onclick="window.scrollTo(0,0);return false;">🏠 Home</a>
+<h1 id="siteTitleHead2" style="background:linear-gradient(90deg,#C8E6C9,#E8F5E9);color:#1B5E20;border:2px solid #2E7D32;padding:20px 18px;border-radius:30px;font-weight:800;font-size:22px;width:90%;margin-left:auto;margin-right:auto;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.15)">Make Friends Connect With Friends</h1>
+<h1 id="helloHead" style="background:linear-gradient(90deg,#F8BBD0,#FCE4EC);color:#4A148C;border:2px solid #AD1457;padding:20px 18px;border-radius:30px;font-weight:800;font-size:22px;width:90%;margin-left:auto;margin-right:auto;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.15)">WELCOME</h1>
+  
+<a id="ordBtn" class="btn2" href="#" onclick="window.scrollTo(0,0);return false;">🏠MERA GHAR AND WORLD</a>
 </div></section>
 <div id="profileTop"></div>
+<div id="worldBoxAll"></div> 
+
+  
 <section id="infobox" style="padding:0 20px"></section>
 <section id="items"></section>
 <section id="ordermenu" style="padding:0 20px 10px"></section>
 <section id="friends" style="padding:10px 20px"></section>
 <footer id="ftr">
+
+  
 <b></b> <br><br>
 
 
+
+
+  
+
+
+<!-- ===== HOME - WORLD FRIENDS - 1 ROW SLIDE + ARROW ===== -->
+
+
+  <div style="padding:12px 12px 0;">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+  <input id="frSearchNew" placeholder="🔍 Naam likho..." oninput="searchWorldFriends(this.value)" style="width:100%;padding:13px;border:2px solid #e65100;border-radius:24px;outline:none">  
+    
+    <b style="font-size:20px;"><span style="font-size:32px;">🌍</span> World Friends</b>
+    <span onclick="location.href='world.html'" style="font-size:14px;color:#e65100;font-weight:bold;cursor:pointer;">Poora Dekho ›</span>
+  </div>
+
+  <!-- ARROW + SLIDE ROW -->
+  <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+    <button onclick="slideHomeWorld(-1)" style="width:32px;height:32px;min-width:32px;background:#e65100;color:#fff;border:none;border-radius:50%;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3);">◀</button>
+
+    <div id="homeWorldStrip" style="display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;">
+      <div style="min-width:140px;text-align:center;color:#999;padding:20px 0;">⏳ World dost load ho rahe hain...</div>
+    </div>
+
+    <button onclick="slideHomeWorld(1)" style="width:32px;height:32px;min-width:32px;background:#e65100;color:#fff;border:none;border-radius:50%;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3);">▶</button>
+  </div>
+</div>
+
+<script>
+// ===== HOME WORLD STRIP - 1 ROW + ARROW SLIDE =====
+function slideHomeWorld(dir){
+  var box = document.getElementById("homeWorldStrip");
+  if(!box) return;
+  // 1 card jitna aage / peeche
+  box.scrollBy({left: dir * 150, behavior: "smooth"});
+}
+function loadHomeWorldStrip(){
+  var box = document.getElementById("homeWorldStrip");
+  if(!box) return;
+  var me = localStorage.getItem("auth_uid") || localStorage.getItem("myLoginId") || "";
+  var db = null;
+  try{ db = window._fbDb || (window.firebase && window.firebase.database && window.firebase.database()); }catch(e){}
+  if(!db){ setTimeout(loadHomeWorldStrip, 1500); return; }
+  db.ref("customer_profiles").once("value").then(function(snap){
+    var val = snap.val() || {};
+    var h = "";
+    var count = 0;
+    Object.keys(val).forEach(function(id){
+      if(id===me) return;
+      var P = val[id] || {};
+      var name = P.profileName || P.name || "Friend";
+      var photo = P.profilePhoto || "👤";
+      var pic = "";
+      if(photo!=="👤" && (photo.indexOf("http")===0 || photo.indexOf("data:")===0))
+        pic = '<img src="'+photo+'" style="width:100%;height:110px;object-fit:cover;border-radius:12px 12px 0 0;">';
+      else
+        pic = '<div style="height:110px;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:40px;border-radius:12px 12px 0 0;">👤</div>';
+
+      h += '<div onclick="location.href=\'world.html\'" style="min-width:140px;max-width:140px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);scroll-snap-align:start;flex-shrink:0;cursor:pointer;">'
+        + pic
+        + '<div style="padding:8px 6px;text-align:center;"><b style="font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+name+'</b>'
+        + '<span style="font-size:11px;color:#fff;background:#e65100;padding:3px 10px;border-radius:20px;display:inline-block;margin-top:5px;">👤 Profile Dekho</span></div>'
+        + '</div>';
+      count++;
+    });
+    if(count==0) h = '<div style="min-width:100%;text-align:center;color:#999;padding:16px;">Abhi World me koi dost nahi hai</div>';
+    box.innerHTML = h;
+  });
+}
+document.addEventListener("DOMContentLoaded", function(){ setTimeout(loadHomeWorldStrip, 500); });
+setTimeout(loadHomeWorldStrip, 1200);
+setTimeout(loadHomeWorldStrip, 3000);
+</script>
+
+
+
+
+
+
+  
 <a href="https://meragharandworld.web.app" style="display:none;">https://meragharandworld.web.app</a>
 <div id="profile"></div>
 </footer>
@@ -533,23 +886,140 @@ document.getElementById("loginCover").style.display="flex";
 <!-- ===== NAYA - HAMARE DOST KE NEECHE - OLD KE SAATH ===== -->
 <div style="padding:12px;width:100%;box-sizing:border-box">
 <!-- 1. SEARCH BOX - World ke upar -->
-<input id="frSearchNew" placeholder="🔍 Naam likho..." oninput="loadNewFriends(this.value)" style="width:100%;padding:13px;border:2px solid #e65100;border-radius:24px;outline:none">
+  
 
-<!-- 2. WORLD FRIENDS - Sirf naye -->
-<h2 style="margin:14px 0 8px" onclick="location.href='world.html'">🌍 World Friends <span style="font-size:13px;color:#e65100">Poora Dekho ›</span></h2>  
+
+  
+
 
 <div id="worldGridNew" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
 
 <!-- 3. ACCEPTED - Neeche -->
-<h2 style="background:#4caf50;color:#fff;padding:10px;border-radius:12px 12px 0 0;margin-top:18px">✅ Accepted Dost</h2>
-<div id="acceptedListNew" style="background:#fff;padding:10px;border-radius:0 0 12px 12px"></div>
 
-<!-- 4. REQUEST - Sabse neeche -->
-<h2 style="background:#ff9800;color:#fff;padding:10px;border-radius:12px 12px 0 0;margin-top:14px">🔔 Friend Request Aayi Hai</h2>
-<div id="incomingListNew" style="background:#fff;padding:10px;border-radius:0 0 12px 12px"></div>
 
-<h2 style="background:#2196F3;color:#fff;padding:10px;border-radius:12px 12px 0 0;margin-top:14px">📤 Sent Request</h2>
-<div id="sentListNew" style="background:#fff;padding:10px;border-radius:0 0 12px 12px"></div>
+<div class="acc-green">
+  <div class="acc-green-top"><b>✅FRIENDS </b><b>✅ Friends list</b></div>
+  
+  <div class="acc-green-body">
+  
+    <div class="acc-green-left"><b> <br></b><a href="friend-accepted.html">Poora Dekho ›</a></div>
+    
+<div class="acc-white-box">
+  <!-- SEARCH - TUBELIGHT -->
+  <div class="acc-search-wrap"><input class="acc-search" id="accSearchBox" placeholder="🔍 Naam likho..." oninput="filterAccepted(this.value)"></div>
+  <div class="acc-slide-wrap">
+    <button class="acc-slide-btn" onclick="document.getElementById('acceptedSlide').scrollBy({left:-260,behavior:'smooth'})">‹</button>
+    <div id="acceptedSlide" style="display:grid !important;grid-template-columns:repeat(5,1fr) !important;grid-auto-flow:row !important;gap:6px !important;justify-items:start !important;height:auto !important;min-height:90px !important;padding:6px"></div>
+    <button class="acc-slide-btn" onclick="document.getElementById('acceptedSlide').scrollBy({left:260,behavior:'smooth'})">›</button>
+  </div>
+</div>
+</div>
+</div>
+<div style="height:14px"></div>
+
+      
+      
+        
+
+
+
+
+<script>
+
+function searchWorldFriends(q){
+  q=(q||"").toLowerCase();
+  if(typeof loadNewFriends==="function") loadNewFriends(q);
+  // brown wala World strip - naam se filter
+  var cards=document.querySelectorAll('#homeWorldStrip > div, #worldStrip > div, #worldGrid > div');
+  cards.forEach(function(c){
+    var nm=(c.innerText||"").toLowerCase();
+    c.style.display = (!q || nm.indexOf(q)>-1) ? "" : "none";
+  });
+}
+
+
+  
+  </script>
+
+  
+
+<script>
+// Accepted Slide - 3 ROW - CHAUDA CARD
+
+
+
+  
+(function(){
+  function loadAcceptedSlide(){
+    try{
+      var me = localStorage.getItem("auth_uid")||localStorage.getItem("customer_phone")||"";
+      var db = window._fbDb || (window.firebase ? firebase.database() : null);
+      if(!db || !me) return;
+      var acc = {};
+      db.ref("friends").once("value").then(function(s){
+        var fr=s.val()||{};
+        if(fr[me]) Object.keys(fr[me]).forEach(function(f){ acc[f]=true; });
+        Object.keys(fr).forEach(function(o){ if(fr[o] && fr[o][me]) acc[o]=true; });
+        return db.ref("friend_requests").once("value");
+      }).then(function(s){
+        var req=s.val()||{};
+        Object.keys(req).forEach(function(k){
+          var r=req[k]||{};
+          if(r.status=="accepted"){ if(r.to==me) acc[r.from]=true; if(r.from==me) acc[r.to]=true; }
+        });
+        return db.ref("customer_profiles").once("value");
+      }).then(function(s){
+        var val=s.val()||{};
+        var box=document.getElementById("acceptedSlide");
+        if(!box) return;
+        var h="";
+        Object.keys(acc).forEach(function(id){
+          if(id==me) return;
+          var P=val[id]||{};
+          var name=P.profileName||P.name||"Friend";
+          var photo=P.profilePhoto||P.photo||"";
+          var pic=(photo && (photo.indexOf("http")==0 || photo.indexOf("data:")==0)) ? '<img src="'+photo+'" style="width:52px;height:52px;border-radius:50%;object-fit:cover">' : '<div style="width:52px;height:52px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto">👤</div>';
+          h+='<div onclick="location.href=\'profile.html?uid='+id+'\'" style="text-align:center;cursor:pointer;white-space:nowrap;background:#fff;border:1px solid #eee;border-radius:12px;padding:6px 2px">'
+          +'<div style="display:flex;justify-content:center">'+pic+'</div>'
+          +'<div style="font-size:12px;font-weight:bold;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px">'+name+'</div>'
+          +'<div style="font-size:10px;color:#2e7d32;font-weight:bold">✅ Accepted</div>'
+          +'<button onclick="event.stopPropagation();location.href=\'chat.html?uid='+id+'\'" style="background:#25D366;color:#fff;border:none;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:bold;margin-top:2px">💬 Chat</button>'
+          +'</div>';
+        });
+      box.innerHTML = h;  
+
+
+
+
+
+        
+        
+      }).catch(function(){});
+    }catch(e){}
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", function(){ setTimeout(loadAcceptedSlide, 800); });
+  else setTimeout(loadAcceptedSlide, 800);
+  setTimeout(loadAcceptedSlide, 2500);
+})();
+</script>
+
+
+
+
+
+<script>
+function filterAccepted(q){
+  q=(q||"").toLowerCase();
+  var cards=document.getElementById('acceptedSlide').children;
+  for(var i=0;i<cards.length;i++){
+    var txt=cards[i].innerText.toLowerCase();
+    cards[i].style.display = (!q || txt.indexOf(q)>-1) ? "" : "none";
+  }
+}
+</script>
+
+
+  
 </div>
 
 <script>
@@ -607,7 +1077,7 @@ document.getElementById('sentListNew').innerHTML=sent||'<div style="text-align:c
 });
 }
 loadNewFriends("");
-</script>
+</scrip>
 <!-- ===== NAYA END ===== -->
 
 
@@ -1703,7 +2173,10 @@ else{msg={type:"file",data:dt,name:file.name,sender:"me",time:Date.now()};}
 _sendMsg(msg);};
 rd.readAsDataURL(file);e.target.value="";});
 })();
-
+<!-- ===== HAMARE DOST - REAL FIREBASE WALE ===== -->
+<div id="realFriendsList" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px;">
+  <div style="grid-column:1/-1;text-align:center;color:#999;padding:20px;">⏳ Real dost load ho rahe hain...</div>
+</div>
 // PHOTO LIGHTBOX (click → big photo)
 window._openLightbox=function(src){
 var old=document.getElementById('_lightbox');if(old)old.remove();
@@ -1914,7 +2387,7 @@ function renderMyFriends(){
   // FIX 2 - Nakli dost hatao
 myF = myF.filter(function(n){
   var l = (n||"").toLowerCase();
-  return l!=="rahul" && l!=="priya" && l!=="amit" && l!=="ramesh" && l!=="naam likho" && l!=="manisha";
+  return l!=="rahul" && l!=="priya" && l!=="amit" && l!=="ramesh" && l!=="naam likho" && l!=="";
 });
 if(myF.length===0){ if(sec) sec.style.display="none"; return; }
   myF.forEach(function(name){
@@ -2005,6 +2478,297 @@ var myUid=localStorage.getItem("auth_uid")||"";
 <script src="fastorderprocess.js"></script>   
 
 <script src="privacy.js"></script>
+
+
+<script>
+/* ===== CUSTOM POPUP - APNA WALA, privacy.js se alag ===== */
+function setPrivacyClean(btn, key, val){
+  // 1. Row me ON lagao
+  var row = btn.parentElement;
+  var all = row.querySelectorAll(".privBtn");
+  for(var i=0;i<all.length;i++){ all[i].classList.remove("on"); }
+  btn.classList.add("on");
+
+  // 2. Save karo
+  try{
+    var uid = localStorage.getItem("auth_uid") || localStorage.getItem("MY_OWN_UID") || "me";
+    var o = JSON.parse(localStorage.getItem("privacy_" + uid) || "{}");
+    o[key] = val;
+    localStorage.setItem("privacy_" + uid, JSON.stringify(o));
+  }catch(e){}
+
+  // 3. Custom hai to APNA popup kholo - privacy.js ka wait mat karo
+  if(val === "custom"){
+    openCustomPopup(key);
+    return;
+  }
+
+  // 4. Public / Friend / Private hai to privacy.js ko bhi bata do
+  try{
+    if(key === "profile" && typeof window.setVis === "function"){
+      var v2 = val.charAt(0).toUpperCase() + val.slice(1);
+      // Visitor wali nakli setVis se bachne ke liye seedha save
+      var q = new URLSearchParams(location.search);
+      var owner = q.get("uid") || q.get("cid") || localStorage.getItem("auth_uid") || "me";
+      localStorage.setItem("timeline_privacy_" + owner, v2);
+      localStorage.setItem("timeline_privacy", v2);
+    }
+  }catch(e){}
+
+  var m = document.getElementById("privMsg");
+  if(m){ m.style.display="block"; m.textContent="✅ "+key+" : "+val+" save ho gaya!"; setTimeout(function(){ m.style.display="none"; },2000); }
+}
+
+var _customKeyNow = "profile";
+function openCustomPopup(key){
+  _customKeyNow = key || "profile";
+  var old = document.getElementById("myCustomPopup");
+  if(old) old.remove();
+
+  var p = document.createElement("div");
+  p.id = "myCustomPopup";
+  p.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;";
+  p.innerHTML = '<div style="background:#fff;width:100%;max-width:420px;border-radius:16px;padding:16px;max-height:80vh;overflow:auto;">'
+    + '<b style="font-size:18px;">⚙️ Custom - Kisko Dikhana Hai?</b>'
+    + '<div style="font-size:12px;color:#666;margin:6px 0;">Tick karo, jisko tick karoge sirf wahi dekhega</div>'
+    + '<input id="myCustomSearch" oninput="filterMyCustom(this.value)" placeholder="🔍 Friend dhoondo..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:20px;outline:none;margin-bottom:10px;">'
+    + '<div id="myCustomList"><div style="text-align:center;color:#999;padding:16px;">⏳ Friend list load ho rahi hai...</div></div>'
+    + '<div id="myCustomCount" style="font-size:12px;color:#e65100;margin-top:8px;font-weight:bold;"></div>'
+    + '<div style="display:flex;gap:8px;margin-top:12px;"><button onclick="saveMyCustom()" style="flex:1;background:#e65100;color:#fff;border:none;border-radius:20px;padding:12px;font-weight:bold;">✅ Done</button><button onclick="closeMyCustom()" style="background:#eee;border:1px solid #ddd;border-radius:20px;padding:12px 16px;">✖️</button></div>'
+    + '</div>';
+  document.body.appendChild(p);
+  loadMyCustomFriends();
+}
+
+function closeMyCustom(){
+  var p = document.getElementById("myCustomPopup");
+  if(p) p.remove();
+}
+
+var _myCustomNames = [];
+function loadMyCustomFriends(){
+  var box = document.getElementById("myCustomList");
+  if(!box) return;
+  var uid = localStorage.getItem("auth_uid") || localStorage.getItem("MY_OWN_UID") || "";
+  var saved = [];
+  try{
+    var q = new URLSearchParams(location.search);
+    var owner = q.get("uid") || q.get("cid") || uid || "me";
+    saved = JSON.parse(localStorage.getItem("timeline_privacy_custom_" + owner) || "[]");
+    // Friends wali Custom ke liye alag key
+    var saved2 = JSON.parse(localStorage.getItem("privacy_custom_" + _customKeyNow) || "[]");
+    if(saved2.length) saved = saved2;
+  }catch(e){}
+
+  function showList(names){
+    _myCustomNames = names;
+    if(!names.length){
+      box.innerHTML = '<div style="text-align:center;color:#999;padding:16px;">Koi Accepted dost nahi mila<br>friends.html se pehle Accept karo</div>';
+      return;
+    }
+    var h = "";
+    names.forEach(function(n){
+      var ck = saved.indexOf(n) !== -1 ? " checked" : "";
+      h += '<label style="display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #eee;cursor:pointer;">'
+        + '<input type="checkbox" class="myCustomChk" value="' + n.replace(/"/g,"") + '"' + ck + ' style="width:20px;height:20px;">'
+        + '<span style="font-size:15px;">👤 ' + n + '</span></label>';
+    });
+    box.innerHTML = h;
+    var c = document.getElementById("myCustomCount");
+    if(c) c.textContent = "✅ " + saved.length + " friend selected";
+  }
+
+  // 1. Pehle localStorage se - turant dikhe
+  try{
+    var local = JSON.parse(localStorage.getItem("fr_myfriends") || "[]");
+    if(local.length) showList(local);
+  }catch(e){}
+
+  // 2. Phir Firebase se Accepted dost lao
+  if(window._fbDb && uid){
+    window._fbDb.ref("friends/" + uid).once("value").then(function(snap){
+      var ids = Object.keys(snap.val() || {});
+      if(!ids.length){ if(!_myCustomNames.length) showList([]); return; }
+      window._fbDb.ref("customer_profiles").once("value").then(function(s2){
+        var all = s2.val() || {};
+        var names = [];
+        ids.forEach(function(id){
+          var P = all[id] || {};
+          var nm = P.profileName || P.name || "";
+          if(nm && names.indexOf(nm) === -1) names.push(nm);
+        });
+        try{ localStorage.setItem("fr_myfriends", JSON.stringify(names)); }catch(e){}
+        showList(names);
+      });
+    });
+  }
+}
+
+function filterMyCustom(q){
+  q = (q || "").toLowerCase();
+  var box = document.getElementById("myCustomList");
+  if(!box) return;
+  box.querySelectorAll("label").forEach(function(l){
+    var t = (l.textContent || "").toLowerCase();
+    l.style.display = (!q || t.indexOf(q) !== -1) ? "flex" : "none";
+  });
+}
+
+function saveMyCustom(){
+  var sel = [];
+  document.querySelectorAll(".myCustomChk:checked").forEach(function(c){ sel.push(c.value); });
+  try{
+    var uid = localStorage.getItem("auth_uid") || localStorage.getItem("MY_OWN_UID") || "me";
+    var q = new URLSearchParams(location.search);
+    var owner = q.get("uid") || q.get("cid") || uid || "me";
+    localStorage.setItem("timeline_privacy_custom_" + owner, JSON.stringify(sel));
+    localStorage.setItem("privacy_custom_" + _customKeyNow, JSON.stringify(sel));
+    localStorage.setItem("timeline_privacy_" + owner, "Custom");
+    localStorage.setItem("timeline_privacy", "Custom");
+  }catch(e){}
+  closeMyCustom();
+  var m = document.getElementById("privMsg");
+  if(m){ m.style.display="block"; m.textContent="✅ Custom save ho gaya! Sirf "+sel.length+" friend dekhenge"; setTimeout(function(){ m.style.display="none"; },2500); }
+}
+</script>
+
+<script>
+/* ===== CUSTOM ME FRIEND LIST LANA - privacy.js ke SAATH ===== */
+(function(){
+  // 1. Apni UID nikalo - privacy.js wali hi
+  function myUid(){
+    try{
+      if(typeof window.getMyOwnUid === "function" && window.getMyOwnUid()) return window.getMyOwnUid();
+    }catch(e){}
+    return localStorage.getItem("auth_uid") || localStorage.getItem("MY_OWN_UID") || "";
+  }
+
+  // 2. Firebase se Accepted Friend ke naam lao aur fr_myfriends me bharo
+  // Taaki privacy.js wala Custom picker unko dikha sake
+  function loadCustomFriends(){
+    var uid = myUid();
+    if(!uid || !window._fbDb) return;
+    // A. Accepted friends ki ID
+    window._fbDb.ref("friends/" + uid).once("value").then(function(snap){
+      var ids = Object.keys(snap.val() || {});
+      if(!ids.length) return;
+      // B. Un ID ka naam customer_profiles se lao
+      window._fbDb.ref("customer_profiles").once("value").then(function(s2){
+        var all = s2.val() || {};
+        var names = [];
+        try{ names = JSON.parse(localStorage.getItem("fr_myfriends") || "[]"); }catch(e){ names = []; }
+        ids.forEach(function(id){
+          var P = all[id] || {};
+          var nm = P.profileName || P.name || "";
+          if(nm && names.indexOf(nm) === -1) names.push(nm);
+        });
+        try{ localStorage.setItem("fr_myfriends", JSON.stringify(names)); }catch(e){}
+        // Agar Custom picker khula hua hai to uski list turant dobara bharo
+        if(document.getElementById("customPicker")){
+          try{ if(typeof window.filterCustomFriends === "function") window.filterCustomFriends(); }catch(e){}
+          fillCustomPickerNow(names);
+        }
+      });
+    });
+  }
+
+  // 3. Agar picker khula hai aur list khaali hai to khud bhar do
+  function fillCustomPickerNow(names){
+    var box = document.getElementById("customFriendList");
+    if(!box) return;
+    if(box.innerHTML && box.innerHTML.indexOf("checkbox") !== -1) return; // pehle se bhari hai to chhedo mat
+    var saved = [];
+    try{
+      var o = myUid();
+      // privacy.js Custom ko owner UID se save karta hai
+      var q = new URLSearchParams(location.search);
+      var owner = q.get("uid") || q.get("cid") || o || "me";
+      saved = JSON.parse(localStorage.getItem("timeline_privacy_custom_" + owner) || "[]");
+    }catch(e){ saved = []; }
+    if(!names.length){
+      box.innerHTML = '<div style="text-align:center;color:#999;padding:12px;">⏳ Friend list load ho rahi hai...<br>2 sec me dobara Custom dabao</div>';
+      return;
+    }
+    var h = "";
+    names.forEach(function(n){
+      var ck = saved.indexOf(n) !== -1 ? " checked" : "";
+      // privacy.js wala checkbox class same rakha hai taaki Save waisa hi kaam kare
+      h += '<label style="display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #eee;cursor:pointer;">'
+        + '<input type="checkbox" class="customFrChk" value="' + n.replace(/"/g,"") + '"' + ck + ' style="width:20px;height:20px;">'
+        + '<span style="font-size:15px;">👤 ' + n + '</span></label>';
+    });
+    box.innerHTML = h;
+    // Tick badalte hi Count dikhao
+    var cnt = document.getElementById("customSelectedCount");
+    if(cnt) cnt.textContent = "✅ " + saved.length + " friend selected";
+    box.querySelectorAll(".customFrChk").forEach(function(c){
+      c.onchange = function(){
+        var sel = [];
+        box.querySelectorAll(".customFrChk:checked").forEach(function(x){ sel.push(x.value); });
+        if(cnt) cnt.textContent = "✅ " + sel.length + " friend selected";
+      };
+    });
+  }
+
+  // 4. Custom picker khulte hi Friend List load karo
+  // privacy.js ka setVis Custom pe picker kholta hai, hum uske baad list bhar denge
+  var _oldSetVis = window.setVis;
+  if(typeof _oldSetVis === "function" && !window.setVis._customFixed){
+    var _newSetVis = function(v){
+      var r = _oldSetVis(v);
+      if(v === "Custom"){
+        loadCustomFriends();
+        setTimeout(function(){
+          try{
+            var names = JSON.parse(localStorage.getItem("fr_myfriends") || "[]");
+            if(names.length) fillCustomPickerNow(names);
+            else loadCustomFriends();
+          }catch(e){}
+        }, 800);
+        // Firebase se aane me time lage to 2 sec baad phir try karo
+        setTimeout(loadCustomFriends, 2000);
+      }
+      return r;
+    };
+    _newSetVis._customFixed = true;
+    window.setVis = _newSetVis;
+  }
+
+  // 5. Save button - privacy.js wala saveCustomPicker hi chalega
+  // Par agar usne naye checkbox nahi padhe to hum yahan se bhi save kar denge
+  document.addEventListener("click", function(e){
+    if(!e.target) return;
+    var t = e.target.textContent || "";
+    if(t.indexOf("Done") !== -1 && document.getElementById("customPicker")){
+      setTimeout(function(){
+        var box = document.getElementById("customFriendList");
+        if(!box) return;
+        var sel = [];
+        box.querySelectorAll(".customFrChk:checked").forEach(function(x){ sel.push(x.value); });
+        // Purane wale checkbox bhi ho to unko bhi le lo
+        box.querySelectorAll("input[type=checkbox]:checked").forEach(function(x){
+          if(x.value && sel.indexOf(x.value) === -1) sel.push(x.value);
+        });
+        if(sel.length){
+          try{
+            var q = new URLSearchParams(location.search);
+            var owner = q.get("uid") || q.get("cid") || myUid() || "me";
+            localStorage.setItem("timeline_privacy_custom_" + owner, JSON.stringify(sel));
+          }catch(e){}
+        }
+      }, 200);
+    }
+  });
+
+  // 6. Page khulte hi pehle se Friend List bhar ke rakho
+  // Taaki Custom dabate hi turant list dikhe, wait na karna pade
+  setTimeout(loadCustomFriends, 1000);
+  setTimeout(loadCustomFriends, 3000);
+})();
+</script>
+
+
+
 
 
 
@@ -2708,7 +3472,145 @@ function setUpdateTime(m){ m.updatedAt = Date.now(); return m; }
   console.log("INDEX LOCK ON | Login:", LOGIN, "| Logged In?", IS_LOGGED_IN);
 })();
 </script>
-  
+
+
+
+
+
+
+
+
+<script>
+/* ===== REAL FRIENDS - Firebase Login ID wale ===== */
+function loadRealFriends(){
+  var box = document.getElementById("realFriendsList");
+  if(!box) return;
+  var myUid = "";
+  try{ myUid = localStorage.getItem("auth_uid") || localStorage.getItem("MY_OWN_UID") || localStorage.getItem("customer_uid") || ""; }catch(e){}
+
+  function showList(users){
+    // Khud ko list se hatao - apna card apni list me nahi dikhega
+    users = users.filter(function(u){ return u.uid !== myUid && u.name; });
+    if(!users.length){
+      box.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#999;padding:20px;background:#fff;border-radius:12px;">Abhi koi Real dost nahi hai<br><span style="font-size:12px;">Pehle kisi ko Login karke Friend Request bhejo</span></div>';
+      return;
+    }
+    var h = "";
+    users.forEach(function(u){
+      var photo = u.photo || u.profilePic || u.avatar || "";
+      var img = photo ? '<img src="'+photo+'" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">' : '<div style="width:64px;height:64px;border-radius:50%;background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto;">👤</div>';
+      h += '<div onclick="location.href=\'chat-box.html?uid='+u.uid+'\'" style="background:#fff;border-radius:12px;padding:12px;text-align:center;cursor:pointer;">'
+        + img
+        + '<div style="font-weight:bold;margin-top:6px;font-size:14px;">'+u.name+'</div>'
+        + '<div style="color:#e65100;font-size:12px;font-weight:bold;">'+(u.role || u.work || "Friend")+'</div>'
+        + '<div style="font-size:11px;color:#999;margin-top:4px;">👆 Tap karo - poora page dekho</div>'
+        + '</div>';
+    });
+    box.innerHTML = h;
+  }
+
+  // 1. Pehle localStorage se - turant dikhe
+  try{
+    var local = JSON.parse(localStorage.getItem("real_friends_cache") || "[]");
+    if(local.length) showList(local);
+  }catch(e){}
+
+  // 2. Phir Firebase se REAL Login wale lao
+  var db = null;
+  try{ db = window._fbDb || (typeof firebase !== "undefined" ? firebase.database() : null); }catch(e){}
+  if(!db){
+    if(!box.innerHTML || box.innerHTML.indexOf("Real dost") === -1){
+      // Firebase nahi mila to local hi dikhao
+    }
+    return;
+  }
+
+  // customer_profiles me saare Login wale hain
+  db.ref("customer_profiles").once("value").then(function(snap){
+    var all = snap.val() || {};
+    var users = [];
+    Object.keys(all).forEach(function(uid){
+      var P = all[uid] || {};
+      var name = P.profileName || P.name || P.displayName || "";
+      if(!name) return;
+      users.push({uid:uid, name:name, role:P.role || P.work || P.job || "Friend", photo:P.photoURL || P.profilePic || P.photo || ""});
+    });
+    // Agar customer_profiles khali hai to users/ se try karo
+    if(!users.length){
+      db.ref("users").once("value").then(function(s2){
+        var all2 = s2.val() || {};
+        var users2 = [];
+        Object.keys(all2).forEach(function(uid){
+          var P = all2[uid] || {};
+          var name = P.profileName || P.name || "";
+          if(!name) return;
+          users2.push({uid:uid, name:name, role:P.role || "Friend", photo:P.photoURL || P.photo || ""});
+        });
+        try{ localStorage.setItem("real_friends_cache", JSON.stringify(users2)); }catch(e){}
+        showList(users2);
+      });
+      return;
+    }
+    try{ localStorage.setItem("real_friends_cache", JSON.stringify(users)); }catch(e){}
+    showList(users);
+  });
+}
+document.addEventListener("DOMContentLoaded", function(){ setTimeout(loadRealFriends, 800); });
+setTimeout(loadRealFriends, 1500);
+</script>
+
+
+
+
+
+
+<script>
+// FIX: Home Menu order sahi karo - header upar, baaki neeche
+(function(){
+  function moveOrder(){
+    try{
+      var body = document.body;
+      var header = document.querySelector("header");
+      var friendsBar = document.querySelector("#friendsBar") || document.querySelector("[id*='friendBtn']")?.closest("div");
+      // 1. Header sabse upar
+      if(header && body.firstChild !== header){
+        body.insertBefore(header, body.firstChild);
+      }
+      // 2. Duplicate Customer Login me se 2nd wala hatao
+      var logins = document.querySelectorAll("button[onclick*='customerlogin.html']");
+      // pehla rakho, baaki jo green/purple duplicate hain unme se ek hatao
+      if(logins.length > 1){
+        // sirf jo bilkul same text wale hain, unme se last wala hatao
+        for(var i=1;i<logins.length;i++){
+          if(logins[i].textContent.indexOf("Customer Login")!==-1 && i===logins.length-1){
+            // agar dono alag colour ke hain to dono rehne do, sirf 3rd wala hatao
+            if(logins.length>2) logins[i].remove();
+            break;
+          }
+        }
+      }
+      // 3. Duplicate Meri Friend Requests - 1 rakho, baaki chhupao
+      var reqHeads = Array.prototype.slice.call(document.querySelectorAll("*")).filter(function(el){
+        return el.textContent && el.textContent.trim()==="📩 Meri Friend Requests" && el.children.length===0;
+      });
+      // isko chhedo mat agar tumko 1 hi chahiye to - sirf extra orange patti wale ko CSS se chhupayenge
+    }catch(e){}
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", moveOrder);
+  else moveOrder();
+  setTimeout(moveOrder, 1000);
+})();
+</script>
+
+
+<style>
+/* WAPAS PEHLE JAISA: Home Menu Orders Contact + Bell chhupao */
+#nav, nav#nav, #mH, #mM, #mO, #mC,
+#bellBtn, #bellCount, #bellPanel{
+  display:none !important;
+}
+</style>  
+
 </body>
 </html>
   
