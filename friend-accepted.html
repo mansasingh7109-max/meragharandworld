@@ -14,6 +14,12 @@
 
 <input id="accSearch" placeholder="🔍 Naam likho..." oninput="loadAccepted(this.value)" style="width:calc(100% - 32px);margin:12px 16px;padding:13px;border:2px solid #4caf50;border-radius:24px;outline:none;box-sizing:border-box">
 
+<!-- VIEW TOGGLE - Grid / List -->
+<div style="display:flex;gap:8px;padding:0 16px 10px">
+<button id="viewGridBtn" onclick="setAccView('grid')" style="flex:1;background:#4caf50;color:#fff;border:none;padding:10px;border-radius:20px;font-weight:bold">🔲 Grid View</button>
+<button id="viewListBtn" onclick="setAccView('list')" style="flex:1;background:#fff;color:#4caf50;border:2px solid #4caf50;padding:10px;border-radius:20px;font-weight:bold">📋 List View</button>
+</div>
+
 <div id="accList" style="padding:0 12px 20px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px"></div>
 
 <script>
@@ -24,8 +30,24 @@ function myUid(){
   var m=location.search.match(/[?&]login=([^&]+)/); if(m) return decodeURIComponent(m[1]);
   return localStorage.getItem("auth_uid")||"";
 }
+function esc(t){ return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// ===== FRIENDS.HTML WALA DATA - Accepted ke saare function =====
+var ACC_FRIENDS=[]; // {id, name, photo, role}
+var ACC_VIEW="grid";
+var ACC_SEARCH="";
+
+function setAccView(v){
+  ACC_VIEW=v;
+  document.getElementById('viewGridBtn').style.background = v==="grid" ? "#4caf50" : "#fff";
+  document.getElementById('viewGridBtn').style.color = v==="grid" ? "#fff" : "#4caf50";
+  document.getElementById('viewListBtn').style.background = v==="list" ? "#4caf50" : "#fff";
+  document.getElementById('viewListBtn').style.color = v==="list" ? "#fff" : "#4caf50";
+  renderAccepted();
+}
+
 function loadAccepted(q){
-  q=(q||"").toLowerCase();
+  ACC_SEARCH=(q||"").toLowerCase();
   var me=myUid();
   var acc={};
   _fbDb.ref("friends").once("value").then(function(s){
@@ -41,31 +63,100 @@ function loadAccepted(q){
         if(r.to==me) acc[r.from]=true;
         if(r.from==me) acc[r.to]=true;
       }
+      // friends.html wala format - friend_requests/{myUid}/{pushId} = {fromUid}
+      if(r.fromUid && (r.toUid==me || r.to==me)) acc[r.fromUid]=true;
     });
+    return _fbDb.ref("friend_requests_sent").once("value");
+  }).then(function(s){
+    // Future wale - jisko request bheji aur accept ho gayi, wo bhi friends me aa jayega
+    // Yahan sirf list banane ke liye, accept ka final check friends node se hi hoga
     return _fbDb.ref("customer_profiles").once("value");
   }).then(function(s){
     var val=s.val()||{};
-    var h="";
-    var count=0;
+    ACC_FRIENDS=[];
     Object.keys(acc).forEach(function(id){
       if(id==me) return;
       var P=val[id]||{};
-      var name=P.profileName||P.name||"Friend";
-      if(q && name.toLowerCase().indexOf(q)===-1) return;
-      count++;
-      var photo=P.profilePhoto||P.photo||"👤";
-      var pic=(photo!=="👤" && (photo.indexOf("http")==0 || photo.indexOf("data:")==0)) ? '<img src="'+photo+'" style="width:100%;height:130px;object-fit:cover">' : '<div style="height:130px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:50px">👤</div>';
-      h+='<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)">'+pic
-      +'<div style="padding:10px;text-align:center"><b style="color:#222;font-size:15px;">'+name+'</b><div style="background:#e8f5e9;color:#2e7d32;padding:5px;border-radius:20px;font-size:11px;font-weight:bold;margin:6px 0;">✅ Accepted Dost</div>'
-      +'<button onclick="location.href=\'chat.html?uid='+id+'\'" style="background:#25D366;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold">💬 Chat Karo</button>'
-      +'<button onclick="location.href=\'profile.html?uid='+id+'\'" style="background:#2196F3;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">👤 Profile Dekho</button>'
-      +'<button onclick="location.href=\'timedatalist.html?uid='+id+'\'" style="background:#E91E63;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">📅 Timeline Dekho</button>'
-      +'</div></div>';
+      ACC_FRIENDS.push({id:id, name:P.profileName||P.name||"Friend", photo:P.profilePhoto||P.photo||"", role:P.profilePhone||P.phone||""});
     });
-    document.getElementById('accTotal').textContent = count+" Accepted Dost";
-    document.getElementById('accList').innerHTML = h || '<div style="grid-column:1/-1;text-align:center;color:#999;padding:20px">Abhi koi Accepted Dost nahi hai</div>';
+    renderAccepted();
   }).catch(function(){ document.getElementById('accList').innerHTML='<div style="grid-column:1/-1;text-align:center;color:#999;padding:20px">Load nahi hua - Internet check karo</div>'; });
 }
+
+function renderAccepted(){
+  var box=document.getElementById('accList');
+  var q=ACC_SEARCH;
+  var list=ACC_FRIENDS.filter(function(f){ return !q || f.name.toLowerCase().indexOf(q)!==-1; });
+  document.getElementById('accTotal').textContent = list.length+" Accepted Dost";
+  if(!list.length){ box.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#999;padding:20px">Abhi koi Accepted Dost nahi hai</div>'; return; }
+
+  // GRID VIEW - purana wala card
+  if(ACC_VIEW==="grid"){
+    box.style.display="grid";
+    box.style.gridTemplateColumns="repeat(2,1fr)";
+    var h="";
+    list.forEach(function(f){
+      var pic=(f.photo && (f.photo.indexOf("http")==0 || f.photo.indexOf("data:")==0)) ? '<img src="'+f.photo+'" style="width:100%;height:130px;object-fit:cover">' : '<div style="height:130px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:50px">👤</div>';
+      h+='<div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)">'+pic
+      +'<div style="padding:10px;text-align:center"><b style="color:#222;font-size:15px;">'+esc(f.name)+'</b><div style="background:#e8f5e9;color:#2e7d32;padding:5px;border-radius:20px;font-size:11px;font-weight:bold;margin:6px 0;">✅ Accepted Dost</div>'
+      +'<button onclick="openAccChat(\''+f.id+'\')" style="background:#25D366;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold">💬 Chat Karo</button>'
+      +'<button onclick="openAccProfile(\''+f.id+'\')" style="background:#2196F3;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">👤 Profile Dekho</button>'
+      +'<button onclick="openAccTimeline(\''+f.id+'\')" style="background:#E91E63;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">📅 Timeline Dekho</button>'
+      +'<button onclick="openAccPreview(\''+f.id+'\')" style="background:#7b1fa2;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">👁️ Preview</button>'
+      +'<button onclick="accUnfriend(\''+f.id+'\',\''+esc(f.name).replace(/\'/g,"")+'\')" style="background:#f44336;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">🚫 Unfriend</button>'
+      +'<button onclick="accBlock(\''+f.id+'\',\''+esc(f.name).replace(/\'/g,"")+'\')" style="background:#000;color:#fff;border:none;padding:8px;width:100%;border-radius:16px;font-weight:bold;margin-top:4px">⛔ Block</button>'
+      +'</div></div>';
+    });
+    box.innerHTML=h;
+    return;
+  }
+
+  // LIST VIEW - friends.html wali myFriendsList jaisi line
+  box.style.display="block";
+  box.style.gridTemplateColumns="none";
+  var h2="";
+  list.forEach(function(f){
+    var pic2=(f.photo && (f.photo.indexOf("http")==0 || f.photo.indexOf("data:")==0)) ? '<img src="'+f.photo+'" style="width:52px;height:52px;border-radius:50%;object-fit:cover">' : '<div style="width:52px;height:52px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:26px">👤</div>';
+    h2+='<div style="background:#fff;border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px">'+pic2
+    +'<div style="flex:1"><div style="font-weight:bold;font-size:14px">'+esc(f.name)+'</div><div style="font-size:11px;color:#4caf50">✅ Accepted Dost</div></div>'
+    +'<button onclick="openAccChat(\''+f.id+'\')" style="background:#25D366;color:#fff;border:none;padding:8px 14px;border-radius:18px;font-weight:bold">💬 Chat</button>'
+    +'<button onclick="openAccPreview(\''+f.id+'\')" style="background:#7b1fa2;color:#fff;border:none;padding:8px 10px;border-radius:18px;font-weight:bold">👁️</button>'
+    +'</div>';
+  });
+  box.innerHTML=h2;
+}
+
+// ===== FRIENDS.HTML WALE FUNCTION - Accepted me bhi same =====
+function openAccChat(uid){ location.href='chat-box.html?uid='+encodeURIComponent(uid); }
+function openAccProfile(uid){ location.href='friend-profile.html?uid='+encodeURIComponent(uid); }
+function openAccTimeline(uid){ location.href='friend-view.html?uid='+encodeURIComponent(uid)+'&tab=timeline'; }
+function openAccPreview(uid){ location.href='friend-preview.html?uid='+encodeURIComponent(uid)+'&tab=friends'; }
+
+function accUnfriend(uid,name){
+  if(!confirm((name||"Friend")+" ko Unfriend karein? Chat Recycle me safe rahegi, delete nahi hogi.")) return;
+  var me=myUid();
+  if(_fbDb && me){
+    _fbDb.ref("friends/"+me+"/"+uid).remove();
+    _fbDb.ref("friends/"+uid+"/"+me).remove();
+    _fbDb.ref("friend_request_history/"+me+"/"+uid).set({type:"unfriended",time:Date.now()});
+  }
+  alert("✅ Unfriend ho gaya");
+  loadAccepted(document.getElementById('accSearch').value);
+}
+function accBlock(uid,name){
+  if(!confirm((name||"Friend")+" ko Block karein?")) return;
+  var me=myUid();
+  if(_fbDb && me){ _fbDb.ref("blocked/"+me+"/"+uid).set({name:name,time:Date.now()}); }
+  alert("🚫 Block ho gaya");
+  loadAccepted(document.getElementById('accSearch').value);
+}
+function accUnblock(uid,name){
+  var me=myUid();
+  if(_fbDb && me){ _fbDb.ref("blocked/"+me+"/"+uid).remove(); }
+  alert("✅ Unblock ho gaya");
+  loadAccepted(document.getElementById('accSearch').value);
+}
+
 loadAccepted("");
 </script>
 </body></html>
