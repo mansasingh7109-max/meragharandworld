@@ -252,6 +252,45 @@ function dtHTML(m){ return "<span style='font-size:11px;color:#888;'>"+showDT(m)
 function setNewTime(m){ m.time = Date.now(); m.updatedAt = Date.now(); return m; }
 function setUpdateTime(m){ m.updatedAt = Date.now(); return m; }
 </script>
+
+
+<script>
+/* === BODY KE PEHLE ADD KARO - purana kuch mat hatao === */
+/* Kaam: agar upar wali nakli PASTE_ key chal gayi hai to usko hata ke sahi wali connect.js se dobara chalao */
+(function(){
+  try{
+    if(sessionStorage.getItem("_fbFixed") === "1") return;
+
+    var app = null;
+    try{ app = (window.firebase && firebase.apps && firebase.apps.length) ? firebase.apps[0] : null; }catch(e){}
+    if(!app) return;
+
+    var key = "";
+    try{ key = (app.options && app.options.apiKey) || ""; }catch(e){}
+    var isNakli = !key || key.indexOf("PASTE_") === 0 || key.indexOf("APNI_") === 0 || key.indexOf("PASTE_YOUR") !== -1;
+
+    if(!isNakli){
+      // Key sahi hai, kuch karne ki zaroorat nahi
+      return;
+    }
+
+    // Nakli wali chali hai - usko delete karo, phir sahi wali chalegi
+    sessionStorage.setItem("_fbFixed", "1");
+    app.delete().then(function(){
+      // connect.js ko dobara chalao taaki sahi key se init ho
+      var s = document.createElement("script");
+      s.src = "connect.js";
+      s.onload = function(){ setTimeout(function(){ location.reload(); }, 500); };
+      s.onerror = function(){ location.reload(); };
+      document.body.appendChild(s);
+    }).catch(function(){
+      location.reload();
+    });
+  }catch(e){}
+})();
+</script>
+
+  
 <script src="datetime-all.js"></script>
 
 </body>
