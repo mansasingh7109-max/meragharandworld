@@ -5472,8 +5472,76 @@ html, body{
 </style>
 
 
+
+
+
+
+
+<script>
+/* === LOADING FIX - sabse neeche paste karo === */
+(function(){
+  function fillNow(){
+    var n = document.getElementById("pfName");
+    var img2 = document.getElementById("pfPhotoImg2");
+    var icon2 = document.getElementById("pfGenderIcon2");
+
+    // 1. Naam - pehle local se, turant
+    var nm = "";
+    var pt = "";
+    try{
+      var c = JSON.parse(localStorage.getItem("customer_profile")||"{}");
+      nm = c.profileName || c.name || "";
+      pt = c.profilePhoto || c.photo || "";
+    }catch(e){}
+    try{
+      var m = JSON.parse(localStorage.getItem("my_profile")||"{}");
+      if(!nm) nm = m.name || "";
+      if(!pt) pt = m.photo || "";
+    }catch(e){}
+    try{
+      var l = JSON.parse(localStorage.getItem("customer_login")||"{}");
+      if(!nm) nm = l.name || "";
+    }catch(e){}
+    if(!nm) nm = localStorage.getItem("customer_name") || "";
+
+    if(n && nm){
+      n.textContent = nm;
+    } else if(n && n.textContent.indexOf("Loading")!==-1){
+      n.textContent = "Naam nahi mila - dobara Login karo";
+      n.style.color = "#999";
+      n.style.fontSize = "14px";
+    }
+
+    // 2. Photo - khaali ho to broken icon mat dikhao, 👩 dikhao
+    if(img2){
+      if(pt && pt.length > 10){
+        img2.src = pt;
+        img2.style.display = "block";
+        if(icon2) icon2.style.display = "none";
+      } else {
+        img2.removeAttribute("src");
+        img2.style.display = "none";
+        if(icon2){
+          icon2.style.display = "flex";
+          icon2.style.visibility = "visible";
+        }
+      }
+    }
+  }
+
+  fillNow();
+  setTimeout(fillNow, 1000);
+  setTimeout(fillNow, 3000);
+})();
+</script>
+
+
+
+  
 <script src="header-photo-sync.js"></script>
 
+
+  
   
 </body>
 </html>
