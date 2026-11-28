@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="hi"><head>
-
+<link rel="stylesheet" href="profile-box-style.css">
 <script>
 /* ===== DATA LOCK - isko sabse upar rakho ===== */
 </script>
@@ -17,6 +17,220 @@
 
 
 
+
+
+
+
+
+/* ===== profile-box-style.css - 1 PHOTO BOX - HEADER ME RIGHT ME ===== */
+/* Size yahan se badlo */
+
+:root{
+  --photo-size: 78px;   /* Photo size - 60px chhoti, 100px badi */
+  --name-size: 22px;    /* Naam size - 18px chhota, 26px bada */
+}
+
+/* ===== 1. DUPLICATE PHOTO BOX - bilkul band ===== */
+#pfPhotoBox{
+  display: none !important;
+}
+
+/* ===== 2. PROFILE BOX ko header banao - photo right me aane ke liye ===== */
+#profileBox,
+.pf-box,
+#pfBox{
+  position: relative !important;
+  padding-right: calc(var(--photo-size) + 24px) !important;
+}
+
+/* ===== 3. EK HI PHOTO BOX - upar header me RIGHT me ===== */
+#pfPhotoBox2{
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  left: auto !important;
+  bottom: auto !important;
+  width: var(--photo-size) !important;
+  height: var(--photo-size) !important;
+  min-width: var(--photo-size) !important;
+  min-height: var(--photo-size) !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  /* Stylish - pink + golden border */
+  border: 3px solid #ff5e8a !important;
+  outline: 2px solid #ffd700 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 4px 14px rgba(255,94,138,0.45), 0 0 0 4px #fff !important;
+  background: #ffeef3 !important;
+  z-index: 5 !important;
+}
+
+/* Photo poori, kati hui nahi */
+#pfPhotoBox2 img,
+#pfPhotoImg2{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 50% !important;
+}
+
+/* 👩 placeholder - hamesha gayab */
+#pfPhotoBox2 span{
+  display: none !important;
+}
+
+/* Camera icon - photo ke corner me chhota */
+#pfPhotoBox2 label,
+#pfPhotoBox2 button{
+  display: flex !important;
+  position: absolute !important;
+  right: -2px !important;
+  bottom: -2px !important;
+  top: auto !important;
+  left: auto !important;
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 12px !important;
+  align-items: right !important;
+  justify-content: right !important;
+  background: #fff !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.3) !important;
+  z-index: 6 !important;
+}
+
+/* ===== 4. NAAM - photo ke neeche nahi, left me saaf ===== */
+#pfName{
+  font-size: var(--name-size) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  background: linear-gradient(90deg, #ff2e7e, #7b2eff) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  margin: 0 !important;
+  padding-right: 0 !important;
+  text-align: left !important;
+  line-height: 1.2 !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+#pfPhone{
+  font-size: 13px !important;
+  color: #666 !important;
+  margin-top: 4px !important;
+  text-align: left !important;
+}
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+   
+
+/* ===== profile-box-style.css - SIZE TUM KHUD BADLO ===== */
+/* Yahan sirf number badlo, neeche kuch mat chhedo */
+
+:root{
+  --photo-size: 78px;   /* Photo kitni badi - 60px chhoti, 100px badi */
+  --name-size: 22px;    /* Manisha naam kitna bada - 18px chhota, 26px bada */
+  --box-gap: 30px;      /* Photo aur naam ke beech gap */
+}
+
+/* ===== 1. PHOTO BOX - stylish gol + golden border ===== */
+#pfPhotoBox2{
+  width: var(--photo-size) !important;
+  height: var(--photo-size) !important;
+  min-width: var(--photo-size) !important;
+  min-height: var(--photo-size) !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  /* Stylish border - pink to golden */
+  border: 3px solid #ff5e8a !important;
+  outline: 2px solid #ffd700 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 4px 14px rgba(255,94,138,0.45), 0 0 0 4px #fff !important;
+  background: #ffeef3 !important;
+}
+
+/* Photo ke andar wali photo - poori, kati hui nahi */
+#pfPhotoBox2 img,
+#pfPhotoImg2{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 50% !important;
+}
+
+/* Photo ke upar wala 👩 placeholder - hamesha gayab */
+#pfPhotoBox2 span:not(:has(img)){
+  display: none !important;
+}
+
+/* Camera icon - chhota, corner me */
+#pfPhotoBox2 label,
+#pfPhotoBox2 button{
+  position: absolute !important;
+  right: -2px !important;
+  bottom: -2px !important;
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 12px !important;
+  display: flex !important;
+  align-items: right !important;
+  justify-content: right !important;
+  background: #fff !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.3) !important;
+  z-index: 5 !important;
+}
+
+/* ===== 2. NAAM - stylish ===== */
+#pfName{
+  font-size: var(--name-size) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  /* Pink to purple stylish naam */
+  background: linear-gradient(90deg, #ff2e7e, #7b2eff) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
+
+/* Naam ke neeche phone - saaf */
+#pfPhone{
+  font-size: 13px !important;
+  color: #666 !important;
+  margin-top: 4px !important;
+}
+
+/* ===== 3. PROFILE BOX - thoda stylish ===== */
+#pfPhotoBox2{
+  margin-bottom: var(--box-gap) !important;
+}
+
+
+
+
+   
 
 /* ===== Stylish All Friends Button ===== */
 .btn-all-stylish{
@@ -116,6 +330,49 @@ flex:none !important;
    
 /* Visitor ho to Kaun dekhega wali patti kabhi nahi dikhegi */
 body.visitor-mode #profileBtns{ display:none !important; }
+
+
+
+
+
+
+
+/* PAGE CENTER FIX - purana code delete mat karna, ye sirf upar se fix karega */
+*{box-sizing:border-box!important}
+html,body{width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;overflow-x:hidden!important}
+body{position:relative;left:0!important;right:0!important}
+
+/* saare bade box screen ke andar rahenge, center me */
+div,section,header,footer,main{
+  max-width:100%!important;
+}
+
+/* jo bhi box 100% se bahar ja raha hai usko roko */
+img,video,iframe,table{
+  max-width:100%!important;height:auto;
+}
+
+/* lambi line / banner text bahar na jaye */
+div,section,p,h1,h2,h3,span,b{
+  overflow-wrap:break-word!important;word-break:break-word!important;
+}
+
+/* upar wale Friends/Profile/Edit/Album/Timeline buttons ek line me, bahar na jayen */
+body > div:first-child,header{
+  flex-wrap:wrap!important;
+}
+
+/* All Friends / Logout / Preview wale bade button */
+button{
+  max-width:100%!important;
+}
+
+/* World Friends / FRIENDS wala hara-brown box */
+[style*="margin-left"],[style*="margin-right"]{
+  margin-left:0!important;margin-right:0!important;
+}
+
+   
 </style>
 <script>
 /* FINAL VISITOR FIX - Kaun dekhega patti hamesha chhupi rahegi */
@@ -445,9 +702,18 @@ body{
 
 
     
+
+
+
+
+
+
+
     
 </style><meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
   
 <title>mera ghar and world</title>
 
@@ -609,10 +875,42 @@ body{background:#fff8f0;color:#333}
 
 
 #pfFriendList{ display:block !important; max-height:200px; overflow-y:auto; }
+
+
+
+
+/* Khaali photo - toota icon kabhi mat dikhao */
+#headerPhotoImg[src=""],
+#headerPhotoImg:not([src]){
+  display: none !important;
+}
+#headerPhotoEmoji{
+  display: block !important;
+  visibility: visible !important;
+}  
+
+#headerPhotoBox{
+  width: 200px !important;
+  height: 200px !important;
+}
+
+
+
+/* Header lock - teda-medha motion band */
+body{ overflow-x:hidden !important; }
+#headerPhotoBox{ flex-shrink:0 !important; flex-grow:0 !important; transform:none !important; }
+
+
+
+
+
+
+
+  
 </style></head>
   
 
-
+<body style="overflow-x:hidden;">
 
 
   
@@ -632,14 +930,35 @@ body{background:#fff8f0;color:#333}
 <a href="#" onclick="return checkLogin('album.html')" style="background:#9C27B0;color:#fff;text-decoration:none;font-weight:bold;padding:10px 16px;border-radius:20px;font-size:14px;">📸 Album</a>
 <a href="#" onclick="return checkLogin('timedatalist.html')" style="background:#E91E63;color:#fff;text-decoration:none;font-weight:bold;padding:10px 16px;border-radius:20px;font-size:14px;">📅 Timeline</a>
 </div>
-<div style="background:#e65100;padding:10px;text-align:center;">
-<b style="color:#FF9800;font-size:18px;">📩 </b>
-</div>   
+  
 
+
+
+<div style="background:#e65100;padding:10px;display:flex;align-items:center;justify-content:center;gap:10px;overflow:hidden;flex-shrink:0;">
+
+
+  
+<b style="color:#FF9800;font-size:18px;"></b>
+<div id="headerPhotoBox" class="pos-center" style="width:100px;height:100px;min-width:100px;border-radius:50%;overflow:hidden;border:2px solid #fff;background:#ffeef3;display:flex;align-items:right;justify-content:center;">
+
+
+<img id="headerPhotoImg" style="position:absolute;top:0;left:0;width:50%;height:50%;object-fit:cover;object-position:right center;display:none;">
+
+  
+
+
+  
+<span id="headerPhotoEmoji" style="font-size:100px;display:block;position:right">👩</span>
+</div>
+</div></html>
   
   
 <div class="sec" id="reqSec">
-<h2>📩 </h2>
+
+
+
+
+  
 <div id="reqList"></div>
 <!-- ===== NOTIFICATIONS LIST - notifications.js isko khud bharega ===== -->
 <div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:12px;padding:10px;margin:0 0 8px;">
@@ -698,6 +1017,33 @@ body{background:#fff8f0;color:#333}
   animation:none !important;
   transition:none !important;
 }  
+
+
+/* WEBSITE SCREEN LOCK - screen hilegi nahi, teda-medha band */
+html, body{
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+*{
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+body{
+  position: relative !important;
+  transform: none !important;
+}
+/* Red patti - screen se bahar nahi jayegi */
+#headerPhotoBox{
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  transform: none !important;
+}
+
+  
 </style>
   
 
@@ -2705,10 +3051,9 @@ else{ alert("Logout ho gaya! 👋"); location.reload(); }
 
 
 <div id="profileBox">
-<!-- 1. UPAR WALI PHOTO - top right corner -->
-<div class="pfPhoto" id="pfPhotoBox" style="background:#ffe0b2;display:flex;align-items:center;justify-content:center;font-size:44px"><span id="pfGenderIcon">👩</span><img id="pfPhotoImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover" onload="this.style.display='block'"></div>
-  <button onclick="document.getElementById('pfPhotoFile').click()" style="position:absolute;top:68px;right:16px;background:#e65100;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer;z-index:5">📸</button>
+  
 
+  
   <input type="file" id="pfPhotoFile" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" onchange="pfUploadPhoto(this)">
 
 <!-- 2. USER NAME + USKE PAAS WALI PHOTO -->
@@ -4837,6 +5182,297 @@ document.addEventListener("click", function(e){
 
 
 <script src="friends-popup.js"></script>
+
+<script src="profile-box-fix.js"></script>
+
+<script>
+/* ===== PROFILE BOX - LAST FIX - sabse neeche paste karo ===== */
+(function(){
+  function myUid(){
+    try{ return localStorage.getItem("auth_uid") || localStorage.getItem("MY_OWN_UID") || ""; }catch(e){ return ""; }
+  }
+  function myNameLocal(){
+    try{
+      var c = JSON.parse(localStorage.getItem("customer_profile")||"{}");
+      return c.profileName || c.name || "";
+    }catch(e){ return ""; }
+  }
+  function myPhotoLocal(){
+    try{
+      var c = JSON.parse(localStorage.getItem("customer_profile")||"{}");
+      var m = JSON.parse(localStorage.getItem("my_profile")||"{}");
+      return c.profilePhoto || m.photo || "";
+    }catch(e){ return ""; }
+  }
+
+  /* 1. NAAM + PHOTO - Loading hatayo */
+  function fillNamePhoto(){
+    var n = document.getElementById("pfName");
+    var p1 = document.getElementById("pfPhotoImg");
+    var p2 = document.getElementById("pfPhotoImg2");
+    var ph = document.getElementById("pfPhone");
+    var nm = myNameLocal();
+    var pt = myPhotoLocal();
+    if(n && nm && n.textContent.indexOf("Loading")!==-1) n.textContent = nm;
+    if(n && nm && n.textContent.trim()==="") n.textContent = nm;
+    if(pt){
+      if(p1){ p1.src = pt; p1.style.display = "block"; }
+      if(p2){ p2.src = pt; p2.style.display = "block"; }
+    }
+    try{
+      var c = JSON.parse(localStorage.getItem("customer_profile")||"{}");
+      var phone = c.profilePhone || c.phone || localStorage.getItem("customer_phone") || "";
+      if(ph && phone && ph.textContent.trim()==="📞") ph.textContent = "📞 " + phone;
+    }catch(e){}
+    var uid = myUid();
+    if(!uid || !window._fbDb) return;
+    window._fbDb.ref("customer_profiles/"+uid).once("value").then(function(s){
+      var d = s.val()||{};
+      var n2 = d.profileName || d.name || "";
+      var pt2 = d.profilePhoto || d.photo || "";
+      if(n && n2) n.textContent = n2;
+      if(pt2){
+        if(p1){ p1.src = pt2; p1.style.display = "block"; }
+        if(p2){ p2.src = pt2; p2.style.display = "block"; }
+      }
+      try{
+        var old = JSON.parse(localStorage.getItem("customer_profile")||"{}");
+        if(n2) old.profileName = n2;
+        if(pt2) old.profilePhoto = pt2;
+        localStorage.setItem("customer_profile", JSON.stringify(old));
+      }catch(e){}
+    });
+  }
+
+  /* 2. LIST - Mere Dost wali hi list */
+  window.pfLoadFriends = function(){
+    var box = document.getElementById("pfFriendList");
+    if(!box) return;
+    box.style.display = "block";
+    try{ box.style.setProperty("display","block","important"); }catch(e){}
+    var uid = myUid();
+    if(!window._fbDb){ box.innerHTML = '<div style="text-align:center;color:#999;padding:10px">⏳ Dost load ho rahe hain...</div>'; return; }
+    window._fbDb.ref("customer_profiles").once("value").then(function(s){
+      var all = s.val()||{};
+      return window._fbDb.ref("friends/"+uid).once("value").then(function(snap){
+        var ids = Object.keys(snap.val()||{});
+        var list = [];
+        ids.forEach(function(id){
+          if(id===uid) return;
+          var P = all[id]||{};
+          var nm = P.profileName || P.name || "";
+          if(nm) list.push({id:id, name:nm, photo:P.profilePhoto||P.photo||""});
+        });
+        if(!list.length){
+          Object.keys(all).forEach(function(id){
+            if(id===uid) return;
+            var P2 = all[id]||{};
+            var nm2 = P2.profileName || P2.name || "";
+            if(nm2) list.push({id:id, name:nm2, photo:P2.profilePhoto||P2.photo||""});
+          });
+        }
+        if(!list.length){ box.innerHTML = '<div style="text-align:center;color:#999;padding:10px">Abhi koi dost nahi hai</div>'; return; }
+        var seen = {}, h = "";
+        list.forEach(function(o){
+          if(seen[o.name.toLowerCase()]) return;
+          seen[o.name.toLowerCase()] = 1;
+          var pic = (o.photo && (o.photo.indexOf("http")===0 || o.photo.indexOf("data:")===0)) ? '<img src="'+o.photo+'" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">' : '<span style="font-size:22px;">👤</span>';
+          h += '<label style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #f0dede;cursor:pointer;"><input type="checkbox" class="pfFrChk" value="'+o.id+'" data-name="'+o.name+'" style="width:18px;height:18px;">'+pic+'<b style="flex:1;font-size:14px;">'+o.name+'</b></label>';
+        });
+        box.innerHTML = h;
+      });
+    });
+  };
+
+  /* 3. ALL FRIENDS - popup nahi, list me hi tick */
+  window.pfSelectAll = function(){
+    var box = document.getElementById("pfFriendList");
+    if(box){ box.style.display = "block"; try{ box.style.setProperty("display","block","important"); }catch(e){} }
+    window.pfLoadFriends();
+    setTimeout(function(){ document.querySelectorAll("#pfFriendList .pfFrChk").forEach(function(c){ c.checked = true; }); }, 600);
+    setTimeout(function(){ document.querySelectorAll("#pfFriendList .pfFrChk").forEach(function(c){ c.checked = true; }); }, 1500);
+  };
+  window.openFrPopup = window.pfSelectAll;
+
+  /* 4. CLEAR - sirf isi list ke tick hatayega */
+  window.pfClearAll = function(){
+    document.querySelectorAll("#pfFriendList .pfFrChk").forEach(function(c){ c.checked = false; });
+  };
+
+  /* 5. INBOX ME BHEJO - chat-box wala format, slash wala rasta */
+  window.pfSendMsg = function(){
+    var t = document.getElementById("pfMsgText2");
+    var txt = t ? (t.value||"") : "";
+    if(!txt.trim()){ alert("Pehle message likho!"); return; }
+    var sel = [];
+    document.querySelectorAll("#pfFriendList .pfFrChk:checked").forEach(function(c){ sel.push({id:c.value, name:c.getAttribute("data-name")||c.value}); });
+    if(!sel.length){ alert("Pehle All Friends dabao!"); return; }
+    var uid = myUid();
+    if(!uid || !window._fbDb){ alert("Login / Firebase nahi mila!"); return; }
+    var myName = myNameLocal() || "Me";
+    var ts = Date.now();
+    sel.forEach(function(o, i){
+      var id = "m_"+ts+"_"+i+"_"+Math.floor(Math.random()*1000);
+      var msg = {id:id, me:true, type:"text", text:txt, time:new Date(ts).toLocaleString(), ts:ts, fromUid:uid, fromName:myName, toUid:o.id, toName:o.name};
+      window._fbDb.ref("chats/"+uid+"/"+o.id+"/"+id).set(msg);
+      window._fbDb.ref("chats/"+o.id+"/"+uid+"/"+id).set(msg);
+    });
+    alert("✅ "+sel.length+" dost ko bhej diya!");
+    if(t) t.value = "";
+  };
+
+  /* 6. PHOTO UPLOAD - profile box se upload hote hi save */
+  window.pfUploadPhoto = function(input){
+    var f = input.files[0]; if(!f) return;
+    var r = new FileReader();
+    r.onload = function(e){
+      var photo = e.target.result;
+      var p1 = document.getElementById("pfPhotoImg");
+      var p2 = document.getElementById("pfPhotoImg2");
+      if(p1){ p1.src = photo; p1.style.display = "block"; }
+      if(p2){ p2.src = photo; p2.style.display = "block"; }
+      try{
+        var c = JSON.parse(localStorage.getItem("customer_profile")||"{}");
+        c.profilePhoto = photo; localStorage.setItem("customer_profile", JSON.stringify(c));
+        var m = JSON.parse(localStorage.getItem("my_profile")||"{}");
+        m.photo = photo; localStorage.setItem("my_profile", JSON.stringify(m));
+      }catch(e){}
+      var uid = myUid();
+      if(uid && window._fbDb) window._fbDb.ref("customer_profiles/"+uid).update({profilePhoto:photo});
+      alert("Photo badal gayi! ✅");
+    };
+    r.readAsDataURL(f);
+  };
+
+  /* 7. BUTTONS ko pakka pakdo - purane onclick pe bharosa mat karo */
+  function bindBtns(){
+    document.querySelectorAll("button").forEach(function(b){
+      var txt = (b.textContent||"").trim();
+      if(txt.indexOf("All Friends")!==-1 && txt.indexOf("Clear")===-1){ b.onclick = function(e){ if(e) e.preventDefault(); window.pfSelectAll(); }; }
+      if(txt.indexOf("Clear")!==-1){ b.onclick = function(e){ if(e) e.preventDefault(); window.pfClearAll(); }; }
+      if(txt.indexOf("Inbox Me Bhejo")!==-1){ b.onclick = function(e){ if(e) e.preventDefault(); window.pfSendMsg(); }; }
+    });
+  }
+
+  fillNamePhoto();
+  window.pfLoadFriends();
+  bindBtns();
+  setTimeout(fillNamePhoto, 1200);
+  setTimeout(function(){ window.pfLoadFriends(); bindBtns(); }, 1200);
+  setTimeout(bindBtns, 3000);
+})();
+</script>
+
+
+
+<script>
+  /* HEADER ICON - photo na ho to bhi 👩 dikhe */
+  function forceHeaderIcon(){
+    var box = document.getElementById("headerPhotoBox");
+    if(box){
+      box.style.display = "flex";
+      box.style.visibility = "visible";
+      box.style.opacity = "1";
+    }
+    var img = document.getElementById("headerPhotoImg");
+    var emoji = document.getElementById("headerPhotoEmoji");
+    // Photo hai to photo, nahi hai to 👩
+    if(img && img.src && img.src.length > 10){
+      img.style.display = "block";
+      if(emoji) emoji.style.display = "none";
+    } else {
+      if(img) img.style.display = "none";
+      if(emoji){
+        emoji.style.display = "block";
+        emoji.style.visibility = "visible";
+      }
+    }
+    // Neeche wali photo se bhi copy karo
+    var main = document.getElementById("cePhotoPrev");
+    if(main && main.src && main.src.length > 10 && img){
+      img.src = main.src;
+      img.style.display = "block";
+      if(emoji) emoji.style.display = "none";
+    }
+  }
+  forceHeaderIcon();
+  setTimeout(forceHeaderIcon, 1500);
+  setTimeout(forceHeaderIcon, 3000);
+
+
+
+</script>
+
+
+
+
+
+
+<style>
+/* === RIGHT KATNA BAND - FINAL - sabse neeche paste karo === */
+
+/* 1. FRIENDS green box - 120% ko 100% karo */
+.acc-green-body{
+  display:block !important;
+  width:100% !important;
+}
+.acc-green-left{
+  flex:none !important;
+  max-width:100% !important;
+  width:100% !important;
+  padding:4px 8px 8px !important;
+}
+.acc-white-box{
+  width:100% !important;
+  max-width:100% !important;
+  margin-top:8px !important;
+}
+.acc-green{
+  overflow:hidden !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
+
+/* 2. Red patti wali photo - 200px se 100px */
+#headerPhotoBox{
+  width:100px !important;
+  height:100px !important;
+  min-width:100px !important;
+  flex-shrink:0 !important;
+}
+#headerPhotoEmoji{
+  font-size:52px !important;
+}
+
+/* 3. Title tedha nahi hoga, right nahi jayega */
+#siteTitleHead{
+  transform:none !important;
+  width:auto !important;
+  max-width:calc(100% - 24px) !important;
+  margin:0 12px !important;
+  padding:18px 12px !important;
+  box-sizing:border-box !important;
+  overflow-wrap:break-word !important;
+}
+
+/* 4. Profile box bahar na jaye */
+#profileBox{
+  margin-left:10px !important;
+  margin-right:10px !important;
+  width:auto !important;
+  max-width:calc(100% - 20px) !important;
+}
+
+/* 5. Page ka last lock */
+html, body{
+  overflow-x:hidden !important;
+  width:100% !important;
+  max-width:100% !important;
+}
+</style>
+
+
+<script src="header-photo-sync.js"></script>
 
   
 </body>
