@@ -3075,16 +3075,30 @@ else{ alert("Logout ho gaya! 👋"); location.reload(); }
 
  
 
-<div class="pfPhone" id="pfPhone" style="display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;margin:8px 10px 2px 10px;">
+<div class="
   <span style="flex:1;height:1px;background:linear-gradient(to right,transparent,#ff9933,#ff9933);display:block;"></span>
-  <span style="font-size:13px;font-weight:700;letter-spacing:2px;color:#8a4b00;white-space:nowrap;text-transform:uppercase;text-shadow:0 1px 0 #fff;">✦ Mera Ghar And World ✦<br><span style="font-size:11px;letter-spacing:4px;color:#c27a1a;">— PROFILE —</span></span>
+  <span style="font-size:13px;font-weight:700;letter-spacing:2px;color:#8a4b00;white-space:nowrap;text-transform:uppercase;text-shadow:0 1px 0 #fff;">✦ PROFILE ✦<br><span style="font-size:11px;letter-spacing:4px;color:#c27a1a;">———————— </span></span>
   <span style="flex:1;height:1px;background:linear-gradient(to left,transparent,#ff9933,#ff9933);display:block;"></span>
 </div>
 
 
+<div id="pfTitle" style="display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;margin:8px 10px 2px 10px;">
+  <span style="flex:1;height:1px;background:linear-gradient(to right,transparent,#ff9933,#ff9933);display:block;"></span>
+  <span style="font-size:13px;font-weight:700;letter-spacing:2px;color:#8a4b00;white-space:nowrap;text-transform:uppercase;">✦ Mera Ghar And World ✦<br><span style="font-size:11px;letter-spacing:4px;color:#c27a1a;"></span></span>
+  <span style="flex:1;height:1px;background:linear-gradient(to left,transparent,#ff9933,#ff9933);display:block;"></span>
+</div>
+<div class="pfPhone" id="pfPhone" style="text-align:center"></div>
+
+
+  
+
+
+
+  
+
   
   
-<div class="pfStatus" style="text-align:center"><span>🟢 Hello world</span></div>
+<div class="pfStatus" style="text-align:center"><span>🟢 Hello World</span></div>
   
 
   <div class="pfBadges">
@@ -5552,7 +5566,22 @@ html, body{
 
 
 
-  
+<script>
+/* Phone se 📱 symbol hatao - sirf number dikhega */
+(function(){
+  function fixPhone(){
+    var p = document.getElementById("pfPhone");
+    if(!p) return;
+    var t = p.textContent || "";
+    t = t.replace(/📱/g,"").replace(/📞/g,"").trim();
+    if(t && t !== p.textContent) p.textContent = t;
+  }
+  setTimeout(fixPhone, 500);
+  setTimeout(fixPhone, 1500);
+  setTimeout(fixPhone, 3000);
+  setInterval(fixPhone, 4000);
+})();
+</script>  
 </body>
 </html>
   
