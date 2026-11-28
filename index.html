@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="hi"><head>
 <link rel="stylesheet" href="profile-box-style.css">
+<link rel="stylesheet" href="name-photo-style.css">
+  
 <script>
 /* ===== DATA LOCK - isko sabse upar rakho ===== */
 </script>
@@ -372,7 +374,75 @@ button{
   margin-left:0!important;margin-right:0!important;
 }
 
+
+
+
+
+
+
    
+
+
+
+/* SIRF NAME + PHOTO STYLE - aur kuch nahi chhedega */
+
+/* Naam CENTER + Photo RIGHT + Gap */
+#pfNewTop{
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:18px !important; /* Gap yahan se badlo - 12px kam, 28px zyada */
+  width:100% !important;
+  box-sizing:border-box !important;
+}
+
+#pfNewLeft{
+  flex:1 !important;
+  text-align:center !important;
+  min-width:0 !important;
+}
+
+/* Naam */
+#pfName{
+  display:block !important;
+  text-align:center !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  width:100% !important;
+  font-size:26px !important;
+  font-weight:bold !important;
+}
+
+/* Username / Phone line - Naam ke neeche center */
+#pfUserName, #pfPhone{
+  display:block !important;
+  text-align:center !important;
+  margin:2px auto 0 !important;
+  width:100% !important;
+}
+
+/* Photo Box - RIGHT */
+#pfPhotoBox2, #pfPhotoBox, #headerPhotoBox{
+  position:relative !important;
+  right:auto !important;
+  top:auto !important;
+  transform:none !important;
+  margin:0 0 0 auto !important;
+  flex-shrink:0 !important;
+  width:84px !important; /* Photo size yahan se - 70px chhota, 100px bada */
+  height:84px !important;
+  border-radius:50% !important;
+  overflow:hidden !important;
+  display:flex !important;
+}
+
+#pfPhotoBox2 img, #pfPhotoBox img, #headerPhotoBox img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  display:block !important;
+}   
 </style>
 <script>
 /* FINAL VISITOR FIX - Kaun dekhega patti hamesha chhupi rahegi */
